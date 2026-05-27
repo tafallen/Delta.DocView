@@ -1,0 +1,12 @@
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\bin\Debug\net8.0\Delta.DocView.Shared.deps.json
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\bin\Debug\net8.0\Delta.DocView.Shared.dll
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\bin\Debug\net8.0\Delta.DocView.Shared.pdb
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.GeneratedMSBuildEditorConfig.editorconfig
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.AssemblyInfoInputs.cache
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.AssemblyInfo.cs
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.csproj.CoreCompileInputs.cache
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.sourcelink.json
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.dll
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\refint\Delta.DocView.Shared.dll
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\Delta.DocView.Shared.pdb
+C:\repos\Delta.DocView\.worktrees\feature\scaffold-us01\src\Delta.DocView.Shared\obj\Debug\net8.0\ref\Delta.DocView.Shared.dll

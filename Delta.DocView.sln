@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{51CC6A4C-C662-4EEE-B9D8-3B278994D481}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delta.DocView.Shared", "src\Delta.DocView.Shared\Delta.DocView.Shared.csproj", "{9D7AC32C-B1E0-42E4-9FD0-D139A4740268}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delta.DocView.Server", "src\Delta.DocView.Server\Delta.DocView.Server.csproj", "{B6AE9FB8-DAA3-4400-B5EF-B8E8FAD7C751}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delta.DocView.Client", "src\Delta.DocView.Client\Delta.DocView.Client.csproj", "{DE487DD1-0637-43C3-A414-1E61C3CE6C19}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{860AC994-05EA-47B9-9124-3C011A986D06}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Delta.DocView.Tests", "tests\Delta.DocView.Tests\Delta.DocView.Tests.csproj", "{F7DBA3B9-95DA-4A87-BC68-962F05499C82}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9D7AC32C-B1E0-42E4-9FD0-D139A4740268}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9D7AC32C-B1E0-42E4-9FD0-D139A4740268}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9D7AC32C-B1E0-42E4-9FD0-D139A4740268}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9D7AC32C-B1E0-42E4-9FD0-D139A4740268}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6AE9FB8-DAA3-4400-B5EF-B8E8FAD7C751}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6AE9FB8-DAA3-4400-B5EF-B8E8FAD7C751}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6AE9FB8-DAA3-4400-B5EF-B8E8FAD7C751}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6AE9FB8-DAA3-4400-B5EF-B8E8FAD7C751}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DE487DD1-0637-43C3-A414-1E61C3CE6C19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DE487DD1-0637-43C3-A414-1E61C3CE6C19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DE487DD1-0637-43C3-A414-1E61C3CE6C19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DE487DD1-0637-43C3-A414-1E61C3CE6C19}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F7DBA3B9-95DA-4A87-BC68-962F05499C82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7DBA3B9-95DA-4A87-BC68-962F05499C82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7DBA3B9-95DA-4A87-BC68-962F05499C82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7DBA3B9-95DA-4A87-BC68-962F05499C82}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{9D7AC32C-B1E0-42E4-9FD0-D139A4740268} = {51CC6A4C-C662-4EEE-B9D8-3B278994D481}
+		{B6AE9FB8-DAA3-4400-B5EF-B8E8FAD7C751} = {51CC6A4C-C662-4EEE-B9D8-3B278994D481}
+		{DE487DD1-0637-43C3-A414-1E61C3CE6C19} = {51CC6A4C-C662-4EEE-B9D8-3B278994D481}
+		{F7DBA3B9-95DA-4A87-BC68-962F05499C82} = {860AC994-05EA-47B9-9124-3C011A986D06}
+	EndGlobalSection
+EndGlobal

@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\Delta.DocView.Client.props" />
-</Project>

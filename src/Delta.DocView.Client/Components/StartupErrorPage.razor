@@ -1,0 +1,17 @@
+<div class="startup-error">
+    <div class="startup-error-icon">⚠</div>
+    <h1 class="startup-error-title">Unable to load Delta · Step Library</h1>
+    <p class="startup-error-desc">
+        The step library could not be loaded. Fix the issue below and restart the container.
+    </p>
+    <pre class="startup-error-detail">@ErrorMessage</pre>
+    <p class="startup-error-hint">
+        Set the <code>DOCVIEW_LIBRARY_PATH</code> environment variable to the absolute path
+        of a valid <code>step-library.v1.json</code> file.
+    </p>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string ErrorMessage { get; set; } = "";
+}

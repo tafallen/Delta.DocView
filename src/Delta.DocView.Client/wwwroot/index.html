@@ -1,32 +1,44 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Delta.DocView.Client</title>
+    <title>Delta · Step Library</title>
     <base href="/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
     <link rel="stylesheet" href="css/app.css" />
-    <link rel="icon" type="image/png" href="favicon.png" />
-    <link href="Delta.DocView.Client.styles.css" rel="stylesheet" />
+    <style>
+        .loading-screen {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; height: 100vh; gap: 16px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #ffffff; color: #1e293b;
+        }
+        .loading-brand { display: flex; align-items: center; gap: 10px; }
+        .loading-title { font-size: 1.1rem; font-weight: 600; }
+        .loading-sub { font-size: 0.85rem; color: #64748b; margin: 0; }
+        .loading-spinner {
+            width: 28px; height: 28px; border: 3px solid #e2e8f0;
+            border-top-color: #0d9488; border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
 </head>
-
 <body>
     <div id="app">
-        <svg class="loading-progress">
-            <circle r="40%" cx="50%" cy="50%" />
-            <circle r="40%" cx="50%" cy="50%" />
-        </svg>
-        <div class="loading-progress-text"></div>
+        <div class="loading-screen">
+            <div class="loading-brand">
+                <svg width="28" height="28" viewBox="0 0 22 22" fill="none">
+                    <rect x="1.5" y="1.5" width="19" height="19" rx="4.5" fill="#0d9488"/>
+                    <path d="M6 8h7M6 11h10M6 14h5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+                </svg>
+                <span class="loading-title">Delta · Step Library</span>
+            </div>
+            <div class="loading-spinner"></div>
+            <p class="loading-sub">Loading…</p>
+        </div>
     </div>
 
-    <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
-
 </html>

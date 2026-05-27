@@ -20,8 +20,8 @@ public sealed class LibraryController : ControllerBase
     [HttpGet]
     public IActionResult Get()
     {
-        if (_error.HasError)
-            return StatusCode(503, new { error = _error.ErrorMessage });
+        if (_error.HasError || !_store.IsLoaded)
+            return StatusCode(503, new { error = _error.ErrorMessage ?? "Library not loaded." });
 
         var response = new LibraryResponse(
             _store.Library!,

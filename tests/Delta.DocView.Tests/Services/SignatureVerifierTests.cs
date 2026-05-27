@@ -29,9 +29,45 @@ public class SignatureVerifierTests
     {
         var node = JsonNode.Parse(rawJson)!.AsObject();
         node.Remove("signature");
-        var canonical = node.ToJsonString(new JsonSerializerOptions { WriteIndented = false });
+        // Must use the same canonical form as SignatureVerifier: sorted keys, recursive
+        var canonical = Canonicalise(node);
         var hash = SHA256.HashData(Encoding.UTF8.GetBytes(canonical));
         return Convert.ToHexString(hash).ToLowerInvariant();
+    }
+
+    private static string Canonicalise(JsonNode node)
+    {
+        using var ms = new System.IO.MemoryStream();
+        using var writer = new System.Text.Json.Utf8JsonWriter(ms, new System.Text.Json.JsonWriterOptions { Indented = false });
+        WriteCanonical(writer, node);
+        writer.Flush();
+        return Encoding.UTF8.GetString(ms.ToArray());
+    }
+
+    private static void WriteCanonical(System.Text.Json.Utf8JsonWriter writer, JsonNode? node)
+    {
+        switch (node)
+        {
+            case JsonObject obj:
+                writer.WriteStartObject();
+                foreach (var kv in obj.OrderBy(p => p.Key, StringComparer.Ordinal))
+                {
+                    writer.WritePropertyName(kv.Key);
+                    WriteCanonical(writer, kv.Value);
+                }
+                writer.WriteEndObject();
+                break;
+            case JsonArray arr:
+                writer.WriteStartArray();
+                foreach (var item in arr)
+                    WriteCanonical(writer, item);
+                writer.WriteEndArray();
+                break;
+            default:
+                (node ?? JsonValue.Create<object?>(null))
+                    .WriteTo(writer, new JsonSerializerOptions());
+                break;
+        }
     }
 
     [Fact]
@@ -64,5 +100,30 @@ public class SignatureVerifierTests
         var result = SignatureVerifier.Verify(json);
 
         Assert.False(result);
+    }
+
+    [Fact]
+    public void Verify_PropertiesInDifferentOrder_StillReturnsTrue()
+    {
+        // Build canonical JSON, compute its digest, then present the same data
+        // with properties in a completely different order — verifier must still pass.
+        var canonical = BuildRawJson("placeholder");
+        var correctDigest = ComputeExpectedDigest(canonical);
+
+        // Reorder: put "signature" first and shuffle the other fields
+        var reordered = $$"""
+            {
+              "signature": { "algorithm": "SHA-256", "digest": "{{correctDigest}}" },
+              "steps": [],
+              "enriched": true,
+              "domains": [],
+              "generatorVersion": "1.0.0",
+              "generatedAt": "2026-01-01T00:00:00Z",
+              "version": "1.0.0",
+              "$schema": "https://delta.docgen/schema/v1"
+            }
+            """;
+
+        Assert.True(SignatureVerifier.Verify(reordered));
     }
 }

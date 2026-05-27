@@ -65,6 +65,44 @@ public class StartupLoaderTests
 
     // ── helpers ──────────────────────────────────────────────────────────────
 
+    private static string Canonicalise(System.Text.Json.Nodes.JsonNode node)
+    {
+        using var ms = new System.IO.MemoryStream();
+        using var writer = new System.Text.Json.Utf8JsonWriter(ms,
+            new System.Text.Json.JsonWriterOptions { Indented = false });
+        WriteCanonical(writer, node);
+        writer.Flush();
+        return System.Text.Encoding.UTF8.GetString(ms.ToArray());
+    }
+
+    private static void WriteCanonical(
+        System.Text.Json.Utf8JsonWriter writer,
+        System.Text.Json.Nodes.JsonNode? node)
+    {
+        switch (node)
+        {
+            case System.Text.Json.Nodes.JsonObject obj:
+                writer.WriteStartObject();
+                foreach (var kv in obj.OrderBy(p => p.Key, StringComparer.Ordinal))
+                {
+                    writer.WritePropertyName(kv.Key);
+                    WriteCanonical(writer, kv.Value);
+                }
+                writer.WriteEndObject();
+                break;
+            case System.Text.Json.Nodes.JsonArray arr:
+                writer.WriteStartArray();
+                foreach (var item in arr)
+                    WriteCanonical(writer, item);
+                writer.WriteEndArray();
+                break;
+            default:
+                (node ?? System.Text.Json.Nodes.JsonValue.Create<object?>(null))
+                    .WriteTo(writer, new System.Text.Json.JsonSerializerOptions());
+                break;
+        }
+    }
+
     private static (StartupError error, StepLibraryStore store) CreateDeps() =>
         (new StartupError(), new StepLibraryStore());
 
@@ -103,17 +141,12 @@ public class StartupLoaderTests
             }
             """;
 
-        // Compute digest over canonical form (body parsed then re-serialised without signature)
-        using var doc = System.Text.Json.JsonDocument.Parse(body);
-        using var ms = new System.IO.MemoryStream();
-        using var writer = new System.Text.Json.Utf8JsonWriter(ms);
-        writer.WriteStartObject();
-        foreach (var p in doc.RootElement.EnumerateObject())
-            p.WriteTo(writer);
-        writer.WriteEndObject();
-        writer.Flush();
+        // Compute digest using same canonical form as SignatureVerifier: sorted keys, recursive
+        var node = System.Text.Json.Nodes.JsonNode.Parse(body)!.AsObject();
+        var canonical = Canonicalise(node);
         var digest = Convert.ToHexString(
-            System.Security.Cryptography.SHA256.HashData(ms.ToArray())).ToLowerInvariant();
+            System.Security.Cryptography.SHA256.HashData(
+                System.Text.Encoding.UTF8.GetBytes(canonical))).ToLowerInvariant();
 
         return $$"""
             {

@@ -14,14 +14,15 @@ public sealed class StepLibraryValidator
             ?? throw new InvalidOperationException(
                 "Embedded resource 'step-library.v1.schema.json' not found. " +
                 "Verify the LogicalName in Delta.DocView.Server.csproj.");
-        _schema = JsonSchema.FromText(new StreamReader(stream).ReadToEnd());
+        using var reader = new StreamReader(stream);
+        _schema = JsonSchema.FromText(reader.ReadToEnd());
     }
 
     public ValidationResult Validate(string rawJson)
     {
-        var element = JsonDocument.Parse(rawJson).RootElement;
+        using var doc = JsonDocument.Parse(rawJson);
         var options = new EvaluationOptions { OutputFormat = OutputFormat.List };
-        var result = _schema.Evaluate(element, options);
+        var result = _schema.Evaluate(doc.RootElement, options);
 
         if (result.IsValid)
             return ValidationResult.Ok();

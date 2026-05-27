@@ -1,0 +1,12 @@
+{
+  "$schema": "https://delta.docgen/schema/v1/step-library.schema.json",
+  "generatedAt": "2026-01-01T00:00:00Z",
+  "generatorVersion": "1.0.0",
+  "enriched": true,
+  "domains": [],
+  "steps": [],
+  "signature": {
+    "algorithm": "SHA-256",
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

@@ -1,0 +1,22 @@
+@inject LibraryApiClient LibraryClient
+
+@if (LibraryClient.State == LoadingState.Loading)
+{
+    <LoadingScreen />
+}
+else if (LibraryClient.State == LoadingState.Error)
+{
+    <StartupErrorPage ErrorMessage="@(LibraryClient.ErrorMessage ?? "Unknown error.")" />
+}
+else
+{
+    @* Main app rendered in US-02 — placeholder for now *@
+    <p>Library loaded: @LibraryClient.State</p>
+}
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await LibraryClient.LoadAsync();
+    }
+}

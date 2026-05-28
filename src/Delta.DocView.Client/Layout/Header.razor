@@ -1,0 +1,44 @@
+@inject ClientStepLibraryStore Store
+@inject IJSRuntime JS
+
+<header class="app-header">
+    <div class="header-brand">
+        <svg width="28" height="28" viewBox="0 0 22 22" fill="none" aria-hidden="true">
+            <rect x="1.5" y="1.5" width="19" height="19" rx="4.5" fill="#0d9488"/>
+            <path d="M6 8h7M6 11h10M6 14h5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <div class="header-titles">
+            <span class="header-title">Delta · Step Library</span>
+            <span class="header-subtitle">@Store.Steps.Count steps · v@(Store.Version)</span>
+        </div>
+    </div>
+
+    <div class="header-search">
+        <input type="search" class="search-input"
+               placeholder="Search steps…"
+               aria-label="Search steps" />
+        <button class="btn-quickfind" title="Quick find (⌘K)" type="button">⌘K</button>
+    </div>
+
+    <div class="header-actions">
+        <button class="btn-icon" type="button"
+                title="Keyboard shortcuts" aria-label="Keyboard shortcuts">?</button>
+        <button class="btn-icon" type="button"
+                data-testid="dark-toggle"
+                title="Toggle dark mode" aria-label="Toggle dark mode"
+                @onclick="ToggleDarkAsync">
+            @(_isDark ? "☀" : "🌙")
+        </button>
+        <div class="avatar-chip" aria-label="User avatar">QA</div>
+    </div>
+</header>
+
+@code {
+    private bool _isDark;
+
+    private async Task ToggleDarkAsync()
+    {
+        _isDark = !_isDark;
+        await JS.InvokeVoidAsync("docview.setDark", _isDark);
+    }
+}

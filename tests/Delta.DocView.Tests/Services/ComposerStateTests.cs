@@ -146,6 +146,27 @@ public class ComposerStateTests
         Assert.False(state.IsOpen);
     }
 
+    [Fact]
+    public void FeatureText_ReturnsSameReferenceWhenUnchanged()
+    {
+        var (state, _) = Create();
+        state.AddStep(MakeStep("s1", "Given"));
+        var first  = state.FeatureText;
+        var second = state.FeatureText;
+        Assert.Same(first, second); // cached — same string instance
+    }
+
+    [Fact]
+    public void FeatureText_RecomputesAfterMutation()
+    {
+        var (state, _) = Create();
+        state.AddStep(MakeStep("s1", "Given"));
+        var before = state.FeatureText;
+        state.AddStep(MakeStep("s2", "When"));
+        var after = state.FeatureText;
+        Assert.NotEqual(before, after);
+    }
+
     private sealed class FakeKeyboardActions : IKeyboardActions
     {
         public event Action? OpenPaletteRequested;

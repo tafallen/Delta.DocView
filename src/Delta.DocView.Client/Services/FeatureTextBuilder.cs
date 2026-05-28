@@ -4,6 +4,12 @@ namespace Delta.DocView.Client.Services;
 
 public static class FeatureTextBuilder
 {
+    public static string GetKeyword(int index, IReadOnlyList<ComposerItem> items)
+    {
+        var type = items[index].Step.Type;
+        return index > 0 && items[index - 1].Step.Type == type ? "And" : type;
+    }
+
     public static string Build(string scenarioName, IReadOnlyList<ComposerItem> items)
     {
         if (items.Count == 0) return "";
@@ -16,9 +22,7 @@ public static class FeatureTextBuilder
 
         for (int i = 0; i < items.Count; i++)
         {
-            var type = items[i].Step.Type;
-            var keyword = i > 0 && items[i - 1].Step.Type == type ? "And" : type;
-            sb.AppendLine($"    {keyword} {items[i].Step.Pattern}");
+            sb.AppendLine($"    {GetKeyword(i, items)} {items[i].Step.Pattern}");
         }
 
         return sb.ToString().TrimEnd();

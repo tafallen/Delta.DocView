@@ -74,4 +74,25 @@ public class FeatureTextBuilderTests
         Assert.Contains("Feature: My Test", result);
         Assert.Contains("  Scenario: My Test", result);
     }
+
+    [Fact]
+    public void GetKeyword_FirstItem_ReturnsType()
+    {
+        ComposerItem[] items = [Item("Given", "step a")];
+        Assert.Equal("Given", FeatureTextBuilder.GetKeyword(0, items));
+    }
+
+    [Fact]
+    public void GetKeyword_ConsecutiveSameType_ReturnsAnd()
+    {
+        ComposerItem[] items = [Item("Given", "step a"), Item("Given", "step b")];
+        Assert.Equal("And", FeatureTextBuilder.GetKeyword(1, items));
+    }
+
+    [Fact]
+    public void GetKeyword_TypeChange_ReturnsNewType()
+    {
+        ComposerItem[] items = [Item("Given", "step a"), Item("When", "step b")];
+        Assert.Equal("When", FeatureTextBuilder.GetKeyword(1, items));
+    }
 }

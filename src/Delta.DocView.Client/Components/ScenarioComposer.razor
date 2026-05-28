@@ -41,9 +41,7 @@
                         @for (int i = 0; i < Composer.Steps.Count; i++)
                         {
                             var item = Composer.Steps[i];
-                            var keyword = i == 0 || Composer.Steps[i].Step.Type != Composer.Steps[i - 1].Step.Type
-                                ? Composer.Steps[i].Step.Type
-                                : "And";
+                            var keyword = FeatureTextBuilder.GetKeyword(i, Composer.Steps);
                             var capturedId = item.Id;
                             <ComposerRow Item="@item"
                                          Keyword="@keyword"

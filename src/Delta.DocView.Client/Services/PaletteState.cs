@@ -145,6 +145,8 @@ public sealed class PaletteState : IDisposable
             .ToList();
     }
 
+    // Called when the DI root scope is disposed (app shutdown).
+    // Components that subscribe to Changed must unsubscribe themselves via their own IDisposable.
     public void Dispose()
     {
         _actions.OpenPaletteRequested -= Open;

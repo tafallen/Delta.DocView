@@ -8,12 +8,13 @@ public sealed class ComposerState : IDisposable
     private readonly List<ComposerItem> _steps = [];
     private bool _isOpen;
     private string _scenarioName = "";
+    private string? _featureTextCache;
 
     public IReadOnlyList<ComposerItem> Steps => _steps;
     public bool IsOpen => _isOpen;
     public string ScenarioName => _scenarioName;
     public int StepCount => _steps.Count;
-    public string FeatureText => FeatureTextBuilder.Build(_scenarioName, _steps);
+    public string FeatureText => _featureTextCache ??= FeatureTextBuilder.Build(_scenarioName, _steps);
 
     public event Action? Changed;
 
@@ -27,28 +28,28 @@ public sealed class ComposerState : IDisposable
     public void Toggle()
     {
         _isOpen = !_isOpen;
-        Changed?.Invoke();
+        Notify();
     }
 
     public void Open()
     {
         if (_isOpen) return;
         _isOpen = true;
-        Changed?.Invoke();
+        Notify();
     }
 
     public void Close()
     {
         if (!_isOpen) return;
         _isOpen = false;
-        Changed?.Invoke();
+        Notify();
     }
 
     public void AddStep(Step step)
     {
         _steps.Add(ComposerItem.From(step));
         _isOpen = true;
-        Changed?.Invoke();
+        Notify();
     }
 
     public void RemoveStep(Guid id)
@@ -56,7 +57,7 @@ public sealed class ComposerState : IDisposable
         var idx = _steps.FindIndex(x => x.Id == id);
         if (idx < 0) return;
         _steps.RemoveAt(idx);
-        Changed?.Invoke();
+        Notify();
     }
 
     public void MoveStep(Guid id, int targetIndex)
@@ -66,22 +67,26 @@ public sealed class ComposerState : IDisposable
         var item = _steps[idx];
         _steps.RemoveAt(idx);
         _steps.Insert(Math.Clamp(targetIndex, 0, _steps.Count), item);
-        Changed?.Invoke();
+        Notify();
     }
 
     public void SetScenarioName(string name)
     {
         _scenarioName = name;
-        Changed?.Invoke();
+        Notify();
     }
 
     public void Clear()
     {
         _steps.Clear();
         _scenarioName = "";
-        Changed?.Invoke();
+        Notify();
     }
 
+    private void Notify() { _featureTextCache = null; Changed?.Invoke(); }
+
+    // Called when the DI root scope is disposed (app shutdown).
+    // Components that subscribe to Changed must unsubscribe themselves via their own IDisposable.
     public void Dispose()
     {
         _actions.ToggleComposerRequested -= Toggle;

@@ -503,17 +503,19 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
 /* ── Stats strip ──────────────────────────────────────────────────── */
 .stats-strip {
   display: flex; flex-wrap: nowrap; margin: .5rem 1.25rem .75rem;
-  border: 1px solid var(--border-2, #e8e8e9); border-radius: .6rem;
-  background: var(--bg-panel); overflow: hidden; font-size: .85rem;
+  border: 1px solid #e4e4e5; border-radius: .6rem;
+  background: #f3f3f4; overflow: hidden; font-size: .85rem;
 }
+[data-dark="true"] .stats-strip { background: var(--bg-panel); border-color: var(--border); }
 .stat-col {
-  flex: 1; min-width: 0; padding: .65rem .9rem;
-  display: flex; flex-direction: column; gap: .25rem;
+  flex: 1; min-width: 0; padding: .7rem 1rem;
+  display: flex; flex-direction: column; gap: .3rem;
 }
-.stat-col + .stat-col { border-left: 1px solid var(--border-2, #e8e8e9); }
+.stat-col + .stat-col { border-left: 1px solid #e4e4e5; }
+[data-dark="true"] .stat-col + .stat-col { border-color: var(--border); }
 .stat-label { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); }
-.stat-value { font-size: .85rem; font-weight: 500; overflow-wrap: break-word; word-break: break-all; }
-.stat-value code { font-family: var(--font-mono); font-size: .8rem; word-break: break-all; }
+.stat-value { font-size: .88rem; font-weight: 400; overflow-wrap: break-word; word-break: break-word; }
+.stat-value code { font-family: inherit; font-size: .88rem; word-break: break-word; }
 .stat-value code { font-family: var(--font-mono); font-size: .82rem; }
 
 /* ── Params table ─────────────────────────────────────────────────── */
@@ -547,16 +549,20 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
 .try-it-body { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
 .try-it-inputs { display: flex; flex-direction: column; gap: .4rem; }
 .try-it-row {
-  display: flex; align-items: center; gap: .5rem;
-  padding: .4rem .6rem;
-  border: 1px solid var(--border); border-radius: .35rem;
+  display: flex; flex-direction: column; gap: .4rem;
+  padding: .6rem .75rem;
+  border: 1px solid var(--border); border-radius: .45rem;
   background: var(--bg);
 }
-.try-it-param-name { font-size: .85rem; min-width: 5rem; }
+.try-it-row-header { display: flex; align-items: center; gap: .5rem; }
+.try-it-param-name { font-size: .88rem; font-family: var(--font-mono); }
 .try-it-field {
-  flex: 1; border: none; background: transparent; font-family: var(--font-mono);
-  font-size: .85rem; padding: .1rem .2rem; outline: none; color: var(--text);
+  border: 1px solid var(--border); border-radius: .3rem;
+  background: var(--bg); font-family: var(--font-mono);
+  font-size: .88rem; padding: .35rem .5rem; outline: none;
+  color: var(--text); width: 100%; box-sizing: border-box;
 }
+.try-it-field:focus { border-color: var(--accent-500); }
 .try-it-output {
   border: 1px solid var(--border); border-radius: .35rem;
   background: var(--bg-panel); display: flex; flex-direction: column;
@@ -573,13 +579,13 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   color: var(--text);
 }
 .copy-button {
-  padding: .2rem .5rem;
-  border: 1px solid var(--border);
-  border-radius: .25rem; cursor: pointer; font-size: .78rem; background: transparent;
-  color: var(--text-muted); display: flex; align-items: center; gap: .25rem;
+  padding: .25rem .65rem;
+  border: 1.5px solid var(--border);
+  border-radius: 999px; cursor: pointer; font-size: .8rem; background: var(--bg);
+  color: var(--text-muted); display: flex; align-items: center; gap: .3rem;
+  white-space: nowrap;
 }
-.copy-button:hover { background: var(--bg-rail); }
-.copy-confirmation { color: var(--accent-500); font-size: .78rem; }
+.copy-button:hover { border-color: var(--accent-500); color: var(--accent-500); }
 
 /* ── C# block ─────────────────────────────────────────────────────── */
 .cs-block { border-top: 1px solid var(--border); padding: .6rem 1.25rem; }

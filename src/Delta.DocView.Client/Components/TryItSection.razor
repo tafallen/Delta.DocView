@@ -22,11 +22,13 @@
                     var param = (idx < Step.Params.Count) ? Step.Params[idx] : null;
                     var inputId = $"try-it-{_uid}-{idx}";
                     <div class="try-it-row">
-                        <label for="@inputId" class="try-it-param-name">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</label>
-                        @if (param is not null)
-                        {
-                            <span class="param-type-chip param-@param.Type.ToLowerInvariant()">@param.Type</span>
-                        }
+                        <div class="try-it-row-header">
+                            <label for="@inputId" class="try-it-param-name">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</label>
+                            @if (param is not null)
+                            {
+                                <span class="param-type-chip param-@param.Type.ToLowerInvariant()">@param.Type</span>
+                            }
+                        </div>
                         <input id="@inputId" type="text" class="try-it-field" value="@_inputs[idx]" @oninput="e => OnInput(idx, e)" />
                     </div>
                 }

@@ -1,11 +1,16 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<button class="copy-button" data-testid="copy-button" aria-label="@Label" @onclick="OnClick">@Label</button>
-@if (_confirmed)
-{
-    <span class="copy-confirmation" data-testid="copy-confirmation" role="status">@ConfirmLabel</span>
-}
+<button class="copy-button" data-testid="copy-button" aria-label="@Label" @onclick="OnClick">
+    @if (_confirmed)
+    {
+        <span data-testid="copy-confirmation" role="status">@ConfirmLabel</span>
+    }
+    else
+    {
+        <span>&#x2398; @Label</span>
+    }
+</button>
 
 @code {
     private const string JsCopyText = "docview.copyText";

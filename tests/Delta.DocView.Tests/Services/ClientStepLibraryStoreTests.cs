@@ -174,7 +174,7 @@ public class ClientStepLibraryStoreTests
     public void DomainById_Defaults_To_Empty_Before_Populate()
     {
         var store = new ClientStepLibraryStore();
-        Assert.Equal(0, store.DomainById.Count);
+        Assert.Empty(store.DomainById);
         Assert.False(store.DomainById.TryGetValue("Auth", out _));
     }
 }

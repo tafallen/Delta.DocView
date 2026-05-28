@@ -66,9 +66,11 @@ public static class SignatureVerifier
                 break;
 
             default:
-                // Scalar — let the node write itself
-                (node ?? JsonValue.Create<object?>(null))
-                    .WriteTo(writer, new JsonSerializerOptions());
+                // Scalar — let the node write itself, or emit explicit null
+                if (node is null)
+                    writer.WriteNullValue();
+                else
+                    node.WriteTo(writer, new JsonSerializerOptions());
                 break;
         }
     }

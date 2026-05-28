@@ -64,8 +64,8 @@ public class SignatureVerifierTests
                 writer.WriteEndArray();
                 break;
             default:
-                (node ?? JsonValue.Create<object?>(null))
-                    .WriteTo(writer, new JsonSerializerOptions());
+                if (node is null) writer.WriteNullValue();
+                else node.WriteTo(writer, new JsonSerializerOptions());
                 break;
         }
     }

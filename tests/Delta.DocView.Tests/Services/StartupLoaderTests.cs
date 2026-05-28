@@ -97,8 +97,8 @@ public class StartupLoaderTests
                 writer.WriteEndArray();
                 break;
             default:
-                (node ?? System.Text.Json.Nodes.JsonValue.Create<object?>(null))
-                    .WriteTo(writer, new System.Text.Json.JsonSerializerOptions());
+                if (node is null) writer.WriteNullValue();
+                else node.WriteTo(writer, new System.Text.Json.JsonSerializerOptions());
                 break;
         }
     }

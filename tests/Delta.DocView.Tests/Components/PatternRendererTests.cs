@@ -82,4 +82,69 @@ public class PatternRendererTests : TestContext
         Assert.Empty(pill.QuerySelectorAll("mark"));
         Assert.Equal("string", cut.Find(".param-type").TextContent);
     }
+
+    [Fact]
+    public void Empty_Token_Renders_As_Literal_Text()
+    {
+        var cut = RenderComponent<PatternRenderer>(p => p
+            .Add(c => c.Pattern, "do {} thing"));
+
+        Assert.Empty(cut.FindAll(".param-pill"));
+        Assert.Contains("{}", cut.Markup);
+    }
+
+    [Fact]
+    public void Colon_Only_Token_Renders_As_Type_Only_Pill()
+    {
+        var cut = RenderComponent<PatternRenderer>(p => p
+            .Add(c => c.Pattern, "as {:string}"));
+
+        var pills = cut.FindAll(".param-pill");
+        Assert.Single(pills);
+        Assert.Contains("param-string", pills[0].ClassList);
+        Assert.Empty(cut.FindAll(".param-name"));
+        Assert.Equal("string", cut.Find(".param-type").TextContent);
+    }
+
+    [Fact]
+    public void Empty_Type_Token_Renders_As_Literal_Text()
+    {
+        var cut = RenderComponent<PatternRenderer>(p => p
+            .Add(c => c.Pattern, "as {username:}"));
+
+        Assert.Empty(cut.FindAll(".param-pill"));
+        Assert.Contains("{username:}", cut.Markup);
+    }
+
+    [Fact]
+    public void Multi_Colon_Token_Splits_On_First_Colon()
+    {
+        var cut = RenderComponent<PatternRenderer>(p => p
+            .Add(c => c.Pattern, "as {key:Map<string,int>}"));
+
+        var pills = cut.FindAll(".param-pill");
+        Assert.Single(pills);
+        Assert.Equal("key", cut.Find(".param-name").TextContent);
+        Assert.Equal("Map<string,int>", cut.Find(".param-type").TextContent);
+    }
+
+    [Fact]
+    public void Unclosed_Brace_Renders_As_Literal()
+    {
+        var cut = RenderComponent<PatternRenderer>(p => p
+            .Add(c => c.Pattern, "value {bad type"));
+
+        Assert.Empty(cut.FindAll(".param-pill"));
+        Assert.Contains("{bad type", cut.Markup);
+    }
+
+    [Fact]
+    public void Lone_Closing_Brace_Renders_As_Literal()
+    {
+        var cut = RenderComponent<PatternRenderer>(p => p
+            .Add(c => c.Pattern, "value} end"));
+
+        Assert.Empty(cut.FindAll(".param-pill"));
+        Assert.Contains("value} end", cut.Markup);
+    }
 }

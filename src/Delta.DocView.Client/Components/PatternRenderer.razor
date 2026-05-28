@@ -60,6 +60,14 @@
                 type = inner.Trim();
             }
 
+            // Malformed shapes: a pill needs a type. {} and {name:} render as literal text.
+            if (string.IsNullOrEmpty(type))
+            {
+                yield return new Segment(m.Value, false, null, null);
+                lastEnd = m.Index + m.Length;
+                continue;
+            }
+
             yield return new Segment(null, true, name, type);
             lastEnd = m.Index + m.Length;
         }

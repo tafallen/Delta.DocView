@@ -1,0 +1,43 @@
+@using Delta.DocView.Client.Services
+@implements IDisposable
+@inject FilterState State
+@inject ClientStepLibraryStore Store
+
+<div class="domain-filter">
+    <button class="domain-row @(State.Domain is null ? "is-active" : "")"
+            data-domain=""
+            type="button"
+            @onclick="() => State.SetDomain(null)">
+        <span class="domain-label">All domains</span>
+        <span class="count">@Store.Steps.Count</span>
+    </button>
+    @foreach (var domain in Store.Domains)
+    {
+        var d = domain;
+        var isActive = State.Domain == d.Id;
+        var count = Store.Steps.Count(s => s.Domain == d.Id);
+        var idLower = d.Id.ToLowerInvariant();
+        <button class="domain-row @(isActive ? "is-active" : "")"
+                data-domain="@d.Id"
+                type="button"
+                @onclick="() => State.SetDomain(d.Id)">
+            <span class="domain-dot" style="background:var(--dom-@idLower)"></span>
+            <span class="domain-label">@d.Label</span>
+            <span class="count">@count</span>
+        </button>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+    }
+}

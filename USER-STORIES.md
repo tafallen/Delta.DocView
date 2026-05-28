@@ -156,11 +156,11 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] Clicking the star on a row or detail panel toggles favourite status.
-- [ ] Favourites are stored in `localStorage` under key `docview.favs.v1` as a JSON array of step IDs.
-- [ ] On load, favourites are restored from `localStorage`.
-- [ ] Keyboard shortcut `F` while a step is selected toggles its favourite status.
-- [ ] The favourites count in the rail filter button updates immediately.
+- [x] Clicking the star on a row or detail panel toggles favourite status.
+- [x] Favourites are stored in `localStorage` under key `docview.favs.v1` as a JSON array of step IDs.
+- [x] On load, favourites are restored from `localStorage`.
+- [ ] Keyboard shortcut `F` while a step is selected toggles its favourite status. *— deferred to US-07 per implementation-task split.*
+- [x] The favourites count in the rail filter button updates immediately.
 
 #### Implementation tasks
 

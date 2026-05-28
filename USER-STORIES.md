@@ -212,13 +212,13 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] `⌘K` or `/` (when not in an input) opens the Command Palette.
-- [ ] `?` (when not in an input) opens the Shortcuts overlay.
-- [ ] `C` (when not in an input) toggles the Scenario Composer.
-- [ ] `F` (when not in an input) toggles favourite on the currently selected step.
-- [ ] `J` / `K` move selection down / up through the filtered list.
-- [ ] `Escape` closes any open overlay (palette, shortcuts).
-- [ ] None of these fire when the user is typing in a text input or contenteditable.
+- [x] `⌘K` or `/` (when not in an input) opens the Command Palette. *— IKeyboardActions.OpenPaletteRequested fires; subscriber lands in US-08.*
+- [x] `?` (when not in an input) opens the Shortcuts overlay. *— OpenShortcutsRequested fires; subscriber lands in US-10.*
+- [x] `C` (when not in an input) toggles the Scenario Composer. *— ToggleComposerRequested fires; subscriber lands in US-09.*
+- [x] `F` (when not in an input) toggles favourite on the currently selected step.
+- [x] `J` / `K` move selection down / up through the filtered list.
+- [x] `Escape` closes any open overlay (palette, shortcuts). *— CloseOverlayRequested fires; subscribers land with their overlays.*
+- [x] None of these fire when the user is typing in a text input or contenteditable.
 
 #### Implementation tasks
 

@@ -177,4 +177,28 @@ public class ClientStepLibraryStoreTests
         Assert.Empty(store.DomainById);
         Assert.False(store.DomainById.TryGetValue("Auth", out _));
     }
+
+    [Fact]
+    public void Populate_SetsHaystacks_KeyedByStepId_IncludingPatternTypeDomainTagsAndParamNames()
+    {
+        var step = new Step
+        {
+            Id = "s-login",
+            Type = "Given",
+            Pattern = "I am logged in as {string}",
+            Domain = "Auth",
+            Tags = new[] { "login" },
+            Params = new[] { new StepParam { Name = "username", Type = "string" } },
+        };
+        var store = new ClientStepLibraryStore();
+        store.Populate(MakeLibraryWith([], new[] { step }));
+
+        Assert.True(store.Haystacks.ContainsKey("s-login"));
+        var hay = store.Haystacks["s-login"];
+        Assert.Contains("logged in", hay);
+        Assert.Contains("Given", hay);
+        Assert.Contains("Auth", hay);
+        Assert.Contains("login", hay);
+        Assert.Contains("username", hay);
+    }
 }

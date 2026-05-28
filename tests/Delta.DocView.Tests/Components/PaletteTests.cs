@@ -105,14 +105,17 @@ public class PaletteTests
 
         cut.Find("[data-testid='palette-input']").Input("login");
 
-        var results = cut.FindAll("[data-testid='palette-result']");
-        // Only the two auth-related "login" steps should match.
-        Assert.All(results, r =>
+        cut.WaitForAssertion(() =>
         {
-            var id = r.GetAttribute("data-step-id");
-            Assert.Contains(id, new[] { "s1", "s2" });
-        });
-        Assert.True(results.Count < 3);
+            var results = cut.FindAll("[data-testid='palette-result']");
+            // Only the two auth-related "login" steps should match.
+            Assert.All(results, r =>
+            {
+                var id = r.GetAttribute("data-step-id");
+                Assert.Contains(id, new[] { "s1", "s2" });
+            });
+            Assert.True(results.Count < 3);
+        }, TimeSpan.FromMilliseconds(500));
     }
 
     [Fact]
@@ -206,7 +209,9 @@ public class PaletteTests
 
         cut.Find("[data-testid='palette-input']").Input("zzzzzz-no-match");
 
-        Assert.NotNull(cut.Find("[data-testid='palette-empty']"));
+        cut.WaitForAssertion(
+            () => Assert.NotNull(cut.Find("[data-testid='palette-empty']")),
+            TimeSpan.FromMilliseconds(500));
     }
 
     [Fact]
@@ -261,6 +266,23 @@ public class PaletteTests
         input = cut.Find("[data-testid='palette-input']");
         results = cut.FindAll("[data-testid='palette-result']");
         Assert.Equal(results[1].GetAttribute("id"), input.GetAttribute("aria-activedescendant"));
+    }
+
+    [Fact]
+    public void Typing_Input_Updates_Query_After_Debounce()
+    {
+        var (ctx, palette, actions, _) = Setup();
+        var cut = ctx.RenderComponent<Palette>();
+        actions.OpenPalette();
+
+        cut.Find("[data-testid='palette-input']").Input("typed");
+
+        // Immediately after input the debounce timer has not yet fired.
+        Assert.Equal("", palette.Query);
+
+        cut.WaitForAssertion(
+            () => Assert.Equal("typed", palette.Query),
+            TimeSpan.FromMilliseconds(500));
     }
 
     [Fact]

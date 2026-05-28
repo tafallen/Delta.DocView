@@ -121,19 +121,12 @@ public sealed class PaletteState : IDisposable
         }
 
         Results = _store.Steps
-            .Select(s => (Step: s, Score: FuzzySearch.Score(Query, BuildHaystack(s))))
+            .Select(s => (Step: s, Score: FuzzySearch.Score(Query, _store.Haystacks.TryGetValue(s.Id, out var hay) ? hay : "")))
             .Where(t => t.Score > 0)
             .OrderByDescending(t => t.Score)
             .Take(MaxResults)
             .Select(t => t.Step)
             .ToList();
-    }
-
-    private static string BuildHaystack(Step s)
-    {
-        var paramNames = s.Params.Count == 0 ? "" : string.Join(" ", s.Params.Select(p => p.Name));
-        var tags = s.Tags.Count == 0 ? "" : string.Join(" ", s.Tags);
-        return $"{s.Pattern} {s.Type} {s.Domain} {tags} {paramNames}";
     }
 
     public void Dispose()

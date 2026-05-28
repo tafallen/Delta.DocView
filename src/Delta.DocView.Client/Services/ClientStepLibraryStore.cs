@@ -14,6 +14,8 @@ public sealed class ClientStepLibraryStore
         new Dictionary<string, int>();
     public IReadOnlyDictionary<string, StepDomain> DomainById { get; private set; } =
         new Dictionary<string, StepDomain>();
+    public IReadOnlyDictionary<string, string> Haystacks { get; private set; } =
+        new Dictionary<string, string>();
     public IReadOnlyList<string> DistinctParamTypes { get; private set; } = [];
     public string Version { get; private set; } = "";
     public string GeneratedAt { get; private set; } = "";
@@ -24,6 +26,7 @@ public sealed class ClientStepLibraryStore
         Domains = library.Domains;
         ById = library.Steps.ToDictionary(s => s.Id);
         DomainById = library.Domains.ToDictionary(d => d.Id);
+        Haystacks = library.Steps.ToDictionary(s => s.Id, BuildHaystack);
 
         var countByType = GherkinStepTypes.All.ToDictionary(t => t, _ => 0);
         foreach (var step in library.Steps)
@@ -55,4 +58,9 @@ public sealed class ClientStepLibraryStore
         Version = library.Version;
         GeneratedAt = library.GeneratedAt;
     }
+
+    private static string BuildHaystack(Step s) =>
+        $"{s.Pattern} {s.Type} {s.Domain} " +
+        (s.Tags.Count == 0 ? "" : string.Join(" ", s.Tags) + " ") +
+        (s.Params.Count == 0 ? "" : string.Join(" ", s.Params.Select(p => p.Name)));
 }

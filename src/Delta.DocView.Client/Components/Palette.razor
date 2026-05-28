@@ -84,11 +84,15 @@
 }
 
 @code {
+    private const int InputDebounceMs = 150;
+
     private string _inputId = "";
     private string _listboxId = "";
     private string _resultIdPrefix = "";
     private bool _wasOpen;
     private int _lastScrolledIndex = -1;
+    private string _pendingQuery = "";
+    private System.Threading.Timer? _inputTimer;
 
     private string? _currentResultId =>
         State.Results.Count > 0 && State.SelectedIndex >= 0 && State.SelectedIndex < State.Results.Count
@@ -107,7 +111,12 @@
     private void OnChanged() => InvokeAsync(StateHasChanged);
 
     private void OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs e)
-        => State.SetQuery(e.Value?.ToString() ?? "");
+    {
+        _pendingQuery = e.Value?.ToString() ?? "";
+        _inputTimer ??= new System.Threading.Timer(_ =>
+            InvokeAsync(() => State.SetQuery(_pendingQuery)));
+        _inputTimer.Change(InputDebounceMs, System.Threading.Timeout.Infinite);
+    }
 
     private void OnKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
     {
@@ -152,5 +161,9 @@
         _wasOpen = State.IsOpen;
     }
 
-    public void Dispose() => State.Changed -= OnChanged;
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+        _inputTimer?.Dispose();
+    }
 }

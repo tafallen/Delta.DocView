@@ -19,6 +19,11 @@ var app = builder.Build();
 var libraryPath = app.Configuration["DOCVIEW_LIBRARY_PATH"]
     ?? Path.Combine(app.Environment.ContentRootPath, "data", "step-library.json");
 
+// Resolve relative paths against the content root so config can name files
+// relative to the server project regardless of the launch working directory.
+if (!Path.IsPathRooted(libraryPath))
+    libraryPath = Path.GetFullPath(Path.Combine(app.Environment.ContentRootPath, libraryPath));
+
 var startupError = app.Services.GetRequiredService<StartupError>();
 var startupStore = app.Services.GetRequiredService<StepLibraryStore>();
 var loader       = app.Services.GetRequiredService<StepLibraryLoader>();

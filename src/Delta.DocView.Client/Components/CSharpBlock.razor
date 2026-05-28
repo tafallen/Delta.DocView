@@ -1,0 +1,45 @@
+@using Delta.DocView.Client.Services
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="cs-block" data-testid="cs-block">
+    <div class="cs-block-header">
+        <button class="cs-toggle" data-testid="cs-toggle" @onclick="OnToggleClick">
+            @(_expanded ? "▾ Hide C# step definition" : "▸ Show C# step definition")
+        </button>
+        @if (_expanded)
+        {
+            <button class="copy-button" data-testid="cs-copy-button" @onclick="OnCopyClick">Copy source</button>
+            @if (_confirmed)
+            {
+                <span class="copy-confirmation" data-testid="cs-copy-confirmation">✓ source copied</span>
+            }
+        }
+    </div>
+    @if (_expanded)
+    {
+        <pre class="cs-source" data-testid="cs-source">@foreach (var t in CSharpHighlighter.Tokenise(Source))
+{<span class="@t.CssClass">@t.Text</span>}</pre>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public string Source { get; set; } = "";
+
+    private bool _expanded;
+    private bool _confirmed;
+    private System.Threading.Timer? _timer;
+
+    private void OnToggleClick() => _expanded = !_expanded;
+
+    private async Task OnCopyClick()
+    {
+        await JS.InvokeAsync<bool>("docview.copyText", Source);
+        _confirmed = true;
+        _timer ??= new System.Threading.Timer(_ => InvokeAsync(() => { _confirmed = false; StateHasChanged(); }));
+        _timer.Change(1100, System.Threading.Timeout.Infinite);
+    }
+
+    public void Dispose() => _timer?.Dispose();
+}

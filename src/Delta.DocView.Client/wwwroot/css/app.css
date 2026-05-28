@@ -265,7 +265,7 @@ html, body {
   width: var(--rail-w);
   flex-shrink: 0;
   overflow-y: auto;
-  background: var(--bg-rail);
+  background: var(--bg);
   border-right: 1px solid var(--border);
 }
 
@@ -319,10 +319,12 @@ html, body {
 .step-type {
   display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
   padding: 0.55rem 0.25rem 0.5rem; border: 1.5px solid var(--border);
-  background: var(--bg-panel); border-radius: 8px;
-  cursor: pointer; text-align: center;
+  border-radius: 8px; cursor: pointer; text-align: center;
 }
-.step-type.is-active { border-color: var(--accent-500); }
+.step-type[data-type="Given"] { background: var(--chip-given-bg); border-color: var(--chip-given-bg); }
+.step-type[data-type="When"]  { background: var(--chip-when-bg);  border-color: var(--chip-when-bg); }
+.step-type[data-type="Then"]  { background: var(--chip-then-bg);  border-color: var(--chip-then-bg); }
+.step-type.is-active { border-color: var(--accent-500); border-width: 2px; }
 .step-type-count { font-size: 0.8rem; color: var(--text-muted); line-height: 1; }
 
 /* ── Domain filter ────────────────────────────────────────────────── */

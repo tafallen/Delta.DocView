@@ -179,17 +179,17 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] Header row: type chip, domain dot + label, Favourite button, "Add to scenario" primary button.
-- [ ] Pattern rendered large with typed `{param : type}` pills.
-- [ ] Description paragraph below the pattern.
-- [ ] Stats strip: "Used in N scenarios", "Source file:line", "Tags" (joined with ·).
-- [ ] **Parameters table** (hidden when no params): columns Name / Type / Example.
-- [ ] **Try it** section: for each param, an editable input pre-filled with `example`; live "Composed line" preview updates as values change; Copy button copies the composed line.
-- [ ] **Try it** section when no params: shows the final line immediately with a Copy button.
-- [ ] Copy shows a transient "✓ line copied" confirmation for 1.1 s.
-- [ ] **C# step definition** collapsible: collapsed by default (configurable via tweaks); toggle arrow; shows syntax-highlighted C# source; "Copy source" button when expanded.
-- [ ] **Likely next steps** section (hidden when empty): up to 4 related step cards, each clickable to navigate to that step.
-- [ ] When no step is selected the panel is empty/blank.
+- [x] Header row: type chip, domain dot + label, Favourite button, "Add to scenario" primary button. *— Add-to-scenario rendered disabled with "coming soon" tooltip; wired in US-09.*
+- [x] Pattern rendered large with typed `{param : type}` pills.
+- [x] Description paragraph below the pattern.
+- [x] Stats strip: "Used in N scenarios", "Source file:line", "Tags" (joined with ·).
+- [x] **Parameters table** (hidden when no params): columns Name / Type / Example.
+- [x] **Try it** section: for each param, an editable input pre-filled with `example`; live "Composed line" preview updates as values change; Copy button copies the composed line.
+- [x] **Try it** section when no params: shows the final line immediately with a Copy button.
+- [x] Copy shows a transient "✓ line copied" confirmation for 1.1 s.
+- [x] **C# step definition** collapsible: collapsed by default (configurable via tweaks); toggle arrow; shows syntax-highlighted C# source; "Copy source" button when expanded. *— "configurable via tweaks" deferred to US-11.*
+- [x] **Likely next steps** section (hidden when empty): up to 4 related step cards, each clickable to navigate to that step.
+- [x] When no step is selected the panel is empty/blank.
 
 #### Implementation tasks
 

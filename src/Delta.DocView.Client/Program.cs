@@ -14,6 +14,7 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddScoped<ClientStepLibraryStore>();
 builder.Services.AddScoped<LibraryApiClient>();
 builder.Services.AddScoped<FilterState>();
+builder.Services.AddScoped<SelectionState>();
 builder.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
 
 await builder.Build().RunAsync();

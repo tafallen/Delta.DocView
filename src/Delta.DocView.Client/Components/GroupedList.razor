@@ -1,0 +1,74 @@
+@implements IDisposable
+@inject SelectionState Selection
+
+@if (Steps.Count > 0)
+{
+    @if (!Grouped)
+    {
+        @foreach (var s in Steps)
+        {
+            <StepRow Step="@s" Query="@Query" IsSelected="@(Selection.Selected?.Id == s.Id)" />
+        }
+    }
+    else
+    {
+        @foreach (var g in BuildGroups())
+        {
+            <div class="step-group-header" data-domain-id="@g.Id">
+                <span class="domain-dot" style="background: var(@DomainPalette.CssVarName(g.Id));"></span>
+                <span class="domain-label">@g.Label</span>
+                <span class="count">@g.Steps.Count</span>
+            </div>
+            @foreach (var s in g.Steps)
+            {
+                <StepRow Step="@s" Query="@Query" IsSelected="@(Selection.Selected?.Id == s.Id)" />
+            }
+        }
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public IReadOnlyList<Step> Steps { get; set; } = [];
+    [Parameter] public string? Query { get; set; }
+    [Parameter] public bool Grouped { get; set; }
+    [Parameter, EditorRequired] public IReadOnlyList<StepDomain> Domains { get; set; } = [];
+
+    private sealed record Group(string Id, string Label, List<Step> Steps);
+
+    protected override void OnInitialized()
+    {
+        Selection.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private IEnumerable<Group> BuildGroups()
+    {
+        var lookup = Domains.ToDictionary(d => d.Id, d => d.Label, StringComparer.Ordinal);
+        var groups = new Dictionary<string, List<Step>>(StringComparer.Ordinal);
+        var order = new List<string>();
+        foreach (var s in Steps)
+        {
+            if (!groups.TryGetValue(s.Domain, out var list))
+            {
+                list = new List<Step>();
+                groups[s.Domain] = list;
+                order.Add(s.Domain);
+            }
+            list.Add(s);
+        }
+
+        return groups
+            .OrderByDescending(kv => kv.Value.Count)
+            .ThenBy(kv => kv.Key, StringComparer.Ordinal)
+            .Select(kv => new Group(
+                kv.Key,
+                lookup.TryGetValue(kv.Key, out var lbl) ? lbl : kv.Key,
+                kv.Value));
+    }
+
+    public void Dispose()
+    {
+        Selection.Changed -= OnChanged;
+    }
+}

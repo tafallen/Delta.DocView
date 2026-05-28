@@ -210,6 +210,60 @@ public class PaletteTests
     }
 
     [Fact]
+    public void Palette_Input_Has_Combobox_Role_And_Aria_Label()
+    {
+        var (ctx, _, actions, _) = Setup();
+        var cut = ctx.RenderComponent<Palette>();
+        actions.OpenPalette();
+
+        var input = cut.Find("[data-testid='palette-input']");
+        Assert.Equal("combobox", input.GetAttribute("role"));
+        Assert.Equal("Search steps", input.GetAttribute("aria-label"));
+    }
+
+    [Fact]
+    public void Palette_Results_Have_Listbox_Role()
+    {
+        var (ctx, _, actions, _) = Setup();
+        var cut = ctx.RenderComponent<Palette>();
+        actions.OpenPalette();
+
+        var results = cut.Find("[data-testid='palette-results']");
+        Assert.Equal("listbox", results.GetAttribute("role"));
+    }
+
+    [Fact]
+    public void Palette_Result_Has_Option_Role_And_AriaSelected_Reflects_State()
+    {
+        var (ctx, _, actions, _) = Setup();
+        var cut = ctx.RenderComponent<Palette>();
+        actions.OpenPalette();
+
+        var results = cut.FindAll("[data-testid='palette-result']");
+        Assert.Equal("option", results[0].GetAttribute("role"));
+        Assert.Equal("true", results[0].GetAttribute("aria-selected"));
+        Assert.Equal("false", results[1].GetAttribute("aria-selected"));
+    }
+
+    [Fact]
+    public void Palette_Input_AriaActiveDescendant_Points_To_Selected_Result()
+    {
+        var (ctx, palette, actions, _) = Setup();
+        var cut = ctx.RenderComponent<Palette>();
+        actions.OpenPalette();
+
+        var input = cut.Find("[data-testid='palette-input']");
+        var results = cut.FindAll("[data-testid='palette-result']");
+        Assert.Equal(results[0].GetAttribute("id"), input.GetAttribute("aria-activedescendant"));
+
+        palette.MoveSelectionDown();
+
+        input = cut.Find("[data-testid='palette-input']");
+        results = cut.FindAll("[data-testid='palette-result']");
+        Assert.Equal(results[1].GetAttribute("id"), input.GetAttribute("aria-activedescendant"));
+    }
+
+    [Fact]
     public void Active_Result_Has_Is_Active_Class()
     {
         var (ctx, _, actions, _) = Setup();

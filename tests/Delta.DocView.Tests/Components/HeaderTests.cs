@@ -166,6 +166,19 @@ public class HeaderTests : TestContext
     }
 
     [Fact]
+    public void Quick_Find_Button_Has_Aria_Label()
+    {
+        var platform = Substitute.For<IPlatform>();
+        platform.IsMac.Returns(true);
+        platform.ShortcutLabel("K").Returns("⌘K");
+        Register(MakeStore(), platform: platform);
+
+        var cut = RenderComponent<Header>();
+
+        Assert.Equal("Quick find (⌘K)", cut.Find("[data-testid='quick-find']").GetAttribute("aria-label"));
+    }
+
+    [Fact]
     public void Header_SearchInput_ReflectsExternalQueryWrite()
     {
         Register(MakeStore());

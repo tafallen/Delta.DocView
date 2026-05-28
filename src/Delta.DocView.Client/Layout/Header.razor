@@ -27,6 +27,7 @@
                 data-testid="quick-find"
                 type="button"
                 title="@($"Quick find ({Platform.ShortcutLabel("K")})")"
+                aria-label="@($"Quick find ({Platform.ShortcutLabel("K")})")"
                 @onclick="Actions.OpenPalette">
             @Platform.ShortcutLabel("K")
         </button>

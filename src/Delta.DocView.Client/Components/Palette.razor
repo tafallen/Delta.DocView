@@ -18,6 +18,11 @@
                    data-testid="palette-input"
                    type="text"
                    placeholder="Search steps…"
+                   aria-label="Search steps"
+                   role="combobox"
+                   aria-expanded="true"
+                   aria-controls="@_listboxId"
+                   aria-activedescendant="@(_currentResultId ?? "")"
                    value="@State.Query"
                    @oninput="OnInput"
                    @onkeydown="OnKey" />
@@ -31,7 +36,11 @@
                     <span>@State.Results.Count @(State.Results.Count == 1 ? "result" : "results")</span>
                 }
             </div>
-            <div class="palette-results" data-testid="palette-results">
+            <div class="palette-results"
+                 data-testid="palette-results"
+                 id="@_listboxId"
+                 role="listbox"
+                 aria-label="Step search results">
                 @if (State.Results.Count == 0 && !string.IsNullOrWhiteSpace(State.Query))
                 {
                     <div class="palette-empty" data-testid="palette-empty">
@@ -49,6 +58,9 @@
                                 data-testid="palette-result"
                                 data-step-id="@step.Id"
                                 data-result-index="@i"
+                                id="@($"{_resultIdPrefix}-{i}")"
+                                role="option"
+                                aria-selected="@((idx == State.SelectedIndex) ? "true" : "false")"
                                 type="button"
                                 @onmouseover="() => State.SetSelectedIndex(idx)"
                                 @onclick="() => OnClickResult(step)">
@@ -73,12 +85,22 @@
 
 @code {
     private string _inputId = "";
+    private string _listboxId = "";
+    private string _resultIdPrefix = "";
     private bool _wasOpen;
     private int _lastScrolledIndex = -1;
 
+    private string? _currentResultId =>
+        State.Results.Count > 0 && State.SelectedIndex >= 0 && State.SelectedIndex < State.Results.Count
+            ? $"{_resultIdPrefix}-{State.SelectedIndex}"
+            : null;
+
     protected override void OnInitialized()
     {
-        _inputId = "palette-input-" + Guid.NewGuid().ToString("N")[..8];
+        var uid = Guid.NewGuid().ToString("N")[..8];
+        _inputId         = $"palette-input-{uid}";
+        _listboxId       = $"palette-results-{uid}";
+        _resultIdPrefix  = $"palette-result-{uid}";
         State.Changed += OnChanged;
     }
 

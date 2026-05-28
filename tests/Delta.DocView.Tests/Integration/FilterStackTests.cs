@@ -30,7 +30,8 @@ public class FilterStackTests
                 Type = "Given",
                 Domain = "Auth",
                 Pattern = "I am logged in as {string}",
-                Params = [new StepParam { Name = "user", Type = "string" }]
+                Params = [new StepParam { Name = "user", Type = "string" }],
+                SuggestsNext = ["g2"]
             },
             new Step
             {
@@ -311,5 +312,97 @@ public class FilterStackTests
 
         var projected = FilterEngine.Apply(store.Steps, state, favs);
         Assert.Equal("g1", projected[0].Id);
+    }
+
+    [Fact]
+    public void DetailPanel_EmptyBy_Default_When_No_Selection()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var detail = ctx.RenderComponent<DetailPanel>();
+
+        Assert.NotNull(detail.Find("[data-testid='detail-empty']"));
+        Assert.Empty(detail.FindAll("[data-testid='detail-panel']"));
+    }
+
+    [Fact]
+    public void Row_Click_Populates_DetailPanel_With_Same_Step()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+        var detail = ctx.RenderComponent<DetailPanel>();
+
+        var row = list.FindAll(".step-row").First();
+        var expectedId = row.GetAttribute("data-step-id");
+        row.Click();
+
+        detail.WaitForAssertion(
+            () =>
+            {
+                var panel = detail.Find("[data-testid='detail-panel']");
+                Assert.Equal(expectedId, panel.GetAttribute("data-step-id"));
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Row_Star_Click_Reflects_In_Detail_Favourite_Button()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+        var detail = ctx.RenderComponent<DetailPanel>();
+
+        var row = list.FindAll(".step-row").First();
+        row.Click();
+
+        // Star click on the row.
+        list.FindAll(".step-row").First().QuerySelector(".row-star")!.Click();
+
+        detail.WaitForAssertion(
+            () =>
+            {
+                var fav = detail.Find("[data-testid='detail-favourite']");
+                Assert.Contains("is-fav", fav.GetAttribute("class") ?? "");
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Related_Card_Click_Changes_Selection()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+        var detail = ctx.RenderComponent<DetailPanel>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        // Select g1 (which has SuggestsNext = ["g2"]).
+        list.Find(".step-row[data-step-id='g1']").Click();
+
+        detail.WaitForAssertion(
+            () => Assert.NotEmpty(detail.FindAll("[data-testid='related-card']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        detail.Find("[data-testid='related-card']").Click();
+
+        detail.WaitForAssertion(
+            () =>
+            {
+                Assert.NotNull(selection.Selected);
+                Assert.Equal("g2", selection.Selected!.Id);
+                Assert.Equal("g2", detail.Find("[data-testid='detail-panel']").GetAttribute("data-step-id"));
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
     }
 }

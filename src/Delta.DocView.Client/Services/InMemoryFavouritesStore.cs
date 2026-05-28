@@ -4,6 +4,8 @@ public sealed class InMemoryFavouritesStore : IFavouritesStore
 {
     private readonly HashSet<string> _ids = new();
 
+    public Task InitializeAsync() => Task.CompletedTask;
+
     public bool Has(string id) => _ids.Contains(id);
 
     public void Toggle(string id)

@@ -1,4 +1,5 @@
 @inject LibraryApiClient LibraryClient
+@inject IFavouritesStore Favourites
 
 @if (LibraryClient.State == LoadingState.Loading)
 {
@@ -16,6 +17,6 @@ else
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await LibraryClient.LoadAsync();
+        await Task.WhenAll(LibraryClient.LoadAsync(), Favourites.InitializeAsync());
     }
 }

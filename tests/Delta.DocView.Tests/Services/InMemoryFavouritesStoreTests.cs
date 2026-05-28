@@ -5,6 +5,15 @@ namespace Delta.DocView.Tests.Services;
 public class InMemoryFavouritesStoreTests
 {
     [Fact]
+    public async Task InitializeAsync_CompletesImmediately()
+    {
+        var store = new InMemoryFavouritesStore();
+        var task = store.InitializeAsync();
+        Assert.True(task.IsCompletedSuccessfully);
+        await task;
+    }
+
+    [Fact]
     public void Toggle_AddsThenRemoves()
     {
         var store = new InMemoryFavouritesStore();

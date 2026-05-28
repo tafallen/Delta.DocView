@@ -538,3 +538,104 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
     font-size: .85rem;
     margin-bottom: .5rem;
 }
+
+/* ── Command palette ───────────────────────────────────────────────── */
+.palette-backdrop {
+    position: fixed; inset: 0;
+    background: rgba(65, 64, 66, 0.4);
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 8vh;
+    z-index: 100;
+}
+.palette {
+    width: min(640px, 92vw);
+    max-height: 70vh;
+    background: var(--bg, #fff);
+    border: 1px solid var(--border, rgba(0,0,0,0.1));
+    border-radius: .5rem;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+    display: flex; flex-direction: column;
+    overflow: hidden;
+    font-family: var(--font-sans);
+}
+.palette-input {
+    width: 100%;
+    padding: .75rem 1rem;
+    border: none;
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.08));
+    font-size: 1rem;
+    font-family: inherit;
+    background: transparent;
+    color: var(--text);
+    outline: none;
+}
+.palette-meta {
+    padding: .25rem 1rem;
+    font-size: .75rem;
+    opacity: .65;
+    border-bottom: 1px solid var(--border, rgba(0,0,0,0.06));
+}
+.palette-results {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+}
+.palette-result {
+    display: grid;
+    grid-template-columns: auto 1fr auto auto;
+    gap: .5rem;
+    align-items: center;
+    width: 100%;
+    padding: .5rem .75rem;
+    border: none;
+    background: transparent;
+    text-align: left;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: .9rem;
+    color: var(--text);
+}
+.palette-result:hover,
+.palette-result.is-active {
+    background: var(--row-selected-bg, rgba(224,108,43,0.08));
+}
+.palette-pattern {
+    font-family: var(--font-mono);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.palette-domain {
+    font-size: .75rem;
+    opacity: .65;
+}
+.palette-used {
+    font-size: .8rem;
+    opacity: .75;
+}
+.palette-empty {
+    padding: 2rem 1rem;
+    text-align: center;
+    opacity: .75;
+}
+.palette-empty .hint {
+    font-size: .85rem;
+    margin-top: .5rem;
+    opacity: .8;
+}
+.palette-footer {
+    display: flex;
+    gap: 1rem;
+    padding: .4rem .75rem;
+    border-top: 1px solid var(--border, rgba(0,0,0,0.06));
+    font-size: .75rem;
+    opacity: .65;
+}
+.palette-footer kbd {
+    background: var(--bg-panel, rgba(0,0,0,0.04));
+    border: 1px solid var(--border, rgba(0,0,0,0.1));
+    border-radius: .2rem;
+    padding: 0 .25rem;
+    font-family: var(--font-mono);
+    font-size: .8em;
+}

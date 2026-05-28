@@ -1,0 +1,128 @@
+@using Delta.DocView.Client.Services
+@inject PaletteState State
+@inject IJSRuntime JS
+@implements IDisposable
+
+@if (State.IsOpen)
+{
+    <div class="palette-backdrop"
+         data-testid="palette-backdrop"
+         @onclick="State.Close">
+        <div class="palette"
+             data-testid="palette"
+             role="dialog"
+             aria-label="Command palette"
+             @onclick:stopPropagation="true">
+            <input id="@_inputId"
+                   class="palette-input"
+                   data-testid="palette-input"
+                   type="text"
+                   placeholder="Search steps…"
+                   value="@State.Query"
+                   @oninput="OnInput"
+                   @onkeydown="OnKey" />
+            <div class="palette-meta" data-testid="palette-meta">
+                @if (State.Results.Count == 0 && !string.IsNullOrWhiteSpace(State.Query))
+                {
+                    <span>No results</span>
+                }
+                else
+                {
+                    <span>@State.Results.Count @(State.Results.Count == 1 ? "result" : "results")</span>
+                }
+            </div>
+            <div class="palette-results" data-testid="palette-results">
+                @if (State.Results.Count == 0 && !string.IsNullOrWhiteSpace(State.Query))
+                {
+                    <div class="palette-empty" data-testid="palette-empty">
+                        <p>No step matches "@State.Query".</p>
+                        <p class="hint">Try a shorter query, or define a new step in the appropriate <code>*.Steps.cs</code> file.</p>
+                    </div>
+                }
+                else
+                {
+                    @for (var i = 0; i < State.Results.Count; i++)
+                    {
+                        var idx = i;
+                        var step = State.Results[i];
+                        <button class="palette-result @(idx == State.SelectedIndex ? "is-active" : "")"
+                                data-testid="palette-result"
+                                data-step-id="@step.Id"
+                                data-result-index="@i"
+                                type="button"
+                                @onmouseover="() => State.SetSelectedIndex(idx)"
+                                @onclick="() => OnClickResult(step)">
+                            <span class="type-chip chip-@step.Type.ToLowerInvariant()">@step.Type</span>
+                            <span class="palette-pattern">
+                                <PatternRenderer Pattern="@step.Pattern" Query="@State.Query" />
+                            </span>
+                            <span class="palette-domain">@step.Domain</span>
+                            <span class="palette-used">@(step.Used)×</span>
+                        </button>
+                    }
+                }
+            </div>
+            <div class="palette-footer" data-testid="palette-footer">
+                <span><kbd>↑</kbd><kbd>↓</kbd> navigate</span>
+                <span><kbd>↵</kbd> select</span>
+                <span><kbd>Esc</kbd> close</span>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private string _inputId = "";
+    private bool _wasOpen;
+
+    protected override void OnInitialized()
+    {
+        _inputId = "palette-input-" + Guid.NewGuid().ToString("N")[..8];
+        State.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnInput(Microsoft.AspNetCore.Components.ChangeEventArgs e)
+        => State.SetQuery(e.Value?.ToString() ?? "");
+
+    private void OnKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    {
+        switch (e.Key)
+        {
+            case "ArrowDown":   State.MoveSelectionDown(); break;
+            case "ArrowUp":     State.MoveSelectionUp();   break;
+            case "Enter":       State.SelectCurrent();     break;
+            case "Escape":      State.Close();             break;
+        }
+    }
+
+    private void OnClickResult(Delta.DocView.Shared.Models.Step _) => State.SelectCurrent();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (State.IsOpen && !_wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focus.element", _inputId); } catch { }
+        }
+        else if (!State.IsOpen && _wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focus.restorePrevious"); } catch { }
+        }
+
+        if (State.IsOpen && State.Results.Count > 0)
+        {
+            try
+            {
+                await JS.InvokeVoidAsync(
+                    "docview.scrollIntoViewIfNeeded",
+                    $"[data-testid='palette'] [data-result-index='{State.SelectedIndex}']");
+            }
+            catch { }
+        }
+
+        _wasOpen = State.IsOpen;
+    }
+
+    public void Dispose() => State.Changed -= OnChanged;
+}

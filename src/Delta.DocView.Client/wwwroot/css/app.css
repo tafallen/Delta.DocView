@@ -1,16 +1,24 @@
 /* ── Design tokens ────────────────────────────────────────────────── */
 :root {
-  /* Accent — Teal (default) */
-  --accent-500: #0d9488;
-  --accent-600: #0f766e;
-  --accent-100: #ccfbf1;
+  /* Brand palette */
+  --brand-grey:   #414042;
+  --brand-orange: #e06c2b;
+  --brand-white:  #ffffff;
+  --brand-blue:   #409dd7;
+  --brand-purple: #96519f;
+  --brand-pink:   #f7abb8;
+
+  /* Accent — Orange (default, brand) */
+  --accent-500: var(--brand-orange);
+  --accent-600: #c25924;
+  --accent-100: #fce5d5;
 
   /* Surface */
   --bg:          #ffffff;
   --bg-panel:    #f8fafc;
   --bg-rail:     #f1f5f9;
   --border:      #e2e8f0;
-  --text:        #1e293b;
+  --text:        var(--brand-grey);
   --text-muted:  #64748b;
 
   /* Layout */
@@ -19,7 +27,7 @@
   --header-h:    52px;
 
   /* Fonts */
-  --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-sans: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
   /* Syntax highlight palette (light mode) */
@@ -29,30 +37,33 @@
   --syntax-number:  #f59e0b;   /* amber — numeric literals */
 
   /* Step-type chip palette */
-  --chip-given-bg: #0d9488;   /* teal */
-  --chip-when-bg:  #f59e0b;   /* amber */
-  --chip-then-bg:  #7c3aed;   /* violet */
-  --chip-fg:       #ffffff;
+  --chip-given-bg: var(--brand-blue);
+  --chip-when-bg:  var(--brand-orange);
+  --chip-then-bg:  var(--brand-purple);
+  --chip-fg:       var(--brand-white);
 
   /* Row interaction states */
   --row-hover-bg:    rgba(0, 0, 0, 0.03);
-  --row-selected-bg: rgba(13, 148, 136, 0.08);
+  --row-selected-bg: rgba(224, 108, 43, 0.08);
 
   /* Query highlight */
-  --highlight-bg: #fef08a;
+  --highlight-bg: rgba(247, 171, 184, 0.55);
 
   /* Favourite star (active) */
-  --fav-color: #f59e0b;
+  --fav-color: var(--brand-pink);
 }
 
 /* ── Dark mode ────────────────────────────────────────────────────── */
 [data-dark="true"] {
-  --bg:         #0f172a;
-  --bg-panel:   #1e293b;
-  --bg-rail:    #1e293b;
-  --border:     #334155;
-  --text:       #f1f5f9;
-  --text-muted: #94a3b8;
+  --bg:         var(--brand-grey);
+  --bg-panel:   #2a2a2c;
+  --bg-rail:    #2a2a2c;
+  --border:     #555558;
+  --text:       var(--brand-white);
+  --text-muted: #b8b8ba;
+
+  --row-selected-bg: rgba(224, 108, 43, 0.20);
+  --highlight-bg:    rgba(247, 171, 184, 0.35);
 
   /* Syntax highlight palette (dark-mode overrides) */
   --syntax-kw:      #a78bfa;   /* lighter violet */
@@ -477,7 +488,7 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   border-radius: .25rem; cursor: pointer; font-size: .85rem; background: transparent;
 }
 .copy-button:hover { background: var(--row-hover-bg, rgba(0,0,0,0.03)); }
-.copy-confirmation { color: var(--chip-given-bg, #0d9488); font-size: .85rem; }
+.copy-confirmation { color: var(--chip-given-bg); font-size: .85rem; }
 
 .cs-block { border-top: 1px solid var(--border, rgba(0,0,0,0.06)); padding: .5rem .75rem; }
 .cs-block-header { display: flex; align-items: center; gap: .5rem; }

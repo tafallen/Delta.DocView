@@ -6,11 +6,14 @@
     <title>Delta · Step Library</title>
     <base href="/" />
     <link rel="stylesheet" href="css/app.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap">
     <style>
         .loading-screen {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; height: 100vh; gap: 16px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             background: #ffffff; color: #1e293b;
         }
         .loading-brand { display: flex; align-items: center; gap: 10px; }
@@ -18,7 +21,7 @@
         .loading-sub { font-size: 0.85rem; color: #64748b; margin: 0; }
         .loading-spinner {
             width: 28px; height: 28px; border: 3px solid #e2e8f0;
-            border-top-color: #0d9488; border-radius: 50%;
+            border-top-color: #e06c2b; border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -29,7 +32,7 @@
         <div class="loading-screen">
             <div class="loading-brand">
                 <svg width="28" height="28" viewBox="0 0 22 22" fill="none">
-                    <rect x="1.5" y="1.5" width="19" height="19" rx="4.5" fill="#0d9488"/>
+                    <rect x="1.5" y="1.5" width="19" height="19" rx="4.5" fill="#e06c2b"/>
                     <path d="M6 8h7M6 11h10M6 14h5" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
                 <span class="loading-title">Delta · Step Library</span>

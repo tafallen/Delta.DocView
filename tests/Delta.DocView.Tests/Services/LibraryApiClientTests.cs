@@ -85,6 +85,68 @@ public class LibraryApiClientTests
         Assert.Equal(LoadingState.Loaded, client.State);
     }
 
+    [Fact]
+    public async Task LoadAsync_NetworkException_StateBecomesError()
+    {
+        var http = new HttpClient(new ThrowingHandler(new HttpRequestException("connection refused")))
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var store = new ClientStepLibraryStore();
+        var client = new LibraryApiClient(http, store);
+
+        await client.LoadAsync();
+
+        Assert.Equal(LoadingState.Error, client.State);
+        Assert.Contains("connection refused", client.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task LoadAsync_EmptyBody200_StateBecomesError()
+    {
+        var http = new HttpClient(new RawHandler(HttpStatusCode.OK, "null"))
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var store = new ClientStepLibraryStore();
+        var client = new LibraryApiClient(http, store);
+
+        await client.LoadAsync();
+
+        Assert.Equal(LoadingState.Error, client.State);
+        Assert.Equal("Server returned an empty response.", client.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task LoadAsync_ErrorBodyWithoutErrorProperty_FallsBackToStatusCodeMessage()
+    {
+        var body = new { detail = "some other shape" };
+        var http = CreateMockHttpClient(HttpStatusCode.InternalServerError, body);
+        var store = new ClientStepLibraryStore();
+        var client = new LibraryApiClient(http, store);
+
+        await client.LoadAsync();
+
+        Assert.Equal(LoadingState.Error, client.State);
+        Assert.Contains("500", client.ErrorMessage);
+    }
+
+    [Fact]
+    public async Task LoadAsync_MalformedErrorBodyJson_StillTransitionsToError()
+    {
+        var http = new HttpClient(new RawHandler(HttpStatusCode.BadGateway, "not json"))
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var store = new ClientStepLibraryStore();
+        var client = new LibraryApiClient(http, store);
+
+        await client.LoadAsync();
+
+        Assert.Equal(LoadingState.Error, client.State);
+        Assert.False(string.IsNullOrEmpty(client.ErrorMessage));
+    }
+
     // ── helpers ──────────────────────────────────────────────────────────────
 
     private static HttpClient CreateMockHttpClient(HttpStatusCode status, object body)
@@ -105,6 +167,28 @@ public class LibraryApiClientTests
             _body = body;
         }
 
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new HttpResponseMessage(_status)
+            {
+                Content = new StringContent(_body, Encoding.UTF8, "application/json")
+            });
+    }
+
+    private sealed class ThrowingHandler : HttpMessageHandler
+    {
+        private readonly Exception _ex;
+        public ThrowingHandler(Exception ex) => _ex = ex;
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromException<HttpResponseMessage>(_ex);
+    }
+
+    private sealed class RawHandler : HttpMessageHandler
+    {
+        private readonly HttpStatusCode _status;
+        private readonly string _body;
+        public RawHandler(HttpStatusCode status, string body) { _status = status; _body = body; }
         protected override Task<HttpResponseMessage> SendAsync(
             HttpRequestMessage request, CancellationToken cancellationToken) =>
             Task.FromResult(new HttpResponseMessage(_status)

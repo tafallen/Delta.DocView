@@ -15,7 +15,7 @@
     {
         var d = domain;
         var isActive = State.Domain == d.Id;
-        var count = Store.Steps.Count(s => s.Domain == d.Id);
+        var count = Store.CountByDomain.TryGetValue(d.Id, out var n) ? n : 0;
         var varName = DomainPalette.CssVarName(d.Id);
         <button class="domain-row @(isActive ? "is-active" : "")"
                 data-domain="@d.Id"

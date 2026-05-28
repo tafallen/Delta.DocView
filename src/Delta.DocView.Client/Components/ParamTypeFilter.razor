@@ -4,7 +4,7 @@
 @inject ClientStepLibraryStore Store
 
 <div class="param-type-filter">
-    @foreach (var type in Store.Steps.SelectMany(s => s.Params).Select(p => p.Type).Distinct().OrderBy(t => t, StringComparer.Ordinal))
+    @foreach (var type in Store.DistinctParamTypes)
     {
         var t = type;
         var isActive = State.ParamTypes.Contains(t);

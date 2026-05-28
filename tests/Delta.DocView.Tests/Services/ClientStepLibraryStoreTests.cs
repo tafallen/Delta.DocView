@@ -47,4 +47,83 @@ public class ClientStepLibraryStoreTests
         Assert.True(store.ById.ContainsKey("s0"));
         Assert.True(store.ById.ContainsKey("s2"));
     }
+
+    private static StepLibrary MakeLibraryWith(IReadOnlyList<StepDomain> domains, IReadOnlyList<Step> steps) =>
+        new()
+        {
+            Version = "1.0.0",
+            GeneratedAt = "2026-01-01T00:00:00Z",
+            Domains = domains,
+            Steps = steps,
+            Signature = new StepSignature { Algorithm = "SHA-256", Digest = new string('0', 64) }
+        };
+
+    [Fact]
+    public void Populate_SetsCountByType_IncludingZeroForUnusedTypes()
+    {
+        var steps = new List<Step>
+        {
+            new() { Id = "s1", Type = "Given", Pattern = "p1", Domain = "Auth" },
+            new() { Id = "s2", Type = "Given", Pattern = "p2", Domain = "Auth" },
+            new() { Id = "s3", Type = "Then",  Pattern = "p3", Domain = "Auth" },
+        };
+        var store = new ClientStepLibraryStore();
+        store.Populate(MakeLibraryWith([], steps));
+
+        Assert.Equal(2, store.CountByType["Given"]);
+        Assert.Equal(0, store.CountByType["When"]);
+        Assert.Equal(1, store.CountByType["Then"]);
+        Assert.Equal(0, store.CountByType["And"]);
+        Assert.Equal(4, store.CountByType.Count);
+    }
+
+    [Fact]
+    public void Populate_SetsCountByDomain_IncludingZeroForUnusedDomains()
+    {
+        var domains = new List<StepDomain>
+        {
+            new() { Id = "Auth", Label = "Auth" },
+            new() { Id = "Billing", Label = "Billing" },
+        };
+        var steps = new List<Step>
+        {
+            new() { Id = "s1", Type = "Given", Pattern = "p1", Domain = "Auth" },
+            new() { Id = "s2", Type = "Given", Pattern = "p2", Domain = "Auth" },
+        };
+        var store = new ClientStepLibraryStore();
+        store.Populate(MakeLibraryWith(domains, steps));
+
+        Assert.Equal(2, store.CountByDomain["Auth"]);
+        Assert.Equal(0, store.CountByDomain["Billing"]);
+    }
+
+    [Fact]
+    public void Populate_SetsDistinctParamTypes_OrdinalSorted()
+    {
+        var steps = new List<Step>
+        {
+            new()
+            {
+                Id = "s1", Type = "Given", Pattern = "p1", Domain = "Auth",
+                Params =
+                [
+                    new StepParam { Name = "a", Type = "string" },
+                    new StepParam { Name = "b", Type = "int" },
+                ]
+            },
+            new()
+            {
+                Id = "s2", Type = "Given", Pattern = "p2", Domain = "Auth",
+                Params =
+                [
+                    new StepParam { Name = "c", Type = "DocString" },
+                    new StepParam { Name = "d", Type = "string" },
+                ]
+            },
+        };
+        var store = new ClientStepLibraryStore();
+        store.Populate(MakeLibraryWith([], steps));
+
+        Assert.Equal(new[] { "DocString", "int", "string" }, store.DistinctParamTypes);
+    }
 }

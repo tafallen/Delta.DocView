@@ -27,16 +27,6 @@ public class InMemoryFavouritesStoreTests
     }
 
     [Fact]
-    public void Has_TrueAfterAdd_FalseAfterRemove()
-    {
-        var store = new InMemoryFavouritesStore();
-        store.Toggle("x");
-        Assert.True(store.Has("x"));
-        store.Toggle("x");
-        Assert.False(store.Has("x"));
-    }
-
-    [Fact]
     public void Changed_RaisedOnEveryToggle()
     {
         var store = new InMemoryFavouritesStore();

@@ -17,7 +17,7 @@ public sealed class InMemoryFavouritesStore : IFavouritesStore
 
     public int Count => _ids.Count;
 
-    public IReadOnlyCollection<string> All => _ids;
+    public IReadOnlyCollection<string> All => _ids.ToArray();
 
     public event Action? Changed;
 }

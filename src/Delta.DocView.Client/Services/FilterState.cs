@@ -2,24 +2,27 @@ namespace Delta.DocView.Client.Services;
 
 public sealed class FilterState
 {
-    public ISet<string> Types { get; } = new HashSet<string> { "Given", "When", "Then", "And" };
+    private readonly HashSet<string> _types = new() { "Given", "When", "Then", "And" };
+    private readonly HashSet<string> _paramTypes = new();
+
+    public IReadOnlySet<string> Types => _types;
     public string? Domain { get; private set; }
-    public ISet<string> ParamTypes { get; } = new HashSet<string>();
+    public IReadOnlySet<string> ParamTypes => _paramTypes;
     public bool FavsOnly { get; private set; }
     public string Query { get; private set; } = "";
 
-    public event Action? OnChanged;
+    public event Action? Changed;
 
     public void ToggleType(string type)
     {
-        if (Types.Contains(type))
+        if (_types.Contains(type))
         {
-            if (Types.Count == 1) return;
-            Types.Remove(type);
+            if (_types.Count == 1) return;
+            _types.Remove(type);
         }
         else
         {
-            Types.Add(type);
+            _types.Add(type);
         }
         NotifyChanged();
     }
@@ -33,9 +36,9 @@ public sealed class FilterState
 
     public void ToggleParamType(string paramType)
     {
-        if (!ParamTypes.Remove(paramType))
+        if (!_paramTypes.Remove(paramType))
         {
-            ParamTypes.Add(paramType);
+            _paramTypes.Add(paramType);
         }
         NotifyChanged();
     }
@@ -55,5 +58,5 @@ public sealed class FilterState
         NotifyChanged();
     }
 
-    private void NotifyChanged() => OnChanged?.Invoke();
+    private void NotifyChanged() => Changed?.Invoke();
 }

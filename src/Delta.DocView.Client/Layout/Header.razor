@@ -1,6 +1,8 @@
 @inject ClientStepLibraryStore Store
 @inject IJSRuntime JS
 @inject FilterState Filter
+@inject IPlatform Platform
+@inject IKeyboardActions Actions
 @implements IDisposable
 
 <header class="app-header">
@@ -21,7 +23,13 @@
                aria-label="Search steps"
                value="@Filter.Query"
                @oninput="OnSearchInput" />
-        <button class="btn-quickfind" title="Quick find (⌘K)" type="button">⌘K</button>
+        <button class="btn-quickfind"
+                data-testid="quick-find"
+                type="button"
+                title="@($"Quick find ({Platform.ShortcutLabel("K")})")"
+                @onclick="Actions.OpenPalette">
+            @Platform.ShortcutLabel("K")
+        </button>
     </div>
 
     <div class="header-actions">

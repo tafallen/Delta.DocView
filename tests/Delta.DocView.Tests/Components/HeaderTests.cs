@@ -27,11 +27,12 @@ public class HeaderTests : TestContext
         return store;
     }
 
-    private void Register(ClientStepLibraryStore store)
+    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null)
     {
         Services.AddSingleton(store);
         Services.AddSingleton<FilterState>();
-        Services.AddSingleton(_ => Substitute.For<IPlatform>());
+        Services.AddSingleton(_ => platform ?? Substitute.For<IPlatform>());
+        Services.AddSingleton(_ => actions ?? Substitute.For<IKeyboardActions>());
     }
 
     [Fact]
@@ -124,6 +125,44 @@ public class HeaderTests : TestContext
 
         cut.WaitForAssertion(() => Assert.Equal("abc", state.Query), timeout: TimeSpan.FromMilliseconds(500));
         Assert.Equal(1, changedCount);
+    }
+
+    [Fact]
+    public void Quick_Find_Button_Shows_Command_K_On_Mac()
+    {
+        var platform = Substitute.For<IPlatform>();
+        platform.IsMac.Returns(true);
+        platform.ShortcutLabel("K").Returns("⌘K");
+        Register(MakeStore(), platform: platform);
+
+        var cut = RenderComponent<Header>();
+
+        Assert.Equal("⌘K", cut.Find("[data-testid='quick-find']").TextContent.Trim());
+    }
+
+    [Fact]
+    public void Quick_Find_Button_Shows_Ctrl_K_On_NonMac()
+    {
+        var platform = Substitute.For<IPlatform>();
+        platform.IsMac.Returns(false);
+        platform.ShortcutLabel("K").Returns("Ctrl+K");
+        Register(MakeStore(), platform: platform);
+
+        var cut = RenderComponent<Header>();
+
+        Assert.Equal("Ctrl+K", cut.Find("[data-testid='quick-find']").TextContent.Trim());
+    }
+
+    [Fact]
+    public void Quick_Find_Click_Calls_OpenPalette()
+    {
+        var actions = Substitute.For<IKeyboardActions>();
+        Register(MakeStore(), actions: actions);
+
+        var cut = RenderComponent<Header>();
+        cut.Find("[data-testid='quick-find']").Click();
+
+        actions.Received(1).OpenPalette();
     }
 
     [Fact]

@@ -1,16 +1,28 @@
-﻿@inherits LayoutComponentBase
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@using Delta.DocView.Client.Components
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://learn.microsoft.com/aspnet/core/" target="_blank">About</a>
+<div class="app-shell">
+    <Header />
+
+    @if (Warning is not null)
+    {
+        <div class="warning-banner" role="alert">
+            ⚠ @Warning
         </div>
+    }
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
+    <div class="app-body">
+        <aside class="left-rail">
+            <LeftRail />
+        </aside>
+        <section class="step-list-panel">
+            <StepList />
+        </section>
+        <section class="detail-panel">
+            <DetailPanel />
+        </section>
+    </div>
 </div>
+
+@code {
+    [Parameter] public string? Warning { get; set; }
+}

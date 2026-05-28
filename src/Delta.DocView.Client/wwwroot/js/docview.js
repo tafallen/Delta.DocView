@@ -30,5 +30,14 @@ window.docview = {
                 console.warn('docview.favourites.write failed', e);
             }
         }
+    },
+    copyText: async function (text) {
+        try {
+            await navigator.clipboard.writeText(text);
+            return true;
+        } catch (e) {
+            console.warn('docview.copyText failed', e);
+            return false;
+        }
     }
 };

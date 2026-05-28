@@ -267,6 +267,7 @@ html, body {
   overflow-y: auto;
   background: var(--bg);
   border-right: 1px solid var(--border);
+  padding: 0 0.75rem;
 }
 
 .step-list-panel {

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://delta.docgen/schema/v1/step-library.schema.json",
+  "version": "1.0.0",
+  "generatedAt": "2026-01-01T00:00:00Z",
+  "generatorVersion": "1.0.0",
+  "enriched": true,
+  "domains": [
+    { "id": "Auth", "label": "Auth & Identity" }
+  ],
+  "steps": [
+    {
+      "id": "auth-001a2b3c",
+      "type": "Given",
+      "pattern": "I am logged in as {string}",
+      "params": [{ "name": "username", "type": "string", "example": "\"admin@delta.io\"" }],
+      "file": "Auth/AuthSteps.cs",
+      "line": 10,
+      "domain": "Auth",
+      "tags": ["login"],
+      "used": 100,
+      "description": "Logs in as the given user.",
+      "source": "public void Login(string u) {}",
+      "suggestsNext": []
+    }
+  ],
+  "signature": {
+    "algorithm": "SHA-256",
+    "digest": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

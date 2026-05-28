@@ -10,6 +10,19 @@ public readonly record struct HighlightedToken(string Text, string CssClass);
 /// back to plain `cs-text` for everything else. Suitable for v1 read-only
 /// display in the detail panel.
 /// </summary>
+/// <remarks>
+/// <para>Recognised: ~50 common C# keywords; regular, verbatim ($), and interpolated ($) string literals;
+/// line and block comments; bare integer literals.</para>
+/// <para>NOT recognised (silently classified as cs-text):</para>
+/// <list type="bullet">
+///   <item>Raw string literals (<c>"""..."""</c>) — the regular-string regex matches adjacent quote pairs, so <c>"""raw"""</c> tokenises as three cs-string pieces (<c>""</c>, <c>"raw"</c>, <c>""</c>) rather than as a single literal</item>
+///   <item>Nested or escaped braces inside interpolated string holes (<c>$"{x:N2}"</c> tokenises the hole as cs-text)</item>
+///   <item>Modern keywords: <c>init</c>, <c>required</c>, <c>file</c>, <c>with</c>, <c>nint</c>, <c>nuint</c>, <c>and</c>, <c>or</c>, <c>not</c></item>
+///   <item>Floating-point, hex (<c>0x...</c>), binary (<c>0b...</c>), or underscore-separated numeric literals</item>
+///   <item>Operators and punctuation</item>
+/// </list>
+/// <para>The token alternation order is comment → string → number → identifier; comment wins when it overlaps a string (e.g. <c>// "hi"</c> is one comment token), and string wins when its delimiters contain comment-like characters (e.g. <c>"// not a comment"</c> is one string token).</para>
+/// </remarks>
 public static class CSharpHighlighter
 {
     private static readonly HashSet<string> Keywords = new()

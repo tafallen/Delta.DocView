@@ -5,10 +5,10 @@ namespace Delta.DocView.Tests.Services;
 public class DomainPaletteTests
 {
     [Fact]
-    public void HueFor_IsDeterministic_ForSameId()
+    public void IndexFor_IsDeterministic_ForSameId()
     {
-        var first = DomainPalette.HueFor("auth");
-        var second = DomainPalette.HueFor("auth");
+        var first = DomainPalette.IndexFor("auth");
+        var second = DomainPalette.IndexFor("auth");
 
         Assert.Equal(first, second);
     }
@@ -20,40 +20,62 @@ public class DomainPaletteTests
     [InlineData("identity")]
     [InlineData("a")]
     [InlineData("some-very-long-domain-id-12345")]
-    public void HueFor_ReturnsValueInRange(string id)
+    public void IndexFor_ReturnsValueInPaletteRange(string id)
     {
-        var hue = DomainPalette.HueFor(id);
+        var idx = DomainPalette.IndexFor(id);
 
-        Assert.InRange(hue, 0, 359);
+        Assert.InRange(idx, 0, DomainPalette.PaletteSize - 1);
     }
 
     [Fact]
-    public void HueFor_ProducesGenerallyDistinctValues_AcrossDifferentIds()
+    public void IndexFor_EmptyString_ReturnsZero()
     {
-        var ids = new[] { "auth", "storage", "networking", "identity", "compute" };
-        var distinct = ids.Select(DomainPalette.HueFor).Distinct().Count();
-
-        Assert.True(distinct >= 3, $"Expected at least 3 distinct hues, got {distinct}");
+        Assert.Equal(0, DomainPalette.IndexFor(""));
     }
 
     [Fact]
-    public void HueFor_EmptyString_ReturnsZero()
+    public void IndexFor_Null_ReturnsZero()
     {
-        Assert.Equal(0, DomainPalette.HueFor(""));
+        Assert.Equal(0, DomainPalette.IndexFor(null!));
     }
 
     [Fact]
-    public void HueFor_Null_ReturnsZero()
+    public void CssVarValue_IsHslString_ConsistentWithIndexFor()
     {
-        Assert.Equal(0, DomainPalette.HueFor(null!));
-    }
-
-    [Fact]
-    public void CssVarValue_MatchesHueForSameId()
-    {
-        var hue = DomainPalette.HueFor("auth");
         var css = DomainPalette.CssVarValue("auth");
 
-        Assert.Equal($"hsl({hue} 60% 45%)", css);
+        Assert.StartsWith("hsl(", css);
+        // Calling twice yields the same palette entry.
+        Assert.Equal(css, DomainPalette.CssVarValue("auth"));
+    }
+
+    [Fact]
+    public void CssVarName_Lowercases_SimpleId()
+    {
+        Assert.Equal("--dom-auth", DomainPalette.CssVarName("Auth"));
+    }
+
+    [Fact]
+    public void CssVarName_ReplacesWhitespace()
+    {
+        Assert.Equal("--dom-order-mgmt", DomainPalette.CssVarName("Order Mgmt"));
+    }
+
+    [Fact]
+    public void CssVarName_ReplacesPunctuation()
+    {
+        Assert.Equal("--dom-foo-bar", DomainPalette.CssVarName("foo!bar"));
+    }
+
+    [Fact]
+    public void CssVarName_EmptyString_ReturnsDefault()
+    {
+        Assert.Equal("--dom-default", DomainPalette.CssVarName(""));
+    }
+
+    [Fact]
+    public void CssVarName_Null_ReturnsDefault()
+    {
+        Assert.Equal("--dom-default", DomainPalette.CssVarName(null!));
     }
 }

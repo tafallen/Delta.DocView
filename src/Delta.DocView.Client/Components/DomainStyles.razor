@@ -5,8 +5,7 @@
     :root {
     @foreach (var domain in Store.Domains)
     {
-        var id = domain.Id.ToLowerInvariant();
-        @:    --dom-@(id): @DomainPalette.CssVarValue(id);
+        @:    @(DomainPalette.CssVarName(domain.Id)): @DomainPalette.CssVarValue(domain.Id);
     }
     }
 </style>

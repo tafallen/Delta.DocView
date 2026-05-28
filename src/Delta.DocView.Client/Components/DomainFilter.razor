@@ -16,12 +16,12 @@
         var d = domain;
         var isActive = State.Domain == d.Id;
         var count = Store.Steps.Count(s => s.Domain == d.Id);
-        var idLower = d.Id.ToLowerInvariant();
+        var varName = DomainPalette.CssVarName(d.Id);
         <button class="domain-row @(isActive ? "is-active" : "")"
                 data-domain="@d.Id"
                 type="button"
                 @onclick="() => State.SetDomain(d.Id)">
-            <span class="domain-dot" style="background:var(--dom-@idLower)"></span>
+            <span class="domain-dot" style="background:var(@varName)"></span>
             <span class="domain-label">@d.Label</span>
             <span class="count">@count</span>
         </button>

@@ -3,6 +3,7 @@
 @implements IDisposable
 @inject IFavouritesStore Favs
 @inject SelectionState Selection
+@inject ComposerState Composer
 
 <div class="step-row @(IsSelected ? "is-selected" : "")" data-step-id="@Step.Id" @onclick="OnRowClick">
     <span class="type-chip chip-@Step.Type.ToLowerInvariant()">@Step.Type</span>
@@ -19,7 +20,7 @@
     </div>
     <div class="step-actions">
         <button class="row-star @(Favs.Has(Step.Id) ? "is-fav" : "")" data-testid="row-star" @onclick="OnStarClick" @onclick:stopPropagation="true">★</button>
-        <button class="row-add" data-testid="row-add" disabled title="@UiStrings.AddToScenarioComingSoon">＋</button>
+        <button class="row-add" data-testid="row-add" @onclick="OnAddClick" @onclick:stopPropagation="true">＋</button>
     </div>
 </div>
 
@@ -36,6 +37,8 @@
     private void OnRowClick() => Selection.Select(Step);
 
     private void OnStarClick() => Favs.Toggle(Step.Id);
+
+    private void OnAddClick() => Composer.AddStep(Step);
 
     private void OnChanged() => InvokeAsync(StateHasChanged);
 

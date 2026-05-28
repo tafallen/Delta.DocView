@@ -37,6 +37,8 @@ public class StepListTests
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<ComposerState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var store = ctx.Services.GetRequiredService<ClientStepLibraryStore>();

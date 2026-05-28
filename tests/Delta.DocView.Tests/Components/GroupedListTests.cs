@@ -13,6 +13,11 @@ public class GroupedListTests
         var ctx = new TestContext();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
+        ctx.Services.AddScoped<ClientStepLibraryStore>();
+        ctx.Services.AddScoped<FilterState>();
+        ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<ComposerState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         var sel = ctx.Services.GetRequiredService<SelectionState>();
         return (ctx, sel);

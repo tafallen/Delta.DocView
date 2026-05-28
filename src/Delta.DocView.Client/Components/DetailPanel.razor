@@ -3,6 +3,7 @@
 @inject SelectionState Selection
 @inject IFavouritesStore Favs
 @inject ClientStepLibraryStore Store
+@inject ComposerState Composer
 @implements IDisposable
 
 @if (Selection.Selected is null)
@@ -26,9 +27,7 @@ else
                     @onclick="() => Favs.Toggle(step.Id)">★</button>
             <button class="detail-add-primary"
                     data-testid="detail-add-primary"
-                    disabled
-                    aria-disabled="true"
-                    title="@UiStrings.AddToScenarioComingSoon">Add to scenario</button>
+                    @onclick="() => Composer.AddStep(step)">Add to scenario</button>
         </div>
         <PatternHeading Step="@step" />
         @if (!string.IsNullOrWhiteSpace(step.Description))

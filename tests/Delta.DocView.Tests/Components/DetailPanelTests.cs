@@ -50,6 +50,10 @@ public class DetailPanelTests
         ctx.Services.AddScoped<ClientStepLibraryStore>();
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
+        ctx.Services.AddScoped<FilterState>();
+        ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<ComposerState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var store = ctx.Services.GetRequiredService<ClientStepLibraryStore>();
@@ -133,7 +137,7 @@ public class DetailPanelTests
     }
 
     [Fact]
-    public void Add_To_Scenario_Button_Is_Disabled()
+    public void DetailPanel_AddToScenarioButton_IsEnabled()
     {
         var step = MakeStepA();
         var (ctx, _, sel, _) = Setup(new[] { step });
@@ -142,9 +146,21 @@ public class DetailPanelTests
         var cut = ctx.RenderComponent<DetailPanel>();
 
         var btn = cut.Find("[data-testid='detail-add-primary']");
-        Assert.True(btn.HasAttribute("disabled"));
-        var title = btn.GetAttribute("title") ?? "";
-        Assert.Contains("coming soon", title, StringComparison.OrdinalIgnoreCase);
+        Assert.False(btn.HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void DetailPanel_AddToScenarioButton_Click_AddsToComposer()
+    {
+        var step = MakeStepA();
+        var (ctx, _, sel, _) = Setup(new[] { step });
+        sel.Select(step);
+        var composer = ctx.Services.GetRequiredService<ComposerState>();
+
+        var cut = ctx.RenderComponent<DetailPanel>();
+        cut.Find("[data-testid='detail-add-primary']").Click();
+
+        Assert.Equal(1, composer.StepCount);
     }
 
     [Fact]

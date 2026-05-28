@@ -97,6 +97,7 @@ public class FilterStackTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<ComposerState>();
         ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;

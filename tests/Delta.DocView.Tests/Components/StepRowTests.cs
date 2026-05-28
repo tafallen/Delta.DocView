@@ -13,6 +13,11 @@ public class StepRowTests
         var ctx = new TestContext();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
+        ctx.Services.AddScoped<ClientStepLibraryStore>();
+        ctx.Services.AddScoped<FilterState>();
+        ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<ComposerState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         var favs = ctx.Services.GetRequiredService<IFavouritesStore>();
         var sel = ctx.Services.GetRequiredService<SelectionState>();
@@ -150,13 +155,26 @@ public class StepRowTests
     }
 
     [Fact]
-    public void Add_Button_Is_Disabled_Placeholder()
+    public void StepRow_AddButton_IsEnabled()
     {
         var (ctx, _, _) = Setup();
         using var _c = ctx;
         var cut = ctx.RenderComponent<StepRow>(p => p.Add(x => x.Step, MakeStep()));
 
-        var addBtn = cut.Find("[data-testid=\"row-add\"]");
-        Assert.True(addBtn.HasAttribute("disabled"));
+        var btn = cut.Find("[data-testid=\"row-add\"]");
+        Assert.False(btn.HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void StepRow_AddButton_Click_AddsToComposer()
+    {
+        var (ctx, _, _) = Setup();
+        using var _c = ctx;
+        var composer = ctx.Services.GetRequiredService<ComposerState>();
+        var cut = ctx.RenderComponent<StepRow>(p => p.Add(x => x.Step, MakeStep()));
+
+        cut.Find("[data-testid=\"row-add\"]").Click();
+
+        Assert.Equal(1, composer.StepCount);
     }
 }

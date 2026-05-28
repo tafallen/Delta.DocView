@@ -36,6 +36,10 @@ public class ShellComponentTests : TestContext
         Services.AddScoped<ClientStepLibraryStore>();
         Services.AddScoped<SelectionState>();
         Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
+        Services.AddScoped<FilterState>();
+        Services.AddScoped<FilteredStepsProvider>();
+        Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        Services.AddScoped<ComposerState>();
         var cut = RenderComponent<DetailPanel>();
         Assert.Contains("detail-empty", cut.Markup);
     }

@@ -237,15 +237,15 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] Opens as a modal overlay on `⌘K`, `/`, or the "Quick find" header button.
-- [ ] Input auto-focuses when opened; `Escape` closes and returns focus.
-- [ ] Default state (no query): top 50 steps sorted by usage desc.
-- [ ] With a query: fuzzy match against pattern, type, domain, tags, param names; results sorted by fuzzy score desc.
-- [ ] Each result row: type chip, highlighted pattern, domain label, usage count (`N×`).
-- [ ] Arrow Up/Down navigate the list; highlighted row scrolls into view.
-- [ ] Enter or click selects a step: closes palette, updates main selection and detail panel.
-- [ ] Empty state: "No step matches `query`." + hint suggesting a file to create the step in.
-- [ ] Results capped at 50.
+- [x] Opens as a modal overlay on `⌘K`, `/`, or the "Quick find" header button. *— Quick-find label is platform-aware: "⌘K" on macOS, "Ctrl+K" elsewhere.*
+- [x] Input auto-focuses when opened; `Escape` closes and returns focus.
+- [x] Default state (no query): top 50 steps sorted by usage desc.
+- [x] With a query: fuzzy match against pattern, type, domain, tags, param names; results sorted by fuzzy score desc.
+- [x] Each result row: type chip, highlighted pattern, domain label, usage count (`N×`).
+- [x] Arrow Up/Down navigate the list; highlighted row scrolls into view.
+- [x] Enter or click selects a step: closes palette, updates main selection and detail panel.
+- [x] Empty state: "No step matches `query`." + hint suggesting a file to create the step in.
+- [x] Results capped at 50.
 
 #### Implementation tasks
 

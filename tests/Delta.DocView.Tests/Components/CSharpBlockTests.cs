@@ -52,7 +52,7 @@ public class CSharpBlockTests : TestContext
 
         cut.Find("[data-testid='cs-toggle']").Click();
 
-        Assert.NotEmpty(cut.FindAll("[data-testid='cs-copy-button']"));
+        Assert.NotEmpty(cut.FindAll("[data-testid='copy-button']"));
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class CSharpBlockTests : TestContext
         var cut = RenderComponent<CSharpBlock>(p => p.Add(c => c.Source, "public void Foo()"));
 
         cut.Find("[data-testid='cs-toggle']").Click();
-        cut.Find("[data-testid='cs-copy-button']").Click();
+        cut.Find("[data-testid='copy-button']").Click();
 
         var calls = JSInterop.Invocations["docview.copyText"];
         Assert.Single(calls);
@@ -78,12 +78,12 @@ public class CSharpBlockTests : TestContext
         var cut = RenderComponent<CSharpBlock>(p => p.Add(c => c.Source, "public void Foo()"));
 
         cut.Find("[data-testid='cs-toggle']").Click();
-        cut.Find("[data-testid='cs-copy-button']").Click();
+        cut.Find("[data-testid='copy-button']").Click();
 
-        Assert.NotEmpty(cut.FindAll("[data-testid='cs-copy-confirmation']"));
+        Assert.NotEmpty(cut.FindAll("[data-testid='copy-confirmation']"));
 
         cut.WaitForAssertion(
-            () => Assert.Empty(cut.FindAll("[data-testid='cs-copy-confirmation']")),
+            () => Assert.Empty(cut.FindAll("[data-testid='copy-confirmation']")),
             TimeSpan.FromSeconds(2));
     }
 

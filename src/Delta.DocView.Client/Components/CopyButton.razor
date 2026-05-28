@@ -1,0 +1,63 @@
+@inject IJSRuntime JS
+@implements IDisposable
+
+<button class="copy-button" data-testid="copy-button" @onclick="OnClick">@Label</button>
+@if (_confirmed)
+{
+    <span class="copy-confirmation" data-testid="copy-confirmation">@ConfirmLabel</span>
+}
+
+@code {
+    private const string JsCopyText = "docview.copyText";
+    private const int ConfirmMs = 1100;
+
+    [Parameter, EditorRequired]
+    public string Text { get; set; } = "";
+
+    [Parameter]
+    public string Label { get; set; } = "Copy";
+
+    [Parameter]
+    public string ConfirmLabel { get; set; } = "✓ copied";
+
+    private bool _confirmed;
+    private bool _disposed;
+    private System.Threading.Timer? _timer;
+
+    private async Task OnClick()
+    {
+        try
+        {
+            await JS.InvokeAsync<bool>(JsCopyText, Text);
+        }
+        catch
+        {
+            // copy may fail in test contexts or insecure origins; JS side warns
+        }
+
+        if (_disposed) return;
+
+        _confirmed = true;
+        _timer ??= new System.Threading.Timer(_ =>
+        {
+            if (_disposed) return;
+            try
+            {
+                _ = InvokeAsync(() =>
+                {
+                    if (_disposed) return;
+                    _confirmed = false;
+                    StateHasChanged();
+                });
+            }
+            catch (ObjectDisposedException) { }
+        });
+        _timer.Change(ConfirmMs, System.Threading.Timeout.Infinite);
+    }
+
+    public void Dispose()
+    {
+        _disposed = true;
+        _timer?.Dispose();
+    }
+}

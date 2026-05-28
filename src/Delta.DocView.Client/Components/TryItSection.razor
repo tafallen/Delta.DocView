@@ -1,7 +1,5 @@
 @using Delta.DocView.Client.Services
 @using Delta.DocView.Shared.Models
-@inject IJSRuntime JS
-@implements IDisposable
 
 <div class="try-it" data-testid="try-it">
     @if (_paramIndices.Count > 0)
@@ -22,11 +20,7 @@
     }
     <pre class="composed-line" data-testid="composed-line">@_composed</pre>
     <div class="try-it-actions">
-        <button class="copy-button" data-testid="copy-button" @onclick="OnCopyClick">Copy</button>
-        @if (_confirmed)
-        {
-            <span class="copy-confirmation" data-testid="copy-confirmation">✓ line copied</span>
-        }
+        <CopyButton Text="@_composed" Label="Copy" ConfirmLabel="✓ line copied" />
     </div>
 </div>
 
@@ -37,8 +31,6 @@
     private List<int> _paramIndices = new();
     private string[] _inputs = Array.Empty<string>();
     private string _composed = "";
-    private bool _confirmed;
-    private System.Threading.Timer? _timer;
 
     protected override void OnParametersSet()
     {
@@ -81,18 +73,4 @@
         }
         _composed = sb.ToString();
     }
-
-    private async Task OnCopyClick()
-    {
-        await JS.InvokeAsync<bool>("docview.copyText", _composed);
-        _confirmed = true;
-        _timer ??= new System.Threading.Timer(_ => InvokeAsync(() =>
-        {
-            _confirmed = false;
-            StateHasChanged();
-        }));
-        _timer.Change(1100, System.Threading.Timeout.Infinite);
-    }
-
-    public void Dispose() => _timer?.Dispose();
 }

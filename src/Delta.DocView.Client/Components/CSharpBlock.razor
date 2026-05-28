@@ -1,6 +1,4 @@
 @using Delta.DocView.Client.Services
-@inject IJSRuntime JS
-@implements IDisposable
 
 <div class="cs-block" data-testid="cs-block">
     <div class="cs-block-header">
@@ -9,11 +7,7 @@
         </button>
         @if (_expanded)
         {
-            <button class="copy-button" data-testid="cs-copy-button" @onclick="OnCopyClick">Copy source</button>
-            @if (_confirmed)
-            {
-                <span class="copy-confirmation" data-testid="cs-copy-confirmation">✓ source copied</span>
-            }
+            <CopyButton Text="@Source" Label="Copy source" ConfirmLabel="✓ source copied" />
         }
     </div>
     @if (_expanded)
@@ -28,18 +22,6 @@
     public string Source { get; set; } = "";
 
     private bool _expanded;
-    private bool _confirmed;
-    private System.Threading.Timer? _timer;
 
     private void OnToggleClick() => _expanded = !_expanded;
-
-    private async Task OnCopyClick()
-    {
-        await JS.InvokeAsync<bool>("docview.copyText", Source);
-        _confirmed = true;
-        _timer ??= new System.Threading.Timer(_ => InvokeAsync(() => { _confirmed = false; StateHasChanged(); }));
-        _timer.Change(1100, System.Threading.Timeout.Infinite);
-    }
-
-    public void Dispose() => _timer?.Dispose();
 }

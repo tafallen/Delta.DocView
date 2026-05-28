@@ -12,6 +12,8 @@ public sealed class ClientStepLibraryStore
         new Dictionary<string, int>();
     public IReadOnlyDictionary<string, int> CountByDomain { get; private set; } =
         new Dictionary<string, int>();
+    public IReadOnlyDictionary<string, StepDomain> DomainById { get; private set; } =
+        new Dictionary<string, StepDomain>();
     public IReadOnlyList<string> DistinctParamTypes { get; private set; } = [];
     public string Version { get; private set; } = "";
     public string GeneratedAt { get; private set; } = "";
@@ -21,6 +23,7 @@ public sealed class ClientStepLibraryStore
         Steps = library.Steps;
         Domains = library.Domains;
         ById = library.Steps.ToDictionary(s => s.Id);
+        DomainById = library.Domains.ToDictionary(d => d.Id);
 
         var countByType = GherkinStepTypes.All.ToDictionary(t => t, _ => 0);
         foreach (var step in library.Steps)

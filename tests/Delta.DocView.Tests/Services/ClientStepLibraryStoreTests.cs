@@ -126,4 +126,56 @@ public class ClientStepLibraryStoreTests
 
         Assert.Equal(new[] { "DocString", "int", "string" }, store.DistinctParamTypes);
     }
+
+    [Fact]
+    public void Populate_SetsDomainById_WithAllDomains()
+    {
+        var domains = new List<StepDomain>
+        {
+            new() { Id = "Auth", Label = "Auth & Identity" },
+            new() { Id = "Billing", Label = "Billing" },
+            new() { Id = "Reporting", Label = "Reporting" },
+        };
+        var store = new ClientStepLibraryStore();
+        store.Populate(MakeLibraryWith(domains, []));
+
+        Assert.Equal(3, store.DomainById.Count);
+        Assert.Equal("Auth & Identity", store.DomainById["Auth"].Label);
+        Assert.Equal("Billing", store.DomainById["Billing"].Label);
+        Assert.Equal("Reporting", store.DomainById["Reporting"].Label);
+    }
+
+    [Fact]
+    public void Populate_SecondCall_RebuildsDomainById()
+    {
+        var first = new List<StepDomain>
+        {
+            new() { Id = "Auth", Label = "Auth" },
+            new() { Id = "Billing", Label = "Billing" },
+        };
+        var second = new List<StepDomain>
+        {
+            new() { Id = "Reporting", Label = "Reporting" },
+            new() { Id = "Admin", Label = "Admin" },
+            new() { Id = "Search", Label = "Search" },
+        };
+        var store = new ClientStepLibraryStore();
+        store.Populate(MakeLibraryWith(first, []));
+        store.Populate(MakeLibraryWith(second, []));
+
+        Assert.Equal(3, store.DomainById.Count);
+        Assert.False(store.DomainById.ContainsKey("Auth"));
+        Assert.False(store.DomainById.ContainsKey("Billing"));
+        Assert.True(store.DomainById.ContainsKey("Reporting"));
+        Assert.True(store.DomainById.ContainsKey("Admin"));
+        Assert.True(store.DomainById.ContainsKey("Search"));
+    }
+
+    [Fact]
+    public void DomainById_Defaults_To_Empty_Before_Populate()
+    {
+        var store = new ClientStepLibraryStore();
+        Assert.Equal(0, store.DomainById.Count);
+        Assert.False(store.DomainById.TryGetValue("Auth", out _));
+    }
 }

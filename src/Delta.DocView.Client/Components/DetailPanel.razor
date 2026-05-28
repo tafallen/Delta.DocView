@@ -53,7 +53,7 @@ else
     private void OnChanged() => InvokeAsync(StateHasChanged);
 
     private string DomainLabel(string id) =>
-        Store.Domains.FirstOrDefault(d => d.Id == id)?.Label ?? id;
+        Store.DomainById.TryGetValue(id, out var d) ? d.Label : id;
 
     public void Dispose()
     {

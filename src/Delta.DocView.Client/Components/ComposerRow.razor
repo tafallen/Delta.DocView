@@ -1,0 +1,38 @@
+@using Delta.DocView.Client.Services
+
+<li class="composer-row @(IsDragging ? "is-drag" : "")"
+    @ondragover:preventDefault
+    @ondrop="OnDrop">
+    <span class="drag-handle"
+          draggable="true"
+          @ondragstart="OnDragStart"
+          @ondragend="OnDragEnd"
+          aria-hidden="true">⠿</span>
+    <span class="composer-keyword">@Keyword</span>
+    <span class="composer-row-pattern">@Item.Step.Pattern</span>
+    <div class="composer-row-actions">
+        <button class="composer-row-btn"
+                type="button"
+                title="Go to step"
+                aria-label="Navigate to step"
+                data-testid="row-navigate"
+                @onclick="OnNavigate">→</button>
+        <button class="composer-row-btn"
+                type="button"
+                title="Remove step"
+                aria-label="Remove step"
+                data-testid="row-remove"
+                @onclick="OnRemove">×</button>
+    </div>
+</li>
+
+@code {
+    [Parameter, EditorRequired] public ComposerItem Item { get; set; } = default!;
+    [Parameter, EditorRequired] public string Keyword { get; set; } = "";
+    [Parameter] public bool IsDragging { get; set; }
+    [Parameter] public EventCallback OnRemove { get; set; }
+    [Parameter] public EventCallback OnNavigate { get; set; }
+    [Parameter] public EventCallback OnDragStart { get; set; }
+    [Parameter] public EventCallback OnDragEnd { get; set; }
+    [Parameter] public EventCallback OnDrop { get; set; }
+}

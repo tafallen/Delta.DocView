@@ -1,0 +1,147 @@
+@using Delta.DocView.Client.Services
+@inject ComposerState Composer
+@inject SelectionState Selection
+@implements IDisposable
+
+<div class="composer-dock">
+    <button class="composer-tab"
+            type="button"
+            data-testid="composer-tab"
+            @onclick="Composer.Toggle"
+            aria-expanded="@(Composer.IsOpen ? "true" : "false")"
+            aria-controls="composer-body">
+        <span class="composer-tab-icon" aria-hidden="true">🧪</span>
+        <span class="composer-tab-title">Scenario Composer</span>
+        @if (Composer.StepCount > 0)
+        {
+            <span class="composer-tab-count" aria-label="@Composer.StepCount steps added">@Composer.StepCount</span>
+        }
+        <span class="composer-tab-chevron @(Composer.IsOpen ? "is-open" : "")" aria-hidden="true">▲</span>
+    </button>
+
+    @if (Composer.IsOpen)
+    {
+        <div class="composer-body" id="composer-body" role="region" aria-label="Scenario Composer">
+            <div class="composer-edit">
+                <input class="composer-name-input"
+                       type="text"
+                       placeholder="Scenario name…"
+                       value="@Composer.ScenarioName"
+                       @oninput="OnNameInput"
+                       aria-label="Scenario name"
+                       data-testid="composer-name-input" />
+
+                @if (Composer.Steps.Count == 0)
+                {
+                    <p class="composer-empty">Add steps using the <strong>＋</strong> button on any step row.</p>
+                }
+                else
+                {
+                    <ol class="composer-step-list" aria-label="Scenario steps">
+                        @for (int i = 0; i < Composer.Steps.Count; i++)
+                        {
+                            var item = Composer.Steps[i];
+                            var keyword = i == 0 || Composer.Steps[i].Step.Type != Composer.Steps[i - 1].Step.Type
+                                ? Composer.Steps[i].Step.Type
+                                : "And";
+                            var capturedId = item.Id;
+                            <ComposerRow Item="@item"
+                                         Keyword="@keyword"
+                                         IsDragging="@(_draggingId == item.Id)"
+                                         OnRemove="@(() => Composer.RemoveStep(capturedId))"
+                                         OnNavigate="@(() => Selection.Select(item.Step))"
+                                         OnDragStart="@(() => _draggingId = capturedId)"
+                                         OnDragEnd="@(() => _draggingId = null)"
+                                         OnDrop="@(() => OnDropOnItem(capturedId))" />
+                        }
+                    </ol>
+                    <SuggestionStrip />
+                }
+            </div>
+
+            <div class="composer-output">
+                @if (Composer.Steps.Count == 0)
+                {
+                    <p class="composer-output-empty">Your .feature preview will appear here.</p>
+                }
+                else
+                {
+                    <pre class="composer-feature-preview" data-testid="feature-preview">@Composer.FeatureText</pre>
+                }
+                <div class="composer-output-actions">
+                    @if (Composer.Steps.Count == 0)
+                    {
+                        <button class="btn-secondary" disabled>Copy .feature</button>
+                    }
+                    else
+                    {
+                        <CopyButton Text="@Composer.FeatureText" Label="Copy .feature" />
+                    }
+                    <button class="btn-secondary"
+                            type="button"
+                            disabled="@(Composer.Steps.Count == 0)"
+                            @onclick="OnClearClick"
+                            data-testid="clear-composer">Clear</button>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@if (_confirmingClear)
+{
+    <div class="composer-clear-dialog"
+         role="dialog"
+         aria-modal="true"
+         aria-label="Confirm clear">
+        <div class="composer-clear-inner">
+            <p>Remove all @Composer.StepCount step(s) from the composer?</p>
+            <div class="composer-clear-actions">
+                <button type="button"
+                        class="btn-secondary"
+                        @onclick="CancelClear"
+                        data-testid="cancel-clear">Cancel</button>
+                <button type="button"
+                        class="btn-danger"
+                        @onclick="ConfirmClear"
+                        data-testid="confirm-clear">Clear all</button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private Guid? _draggingId;
+    private bool _confirmingClear;
+
+    protected override void OnInitialized() =>
+        Composer.Changed += OnComposerChanged;
+
+    private void OnComposerChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnNameInput(ChangeEventArgs e) =>
+        Composer.SetScenarioName(e.Value?.ToString() ?? "");
+
+    private void OnDropOnItem(Guid targetId)
+    {
+        if (_draggingId is null || _draggingId == targetId) return;
+        var targetIdx = Composer.Steps.ToList().FindIndex(x => x.Id == targetId);
+        if (targetIdx >= 0) Composer.MoveStep(_draggingId.Value, targetIdx);
+        _draggingId = null;
+    }
+
+    private void OnClearClick()
+    {
+        if (Composer.Steps.Count > 0) _confirmingClear = true;
+    }
+
+    private void ConfirmClear()
+    {
+        Composer.Clear();
+        _confirmingClear = false;
+    }
+
+    private void CancelClear() => _confirmingClear = false;
+
+    public void Dispose() => Composer.Changed -= OnComposerChanged;
+}

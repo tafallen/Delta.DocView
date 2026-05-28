@@ -98,13 +98,13 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] **Step type** row shows four toggle buttons: Given · When · Then · And, each with a count badge. At least one type must remain selected (toggle is blocked if it would deselect all).
-- [ ] **Domain** section shows "All domains N" plus one button per domain, each with a coloured dot and count. Selecting a domain activates it; selecting "All" clears domain filter.
-- [ ] **Parameter type** grid shows `string`, `int`, `decimal`, `DocString` chips; multi-select; selects only steps that have at least one param of that type. Deselecting all = no filter.
-- [ ] **Favourites** toggle button shows a star icon and count; when active shows only favourited steps.
-- [ ] Filters are AND-combined: type filter AND domain filter AND param filter AND favourites filter AND search query.
-- [ ] Filter state is not persisted between page loads (session-only).
-- [ ] Domain colour dots match `--dom-{domainid}` CSS variables (lower-case domain id).
+- [x] **Step type** row shows four toggle buttons: Given · When · Then · And, each with a count badge. At least one type must remain selected (toggle is blocked if it would deselect all).
+- [x] **Domain** section shows "All domains N" plus one button per domain, each with a coloured dot and count. Selecting a domain activates it; selecting "All" clears domain filter.
+- [x] **Parameter type** grid shows `string`, `int`, `decimal`, `DocString` chips; multi-select; selects only steps that have at least one param of that type. Deselecting all = no filter.
+- [x] **Favourites** toggle button shows a star icon and count; when active shows only favourited steps.
+- [x] Filters are AND-combined: type filter AND domain filter AND param filter AND favourites filter AND search query.
+- [x] Filter state is not persisted between page loads (session-only).
+- [x] Domain colour dots match `--dom-{domainid}` CSS variables (lower-case domain id).
 
 #### Implementation tasks
 

@@ -1,0 +1,31 @@
+@using Delta.DocView.Client.Services
+@implements IDisposable
+@inject FilterState State
+@inject IFavouritesStore Favs
+
+<button class="favourites-toggle @(State.FavsOnly ? "is-active" : "")"
+        data-testid="favourites-toggle"
+        type="button"
+        @onclick="OnClick">
+    <span class="star">★</span>
+    <span class="favs-label">Favourites</span>
+    <span class="count">@Favs.Count</span>
+</button>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.Changed += OnChanged;
+        Favs.Changed += OnChanged;
+    }
+
+    private void OnClick() => State.SetFavsOnly(!State.FavsOnly);
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+        Favs.Changed -= OnChanged;
+    }
+}

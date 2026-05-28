@@ -315,27 +315,31 @@ html, body {
 }
 
 /* ── Step type filter ─────────────────────────────────────────────── */
-.step-type-filter { display: flex; gap: 0.25rem; }
+.step-type-filter { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
 .step-type {
-  flex: 1; padding: 0.25rem 0.5rem; border: 1px solid var(--border);
-  background: var(--bg); color: var(--text-muted); border-radius: 4px;
-  cursor: pointer; font-size: 0.85rem;
+  display: flex; flex-direction: column; align-items: center; gap: 0.35rem;
+  padding: 0.55rem 0.25rem 0.5rem; border: 1.5px solid var(--border);
+  background: var(--bg-panel); border-radius: 8px;
+  cursor: pointer; text-align: center;
 }
-.step-type.is-active { background: var(--accent-500); color: white; border-color: var(--accent-500); }
-.step-type .count { opacity: 0.7; margin-left: 0.25rem; font-size: 0.75rem; }
+.step-type.is-active { border-color: var(--accent-500); }
+.step-type-count { font-size: 0.8rem; color: var(--text-muted); line-height: 1; }
 
 /* ── Domain filter ────────────────────────────────────────────────── */
-.domain-filter { display: block; }
+.domain-filter { display: flex; flex-direction: column; gap: 0.1rem; }
 .domain-row {
-  display: flex; align-items: center; gap: 0.5rem;
-  width: 100%; padding: 0.25rem 0.5rem; border: 1px solid transparent;
-  background: transparent; color: var(--text); border-radius: 4px;
-  cursor: pointer; font-size: 0.85rem; text-align: left;
+  display: flex; align-items: center; gap: 0.55rem;
+  width: 100%; padding: 0.4rem 0.5rem; border: none;
+  background: transparent; color: var(--text); border-radius: 6px;
+  cursor: pointer; font-size: 0.9rem; text-align: left;
 }
-.domain-row.is-active { background: var(--bg-alt); border-color: var(--border); }
-.domain-row .domain-dot { width: 0.6rem; height: 0.6rem; border-radius: 50%; }
+.domain-row:first-child { font-size: 1.05rem; font-weight: 500; margin-bottom: 0.2rem; }
+.domain-row:first-child .count { font-size: 0.95rem; }
+.domain-row.is-active { background: oklch(0.94 0.045 55); color: oklch(0.38 0.12 48); }
+[data-dark="true"] .domain-row.is-active { background: oklch(0.32 0.06 48); color: oklch(0.88 0.08 55); }
+.domain-row .domain-dot { width: 0.65rem; height: 0.65rem; border-radius: 50%; flex-shrink: 0; }
 .domain-row .domain-label { flex: 1; }
-.domain-row .count { opacity: 0.7; font-size: 0.75rem; }
+.domain-row .count { color: var(--text-muted); font-size: 0.8rem; margin-left: auto; }
 
 /* ── Param type filter ────────────────────────────────────────────── */
 .param-type-filter { display: flex; flex-wrap: wrap; gap: 0.25rem; }
@@ -361,7 +365,7 @@ html, body {
 
 .rail-section { padding: 0.75rem 0; }
 .rail-section + .rail-section { border-top: 1px solid var(--border, rgba(0,0,0,0.08)); }
-.rail-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin: 0 0 0.5rem 0; }
+.rail-section-title { font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-muted); margin: 0 0 0.6rem 0; }
 
 /* ── Step list ────────────────────────────────────────────────────── */
 .step-list { display: block; overflow-y: auto; flex: 1; min-height: 0; height: 100%; }

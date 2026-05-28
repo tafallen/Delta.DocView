@@ -13,7 +13,8 @@
                 data-type="@t"
                 type="button"
                 @onclick="() => State.ToggleType(t)">
-            @t <span class="count">@count</span>
+            <span class="chip chip-@t.ToLower()">@t</span>
+            <span class="step-type-count">@count</span>
         </button>
     }
 </div>

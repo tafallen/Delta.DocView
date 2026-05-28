@@ -18,6 +18,7 @@ builder.Services.AddScoped<SelectionState>();
 builder.Services.AddScoped<IFavouritesStore, LocalStorageFavouritesStore>();
 builder.Services.AddScoped<FilteredStepsProvider>();
 builder.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+builder.Services.AddScoped<PaletteState>();
 builder.Services.AddScoped<IPlatform, PlatformService>();
 
 await builder.Build().RunAsync();

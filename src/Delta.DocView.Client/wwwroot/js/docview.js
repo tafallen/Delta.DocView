@@ -39,5 +39,49 @@ window.docview = {
             console.warn('docview.copyText failed', e);
             return false;
         }
+    },
+    keyboard: {
+        _ref: null,
+        _handler: null,
+
+        attach: function (dotnetRef) {
+            if (this._handler) return; // idempotent — already attached
+            this._ref = dotnetRef;
+            const self = this;
+            this._handler = function (e) {
+                // Skip when the user is typing in an input / textarea / contenteditable
+                const a = document.activeElement;
+                if (a && (a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable)) {
+                    return;
+                }
+
+                const key = e.key;
+                const lower = key.length === 1 ? key.toLowerCase() : key;
+                let action = null;
+
+                if ((e.ctrlKey || e.metaKey) && lower === 'k') action = 'open-palette';
+                else if (key === '/') action = 'open-palette';
+                else if (key === '?') action = 'open-shortcuts';
+                else if (lower === 'c' && !e.ctrlKey && !e.metaKey && !e.altKey) action = 'toggle-composer';
+                else if (lower === 'f' && !e.ctrlKey && !e.metaKey && !e.altKey) action = 'toggle-fav';
+                else if (lower === 'j' && !e.ctrlKey && !e.metaKey && !e.altKey) action = 'select-next';
+                else if (lower === 'k' && !e.ctrlKey && !e.metaKey && !e.altKey) action = 'select-prev';
+                else if (key === 'Escape') action = 'close-overlay';
+
+                if (action) {
+                    e.preventDefault();
+                    self._ref.invokeMethodAsync('OnKey', action);
+                }
+            };
+            window.addEventListener('keydown', this._handler);
+        },
+
+        detach: function () {
+            if (this._handler) {
+                window.removeEventListener('keydown', this._handler);
+                this._handler = null;
+                this._ref = null;
+            }
+        }
     }
 };

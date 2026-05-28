@@ -498,21 +498,22 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   font-size: 1.25rem; font-weight: 600; line-height: 1.5;
   padding: 1rem 1.25rem .5rem;
 }
-.detail-description { padding: .25rem 1.25rem .75rem; line-height: 1.6; color: var(--text-muted); }
+.detail-description { padding: .25rem 1.25rem .75rem; line-height: 1.6; color: var(--text); opacity: .8; }
 
 /* ── Stats strip ──────────────────────────────────────────────────── */
 .stats-strip {
-  display: flex; margin: .5rem 1.25rem .75rem;
-  border: 1px solid var(--border); border-radius: .5rem;
-  overflow: hidden; font-size: .85rem;
+  display: flex; flex-wrap: nowrap; margin: .5rem 1.25rem .75rem;
+  border: 1px solid var(--border-2, #e8e8e9); border-radius: .6rem;
+  background: var(--bg-panel); overflow: hidden; font-size: .85rem;
 }
 .stat-col {
-  flex: 1; padding: .6rem .9rem;
-  display: flex; flex-direction: column; gap: .2rem;
+  flex: 1; min-width: 0; padding: .65rem .9rem;
+  display: flex; flex-direction: column; gap: .25rem;
 }
-.stat-col + .stat-col { border-left: 1px solid var(--border); }
-.stat-label { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; color: var(--text-muted); }
-.stat-value { font-size: .85rem; font-weight: 500; }
+.stat-col + .stat-col { border-left: 1px solid var(--border-2, #e8e8e9); }
+.stat-label { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-muted); }
+.stat-value { font-size: .85rem; font-weight: 500; overflow-wrap: break-word; word-break: break-all; }
+.stat-value code { font-family: var(--font-mono); font-size: .8rem; word-break: break-all; }
 .stat-value code { font-family: var(--font-mono); font-size: .82rem; }
 
 /* ── Params table ─────────────────────────────────────────────────── */

@@ -1,0 +1,46 @@
+@using Delta.DocView.Client.Services
+@using Delta.DocView.Shared.Models
+@implements IDisposable
+@inject IFavouritesStore Favs
+@inject SelectionState Selection
+
+<div class="step-row @(IsSelected ? "is-selected" : "")" data-step-id="@Step.Id" @onclick="OnRowClick">
+    <span class="type-chip chip-@Step.Type.ToLowerInvariant()">@Step.Type</span>
+    <div class="step-body">
+        <div class="step-pattern"><PatternRenderer Pattern="@Step.Pattern" Query="@Query" /></div>
+        <div class="step-meta">
+            <span class="step-file">@Step.File:@Step.Line</span>
+            @if (Step.Tags.Count > 0)
+            {
+                <span class="step-tags">@(string.Join(" · ", Step.Tags.Take(3)))@(Step.Tags.Count > 3 ? $" +{Step.Tags.Count - 3}" : "")</span>
+            }
+            <span class="step-used">@(Step.Used)×</span>
+        </div>
+    </div>
+    <div class="step-actions">
+        <button class="row-star @(Favs.Has(Step.Id) ? "is-fav" : "")" data-testid="row-star" @onclick="OnStarClick" @onclick:stopPropagation="true">★</button>
+        <button class="row-add" data-testid="row-add" disabled title="Add to scenario (coming soon)">＋</button>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Step Step { get; set; } = default!;
+    [Parameter] public string? Query { get; set; }
+    [Parameter] public bool IsSelected { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Favs.Changed += OnChanged;
+    }
+
+    private void OnRowClick() => Selection.Select(Step);
+
+    private void OnStarClick() => Favs.Toggle(Step.Id);
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        Favs.Changed -= OnChanged;
+    }
+}

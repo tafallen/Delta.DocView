@@ -2,6 +2,13 @@ window.docview = {
     setDark: function (isDark) {
         document.documentElement.setAttribute('data-dark', isDark ? 'true' : 'false');
     },
+    prefersDark: function () {
+        try {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches;
+        } catch (e) {
+            return false;
+        }
+    },
     setDomainPalette: function (css) {
         let el = document.getElementById('dom-palette');
         if (!el) {

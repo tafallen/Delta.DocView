@@ -27,12 +27,14 @@ public class HeaderTests : TestContext
         return store;
     }
 
-    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null)
+    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null, bool prefersDark = false)
     {
         Services.AddSingleton(store);
         Services.AddSingleton<FilterState>();
         Services.AddSingleton(_ => platform ?? Substitute.For<IPlatform>());
         Services.AddSingleton(_ => actions ?? Substitute.For<IKeyboardActions>());
+        JSInterop.Setup<bool>("docview.prefersDark").SetResult(prefersDark);
+        JSInterop.SetupVoid("docview.setDark", _ => true);
     }
 
     [Fact]
@@ -69,12 +71,12 @@ public class HeaderTests : TestContext
     public void Header_DarkToggle_CallsSetDark()
     {
         Register(MakeStore());
-        var jsInvoke = JSInterop.SetupVoid("docview.setDark", _ => true);
 
         var cut = RenderComponent<Header>();
         cut.Find("[data-testid='dark-toggle']").Click();
 
-        jsInvoke.VerifyInvoke("docview.setDark", 1);
+        // once from init (OS preference), once from the toggle click
+        JSInterop.VerifyInvoke("docview.setDark", 2);
     }
 
     [Fact]
@@ -176,6 +178,30 @@ public class HeaderTests : TestContext
         var cut = RenderComponent<Header>();
 
         Assert.Equal("Quick find (⌘K)", cut.Find("[data-testid='quick-find']").GetAttribute("aria-label"));
+    }
+
+    [Fact]
+    public void Header_Init_AppliesDark_WhenOsPrefersDark()
+    {
+        Register(MakeStore(), prefersDark: true);
+
+        RenderComponent<Header>();
+
+        var calls = JSInterop.Invocations["docview.setDark"];
+        Assert.True(calls.Count >= 1);
+        Assert.Equal(true, calls[0].Arguments[0]);
+    }
+
+    [Fact]
+    public void Header_Init_AppliesLight_WhenOsDoesNotPreferDark()
+    {
+        Register(MakeStore(), prefersDark: false);
+
+        RenderComponent<Header>();
+
+        var calls = JSInterop.Invocations["docview.setDark"];
+        Assert.True(calls.Count >= 1);
+        Assert.Equal(false, calls[0].Arguments[0]);
     }
 
     [Fact]

@@ -53,6 +53,14 @@
     private System.Threading.Timer? _searchDebounce;
     private string? _pendingValue;
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _isDark = await JS.InvokeAsync<bool>("docview.prefersDark");
+        await JS.InvokeVoidAsync("docview.setDark", _isDark);
+        StateHasChanged();
+    }
+
     protected override void OnInitialized()
     {
         Filter.Changed += OnFilterChanged;

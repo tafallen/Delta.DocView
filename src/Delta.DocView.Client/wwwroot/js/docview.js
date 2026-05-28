@@ -10,5 +10,23 @@ window.docview = {
             document.head.appendChild(el);
         }
         el.textContent = css;
+    },
+    favourites: {
+        read: function () {
+            try {
+                const raw = window.localStorage.getItem('docview.favs.v1');
+                return raw === null ? '[]' : raw;
+            } catch (e) {
+                console.warn('docview.favourites.read failed', e);
+                return '[]';
+            }
+        },
+        write: function (json) {
+            try {
+                window.localStorage.setItem('docview.favs.v1', json);
+            } catch (e) {
+                console.warn('docview.favourites.write failed', e);
+            }
+        }
     }
 };

@@ -47,6 +47,7 @@ public class AppTests
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var cut = ctx.RenderComponent<Delta.DocView.Client.App>();
@@ -101,6 +102,7 @@ public class AppTests
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
         return ctx;
     }
 

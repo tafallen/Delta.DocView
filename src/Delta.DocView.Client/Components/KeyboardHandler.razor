@@ -1,0 +1,38 @@
+@using Delta.DocView.Client.Services
+@inject IJSRuntime JS
+@inject IKeyboardActions Actions
+@implements IAsyncDisposable
+
+@code {
+    private DotNetObjectReference<KeyboardHandler>? _ref;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender) return;
+        _ref = DotNetObjectReference.Create(this);
+        await JS.InvokeVoidAsync("docview.keyboard.attach", _ref);
+    }
+
+    [JSInvokable]
+    public void OnKey(string action)
+    {
+        switch (action)
+        {
+            case KeyboardActionNames.SelectNext:      Actions.SelectNext();              break;
+            case KeyboardActionNames.SelectPrev:      Actions.SelectPrev();              break;
+            case KeyboardActionNames.ToggleFav:       Actions.ToggleSelectedFavourite(); break;
+            case KeyboardActionNames.OpenPalette:     Actions.OpenPalette();             break;
+            case KeyboardActionNames.OpenShortcuts:   Actions.OpenShortcuts();           break;
+            case KeyboardActionNames.ToggleComposer:  Actions.ToggleComposer();          break;
+            case KeyboardActionNames.CloseOverlay:    Actions.CloseOverlay();            break;
+            // unknown action → silent no-op
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try { await JS.InvokeVoidAsync("docview.keyboard.detach"); }
+        catch { /* JSInterop may be torn down already */ }
+        _ref?.Dispose();
+    }
+}

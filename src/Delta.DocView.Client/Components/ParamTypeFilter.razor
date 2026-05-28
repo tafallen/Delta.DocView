@@ -1,0 +1,32 @@
+@using Delta.DocView.Client.Services
+@implements IDisposable
+@inject FilterState State
+@inject ClientStepLibraryStore Store
+
+<div class="param-type-filter">
+    @foreach (var type in Store.Steps.SelectMany(s => s.Params).Select(p => p.Type).Distinct().OrderBy(t => t, StringComparer.Ordinal))
+    {
+        var t = type;
+        var isActive = State.ParamTypes.Contains(t);
+        <button class="param-chip @(isActive ? "is-active" : "")"
+                data-paramtype="@t"
+                type="button"
+                @onclick="() => State.ToggleParamType(t)">
+            @t
+        </button>
+    }
+</div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+    }
+}

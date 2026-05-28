@@ -103,7 +103,25 @@ public class HeaderTests : TestContext
         var cut = RenderComponent<Header>();
         cut.Find("input.search-input").Input("hello");
 
-        Assert.Equal("hello", state.Query);
+        cut.WaitForAssertion(() => Assert.Equal("hello", state.Query), timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Header_SearchInput_DebouncesRapidInput()
+    {
+        Register(MakeStore());
+        var state = Services.GetRequiredService<FilterState>();
+        var changedCount = 0;
+        state.Changed += () => Interlocked.Increment(ref changedCount);
+
+        var cut = RenderComponent<Header>();
+        var input = cut.Find("input.search-input");
+        input.Input("a");
+        input.Input("ab");
+        input.Input("abc");
+
+        cut.WaitForAssertion(() => Assert.Equal("abc", state.Query), timeout: TimeSpan.FromMilliseconds(500));
+        Assert.Equal(1, changedCount);
     }
 
     [Fact]

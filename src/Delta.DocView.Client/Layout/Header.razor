@@ -38,16 +38,27 @@
 </header>
 
 @code {
+    private const int SearchDebounceMs = 150;
+
     private bool _isDark;
+    private System.Threading.Timer? _searchDebounce;
+    private string? _pendingValue;
 
     protected override void OnInitialized()
     {
         Filter.Changed += OnFilterChanged;
+        _searchDebounce = new System.Threading.Timer(_ => DispatchPendingQuery(), null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
 
     private void OnSearchInput(ChangeEventArgs e)
     {
-        Filter.SetQuery(e.Value?.ToString());
+        _pendingValue = e.Value?.ToString();
+        _searchDebounce?.Change(SearchDebounceMs, System.Threading.Timeout.Infinite);
+    }
+
+    private void DispatchPendingQuery()
+    {
+        InvokeAsync(() => Filter.SetQuery(_pendingValue));
     }
 
     private void OnFilterChanged() => InvokeAsync(StateHasChanged);
@@ -61,5 +72,6 @@
     public void Dispose()
     {
         Filter.Changed -= OnFilterChanged;
+        _searchDebounce?.Dispose();
     }
 }

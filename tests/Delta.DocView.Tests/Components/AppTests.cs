@@ -6,6 +6,7 @@ using Delta.DocView.Client.Services;
 using Delta.DocView.Shared;
 using Delta.DocView.Shared.Models;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 
 namespace Delta.DocView.Tests.Components;
 
@@ -48,6 +49,7 @@ public class AppTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var cut = ctx.RenderComponent<Delta.DocView.Client.App>();
@@ -103,6 +105,7 @@ public class AppTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         return ctx;
     }
 

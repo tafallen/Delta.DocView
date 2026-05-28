@@ -40,6 +40,43 @@ window.docview = {
             return false;
         }
     },
+    platform: {
+        isMac: function () {
+            try {
+                const p = navigator.platform || '';
+                const ua = navigator.userAgent || '';
+                return /Mac/i.test(p) || /Mac/i.test(ua);
+            } catch (e) {
+                return false;
+            }
+        }
+    },
+    focus: {
+        _lastFocused: null,
+        element: function (id) {
+            try {
+                this._lastFocused = document.activeElement;
+                const el = document.getElementById(id);
+                if (el) el.focus();
+            } catch (e) { /* swallow */ }
+        },
+        restorePrevious: function () {
+            try {
+                if (this._lastFocused && typeof this._lastFocused.focus === 'function') {
+                    this._lastFocused.focus();
+                }
+            } catch (e) { /* swallow */ }
+            this._lastFocused = null;
+        }
+    },
+    scrollIntoViewIfNeeded: function (selector) {
+        try {
+            const el = document.querySelector(selector);
+            if (el && typeof el.scrollIntoView === 'function') {
+                el.scrollIntoView({ block: 'nearest' });
+            }
+        } catch (e) { /* swallow */ }
+    },
     keyboard: {
         _ref: null,
         _handler: null,

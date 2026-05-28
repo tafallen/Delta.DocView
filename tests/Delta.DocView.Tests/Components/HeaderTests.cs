@@ -3,6 +3,7 @@ using Delta.DocView.Client.Layout;
 using Microsoft.Extensions.DependencyInjection;
 using Delta.DocView.Client.Services;
 using Delta.DocView.Shared.Models;
+using NSubstitute;
 
 namespace Delta.DocView.Tests.Components;
 
@@ -30,6 +31,7 @@ public class HeaderTests : TestContext
     {
         Services.AddSingleton(store);
         Services.AddSingleton<FilterState>();
+        Services.AddSingleton(_ => Substitute.For<IPlatform>());
     }
 
     [Fact]

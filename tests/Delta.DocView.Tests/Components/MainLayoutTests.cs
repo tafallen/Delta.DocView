@@ -3,6 +3,7 @@ using Delta.DocView.Client.Layout;
 using Delta.DocView.Client.Services;
 using Delta.DocView.Shared.Models;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 
 namespace Delta.DocView.Tests.Components;
 
@@ -30,6 +31,7 @@ public class MainLayoutTests : TestContext
         Services.AddSingleton<SelectionState>();
         Services.AddSingleton<FilteredStepsProvider>();
         Services.AddSingleton<IKeyboardActions, KeyboardActions>();
+        Services.AddSingleton(_ => Substitute.For<IPlatform>());
         JSInterop.Mode = JSRuntimeMode.Loose;
         JSInterop.SetupVoid("docview.setDark", _ => true);
     }

@@ -4,6 +4,7 @@ using Delta.DocView.Client.Layout;
 using Delta.DocView.Client.Services;
 using Delta.DocView.Shared.Models;
 using Microsoft.Extensions.DependencyInjection;
+using NSubstitute;
 
 namespace Delta.DocView.Tests.Integration;
 
@@ -89,6 +90,7 @@ public class FilterStackTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();

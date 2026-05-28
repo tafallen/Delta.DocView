@@ -20,8 +20,13 @@ public class ShellComponentTests : TestContext
     [Fact]
     public void StepList_Renders()
     {
+        Services.AddScoped<ClientStepLibraryStore>();
+        Services.AddScoped<FilterState>();
+        Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
+        Services.AddScoped<SelectionState>();
+        JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = RenderComponent<StepList>();
-        Assert.Contains("step-list-shell", cut.Markup);
+        Assert.Contains("step-list", cut.Markup);
     }
 
     [Fact]

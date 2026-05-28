@@ -1,2 +1,55 @@
-<div class="step-list-shell">
+@implements IDisposable
+@inject ClientStepLibraryStore Store
+@inject FilterState State
+@inject IFavouritesStore Favs
+
+<div class="step-list">
+    <div class="step-list-header">
+        <span class="step-list-count" data-testid="step-list-count">
+            @_filtered.Count of @Store.Steps.Count matching@(string.IsNullOrWhiteSpace(State.Query) ? "" : $" for \"{State.Query.Trim()}\"")
+        </span>
+        <button class="sort-button" disabled title="Sorted by most used (no alternative sort in v1)">↓ Sorted by most used</button>
+    </div>
+    @if (_filtered.Count == 0)
+    {
+        <div class="step-list-empty" data-testid="step-list-empty">
+            <p>No steps match your filters.</p>
+            <p class="hint">Try clearing a filter or shortening your search.</p>
+        </div>
+    }
+    else
+    {
+        <GroupedList Steps="_filtered" Query="@State.Query" Grouped="@(State.Domain is null)" Domains="Store.Domains" />
+    }
 </div>
+
+@code {
+    private IReadOnlyList<Step> _filtered = [];
+
+    protected override void OnInitialized()
+    {
+        Recompute();
+        State.Changed += OnChanged;
+        Favs.Changed += OnChanged;
+    }
+
+    private void Recompute()
+    {
+        _filtered = FilterEngine.Apply(Store.Steps, State, Favs)
+            .OrderByDescending(s => s.Used)
+            .ThenBy(s => s.Pattern, StringComparer.Ordinal)
+            .ToList();
+    }
+
+    private void OnChanged()
+    {
+        Recompute();
+        InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+        Favs.Changed -= OnChanged;
+    }
+}

@@ -1,0 +1,15 @@
+@using Delta.DocView.Shared.Models
+
+<div class="stats-strip">
+    <span class="stat-used" data-testid="stat-used">Used in @Step.Used scenarios</span>
+    <span class="stat-source" data-testid="stat-source">Source: <code>@Step.File:@Step.Line</code></span>
+    @if (Step.Tags.Count > 0)
+    {
+        <span class="stat-tags" data-testid="stat-tags">Tags: @(string.Join(" · ", Step.Tags))</span>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Step Step { get; set; } = default!;
+}

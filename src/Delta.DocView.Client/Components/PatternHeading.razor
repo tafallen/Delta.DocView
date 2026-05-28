@@ -1,0 +1,10 @@
+@using Delta.DocView.Shared.Models
+
+<h2 class="detail-pattern">
+    <PatternRenderer Pattern="@Step.Pattern" />
+</h2>
+
+@code {
+    [Parameter, EditorRequired]
+    public Step Step { get; set; } = default!;
+}

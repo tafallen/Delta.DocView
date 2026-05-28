@@ -21,6 +21,23 @@
   /* Fonts */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+
+  /* Step-type chip palette */
+  --chip-given-bg: #0d9488;   /* teal */
+  --chip-when-bg:  #f59e0b;   /* amber */
+  --chip-then-bg:  #7c3aed;   /* violet */
+  --chip-and-bg:   #64748b;   /* slate */
+  --chip-fg:       #ffffff;
+
+  /* Row interaction states */
+  --row-hover-bg:    rgba(0, 0, 0, 0.03);
+  --row-selected-bg: rgba(13, 148, 136, 0.08);
+
+  /* Query highlight */
+  --highlight-bg: #fef08a;
+
+  /* Favourite star (active) */
+  --fav-color: #f59e0b;
 }
 
 /* ── Dark mode ────────────────────────────────────────────────────── */
@@ -336,8 +353,8 @@ html, body {
   padding: 0.5rem 0.75rem; cursor: pointer;
   border-bottom: 1px solid var(--border); align-items: start;
 }
-.step-row:hover { background: rgba(0,0,0,0.03); }
-.step-row.is-selected { background: rgba(13, 148, 136, 0.08); }
+.step-row:hover { background: var(--row-hover-bg); }
+.step-row.is-selected { background: var(--row-selected-bg); }
 
 /* ── Type chip ────────────────────────────────────────────────────── */
 .type-chip {
@@ -345,10 +362,10 @@ html, body {
   font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
   letter-spacing: 0.03em; min-width: 3rem; text-align: center;
 }
-.chip-given { background: #0d9488; color: white; }
-.chip-when  { background: #f59e0b; color: white; }
-.chip-then  { background: #7c3aed; color: white; }
-.chip-and   { background: #64748b; color: white; }
+.chip-given { background: var(--chip-given-bg); color: var(--chip-fg); }
+.chip-when  { background: var(--chip-when-bg); color: var(--chip-fg); }
+.chip-then  { background: var(--chip-then-bg); color: var(--chip-fg); }
+.chip-and   { background: var(--chip-and-bg); color: var(--chip-fg); }
 
 /* ── Step body / meta ─────────────────────────────────────────────── */
 .step-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
@@ -363,7 +380,7 @@ html, body {
 .param-name { font-style: italic; opacity: 0.85; margin-right: 0.15rem; }
 .param-type { opacity: 0.7; }
 
-mark { background: #fef08a; padding: 0 0.1em; border-radius: 0.15em; }
+mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em; }
 
 /* ── Row actions ──────────────────────────────────────────────────── */
 .step-actions { display: flex; gap: 0.25rem; align-items: flex-start; }
@@ -372,7 +389,7 @@ mark { background: #fef08a; padding: 0 0.1em; border-radius: 0.15em; }
   opacity: 0.4; font-size: 1.1rem; padding: 0.1rem 0.3rem; border-radius: 0.25rem;
 }
 .row-star:hover { opacity: 0.8; background: rgba(0,0,0,0.05); }
-.row-star.is-fav { color: #f59e0b; opacity: 1; }
+.row-star.is-fav { color: var(--fav-color); opacity: 1; }
 .row-add {
   background: none; border: none; cursor: pointer;
   opacity: 0.4; font-size: 1.1rem; padding: 0.1rem 0.3rem; border-radius: 0.25rem;

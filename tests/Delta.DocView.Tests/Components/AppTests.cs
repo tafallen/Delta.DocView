@@ -43,6 +43,8 @@ public class AppTests
         ctx.Services.AddScoped(_ => http);
         ctx.Services.AddScoped<ClientStepLibraryStore>();
         ctx.Services.AddScoped<LibraryApiClient>();
+        ctx.Services.AddScoped<FilterState>();
+        ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var cut = ctx.RenderComponent<Delta.DocView.Client.App>();
@@ -93,6 +95,8 @@ public class AppTests
         ctx.Services.AddScoped(_ => http);
         ctx.Services.AddScoped<ClientStepLibraryStore>();
         ctx.Services.AddScoped<LibraryApiClient>();
+        ctx.Services.AddScoped<FilterState>();
+        ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         return ctx;
     }
 

@@ -26,10 +26,16 @@ public class HeaderTests : TestContext
         return store;
     }
 
+    private void Register(ClientStepLibraryStore store)
+    {
+        Services.AddSingleton(store);
+        Services.AddSingleton<FilterState>();
+    }
+
     [Fact]
     public void Header_RendersTitle()
     {
-        Services.AddSingleton(MakeStore());
+        Register(MakeStore());
 
         var cut = RenderComponent<Header>();
 
@@ -39,7 +45,7 @@ public class HeaderTests : TestContext
     [Fact]
     public void Header_RendersStepCount()
     {
-        Services.AddSingleton(MakeStore(stepCount: 42));
+        Register(MakeStore(stepCount: 42));
 
         var cut = RenderComponent<Header>();
 
@@ -49,7 +55,7 @@ public class HeaderTests : TestContext
     [Fact]
     public void Header_RendersVersion()
     {
-        Services.AddSingleton(MakeStore(version: "3.1.0"));
+        Register(MakeStore(version: "3.1.0"));
 
         var cut = RenderComponent<Header>();
 
@@ -59,7 +65,7 @@ public class HeaderTests : TestContext
     [Fact]
     public void Header_DarkToggle_CallsSetDark()
     {
-        Services.AddSingleton(MakeStore());
+        Register(MakeStore());
         var jsInvoke = JSInterop.SetupVoid("docview.setDark", _ => true);
 
         var cut = RenderComponent<Header>();
@@ -71,7 +77,7 @@ public class HeaderTests : TestContext
     [Fact]
     public void Header_RendersSearchInput()
     {
-        Services.AddSingleton(MakeStore());
+        Register(MakeStore());
 
         var cut = RenderComponent<Header>();
 
@@ -81,10 +87,34 @@ public class HeaderTests : TestContext
     [Fact]
     public void Header_RendersAvatarChip()
     {
-        Services.AddSingleton(MakeStore());
+        Register(MakeStore());
 
         var cut = RenderComponent<Header>();
 
         Assert.Contains("avatar-chip", cut.Markup);
+    }
+
+    [Fact]
+    public void Header_SearchInput_UpdatesFilterStateQuery()
+    {
+        Register(MakeStore());
+        var state = Services.GetRequiredService<FilterState>();
+
+        var cut = RenderComponent<Header>();
+        cut.Find("input.search-input").Input("hello");
+
+        Assert.Equal("hello", state.Query);
+    }
+
+    [Fact]
+    public void Header_SearchInput_ReflectsExternalQueryWrite()
+    {
+        Register(MakeStore());
+        var state = Services.GetRequiredService<FilterState>();
+
+        var cut = RenderComponent<Header>();
+        state.SetQuery("external");
+
+        Assert.Equal("external", cut.Find("input.search-input").GetAttribute("value"));
     }
 }

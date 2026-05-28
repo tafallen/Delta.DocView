@@ -25,6 +25,8 @@ public class MainLayoutTests : TestContext
     private void RegisterServices()
     {
         Services.AddSingleton(MakeStore());
+        Services.AddSingleton<FilterState>();
+        Services.AddSingleton<IFavouritesStore, InMemoryFavouritesStore>();
         JSInterop.SetupVoid("docview.setDark", _ => true);
     }
 

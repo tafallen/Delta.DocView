@@ -1,5 +1,7 @@
 @inject ClientStepLibraryStore Store
 @inject IJSRuntime JS
+@inject FilterState Filter
+@implements IDisposable
 
 <header class="app-header">
     <div class="header-brand">
@@ -16,7 +18,9 @@
     <div class="header-search">
         <input type="search" class="search-input"
                placeholder="Search steps…"
-               aria-label="Search steps" />
+               aria-label="Search steps"
+               value="@Filter.Query"
+               @oninput="OnSearchInput" />
         <button class="btn-quickfind" title="Quick find (⌘K)" type="button">⌘K</button>
     </div>
 
@@ -36,9 +40,26 @@
 @code {
     private bool _isDark;
 
+    protected override void OnInitialized()
+    {
+        Filter.Changed += OnFilterChanged;
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        Filter.SetQuery(e.Value?.ToString());
+    }
+
+    private void OnFilterChanged() => InvokeAsync(StateHasChanged);
+
     private async Task ToggleDarkAsync()
     {
         _isDark = !_isDark;
         await JS.InvokeVoidAsync("docview.setDark", _isDark);
+    }
+
+    public void Dispose()
+    {
+        Filter.Changed -= OnFilterChanged;
     }
 }

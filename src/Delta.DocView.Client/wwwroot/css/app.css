@@ -301,3 +301,7 @@ html, body {
 .favourites-toggle.is-active { background: var(--accent-500); color: white; border-color: var(--accent-500); }
 .favourites-toggle.is-active .star { color: #ffd54a; }
 .favourites-toggle.is-active .count { opacity: 0.9; }
+
+.rail-section { padding: 0.75rem 0; }
+.rail-section + .rail-section { border-top: 1px solid var(--border, rgba(0,0,0,0.08)); }
+.rail-section-title { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.7; margin: 0 0 0.5rem 0; }

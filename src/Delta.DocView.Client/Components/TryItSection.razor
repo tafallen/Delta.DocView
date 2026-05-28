@@ -1,0 +1,98 @@
+@using Delta.DocView.Client.Services
+@using Delta.DocView.Shared.Models
+@inject IJSRuntime JS
+@implements IDisposable
+
+<div class="try-it" data-testid="try-it">
+    @if (_paramIndices.Count > 0)
+    {
+        <div class="try-it-inputs">
+            @for (var i = 0; i < _paramIndices.Count; i++)
+            {
+                var idx = i; // closure capture
+                var param = (idx < Step.Params.Count) ? Step.Params[idx] : null;
+                <label class="try-it-input">
+                    <span class="try-it-label">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</span>
+                    <input type="text"
+                           value="@_inputs[idx]"
+                           @oninput="e => OnInput(idx, e)" />
+                </label>
+            }
+        </div>
+    }
+    <pre class="composed-line" data-testid="composed-line">@_composed</pre>
+    <div class="try-it-actions">
+        <button class="copy-button" data-testid="copy-button" @onclick="OnCopyClick">Copy</button>
+        @if (_confirmed)
+        {
+            <span class="copy-confirmation" data-testid="copy-confirmation">✓ line copied</span>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired] public Step Step { get; set; } = default!;
+
+    private IReadOnlyList<PatternToken> _tokens = Array.Empty<PatternToken>();
+    private List<int> _paramIndices = new();
+    private string[] _inputs = Array.Empty<string>();
+    private string _composed = "";
+    private bool _confirmed;
+    private System.Threading.Timer? _timer;
+
+    protected override void OnParametersSet()
+    {
+        _tokens = PatternTokeniser.Tokenise(Step.Pattern);
+        _paramIndices = _tokens
+            .Select((t, idx) => (t, idx))
+            .Where(p => p.t is ParamToken)
+            .Select(p => p.idx)
+            .ToList();
+        _inputs = new string[_paramIndices.Count];
+        for (var i = 0; i < _paramIndices.Count; i++)
+        {
+            _inputs[i] = (i < Step.Params.Count) ? (Step.Params[i].Example ?? "") : "";
+        }
+        Recompose();
+    }
+
+    private void OnInput(int positionalIndex, Microsoft.AspNetCore.Components.ChangeEventArgs e)
+    {
+        _inputs[positionalIndex] = e.Value?.ToString() ?? "";
+        Recompose();
+    }
+
+    private void Recompose()
+    {
+        var sb = new System.Text.StringBuilder();
+        var paramOrd = 0;
+        foreach (var t in _tokens)
+        {
+            switch (t)
+            {
+                case StaticText s:
+                    sb.Append(s.Text);
+                    break;
+                case ParamToken:
+                    sb.Append(paramOrd < _inputs.Length ? _inputs[paramOrd] : "");
+                    paramOrd++;
+                    break;
+            }
+        }
+        _composed = sb.ToString();
+    }
+
+    private async Task OnCopyClick()
+    {
+        await JS.InvokeAsync<bool>("docview.copyText", _composed);
+        _confirmed = true;
+        _timer ??= new System.Threading.Timer(_ => InvokeAsync(() =>
+        {
+            _confirmed = false;
+            StateHasChanged();
+        }));
+        _timer.Change(1100, System.Threading.Timeout.Infinite);
+    }
+
+    public void Dispose() => _timer?.Dispose();
+}

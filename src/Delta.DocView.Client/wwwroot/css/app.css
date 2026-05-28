@@ -520,3 +520,12 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   font-family: var(--font-mono);
   font-size: .85rem; opacity: .85;
 }
+
+.try-it-mismatch {
+    padding: .4rem .75rem;
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: .25rem;
+    font-size: .85rem;
+    margin-bottom: .5rem;
+}

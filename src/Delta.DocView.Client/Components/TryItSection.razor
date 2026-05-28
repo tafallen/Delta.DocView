@@ -2,6 +2,14 @@
 @using Delta.DocView.Shared.Models
 
 <div class="try-it" data-testid="try-it">
+    @if (_hasMismatch)
+    {
+        <div class="try-it-mismatch"
+             data-testid="try-it-mismatch"
+             role="alert">
+            ⚠ This step has @_expectedParamCount parameter @(_expectedParamCount == 1 ? "token" : "tokens") in its pattern but @_actualParamCount @(_actualParamCount == 1 ? "param" : "params") defined. The composed line below may be incomplete.
+        </div>
+    }
     @if (_paramIndices.Count > 0)
     {
         <div class="try-it-inputs">
@@ -34,6 +42,9 @@
     private string[] _inputs = Array.Empty<string>();
     private string _composed = "";
     private string _uid = "";
+    private bool _hasMismatch;
+    private int _expectedParamCount;
+    private int _actualParamCount;
 
     protected override void OnInitialized()
     {
@@ -48,6 +59,9 @@
             .Where(p => p.t is ParamToken)
             .Select(p => p.idx)
             .ToList();
+        _expectedParamCount = _paramIndices.Count;
+        _actualParamCount = Step.Params.Count;
+        _hasMismatch = _expectedParamCount != _actualParamCount;
         _inputs = new string[_paramIndices.Count];
         for (var i = 0; i < _paramIndices.Count; i++)
         {

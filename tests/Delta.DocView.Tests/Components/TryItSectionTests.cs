@@ -102,6 +102,75 @@ public class TryItSectionTests : TestContext
     }
 
     [Fact]
+    public void Mismatch_Warning_Hidden_When_Counts_Match()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var step = new Step
+        {
+            Id = "logged-in",
+            Type = "Given",
+            Pattern = "as {username : string}",
+            Params = new[]
+            {
+                new StepParam { Name = "username", Type = "string", Example = "\"admin\"" }
+            }
+        };
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, step));
+
+        Assert.Empty(cut.FindAll("[data-testid='try-it-mismatch']"));
+    }
+
+    [Fact]
+    public void Mismatch_Warning_Shown_When_Pattern_Has_More_Tokens_Than_Params()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var step = new Step
+        {
+            Id = "two-tokens",
+            Type = "Given",
+            Pattern = "as {a : string} and {b : string}",
+            Params = new[]
+            {
+                new StepParam { Name = "a", Type = "string", Example = "\"x\"" }
+            }
+        };
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, step));
+
+        var banner = cut.Find("[data-testid='try-it-mismatch']");
+        Assert.NotNull(banner);
+        Assert.Contains("2 parameter tokens", banner.TextContent);
+        Assert.Contains("1 param", banner.TextContent);
+    }
+
+    [Fact]
+    public void Mismatch_Warning_Shown_When_Pattern_Has_Fewer_Tokens_Than_Params()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var step = new Step
+        {
+            Id = "no-tokens",
+            Type = "Given",
+            Pattern = "the system is ready",
+            Params = new[]
+            {
+                new StepParam { Name = "extra", Type = "string", Example = "\"x\"" }
+            }
+        };
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, step));
+
+        var banner = cut.Find("[data-testid='try-it-mismatch']");
+        Assert.NotNull(banner);
+        Assert.Contains("0 parameter tokens", banner.TextContent);
+        Assert.Contains("1 param", banner.TextContent);
+    }
+
+    [Fact]
     public void No_Params_Step_Skips_Inputs_And_Composes_From_Static_Text()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;

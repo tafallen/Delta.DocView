@@ -1,0 +1,45 @@
+@using Delta.DocView.Client.Services
+@using Delta.DocView.Shared.Models
+@inject ClientStepLibraryStore Store
+@inject SelectionState Selection
+
+@if (_related.Count > 0)
+{
+    <section class="related-steps" data-testid="related-steps">
+        <h3 class="related-steps-title">Likely next steps</h3>
+        <div class="related-cards">
+            @foreach (var related in _related)
+            {
+                var r = related; // closure capture
+                <button class="related-card"
+                        data-step-id="@r.Id"
+                        data-testid="related-card"
+                        @onclick="() => OnSelect(r)">
+                    <span class="type-chip chip-@r.Type.ToLowerInvariant()">@r.Type</span>
+                    <span class="related-pattern">@Truncate(r.Pattern, 60)</span>
+                </button>
+            }
+        </div>
+    </section>
+}
+
+@code {
+    [Parameter, EditorRequired] public Step Step { get; set; } = default!;
+
+    private List<Step> _related = new();
+
+    protected override void OnParametersSet()
+    {
+        _related = Step.SuggestsNext
+            .Select(id => Store.ById.TryGetValue(id, out var s) ? s : null)
+            .Where(s => s is not null)
+            .Cast<Step>()
+            .Take(4)
+            .ToList();
+    }
+
+    private void OnSelect(Step s) => Selection.Select(s);
+
+    private static string Truncate(string s, int max) =>
+        s.Length <= max ? s : s[..(max - 1)] + "…";
+}

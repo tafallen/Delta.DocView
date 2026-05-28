@@ -28,7 +28,7 @@ public class FilterEngineTests
             [new StepParam { Name = "label", Type = "string" }]),
         MakeStep("s3", "Then", "I see {int} results", "Search",
             [new StepParam { Name = "n", Type = "int" }]),
-        MakeStep("s4", "And", "I wait", "Auth"),
+        MakeStep("s4", "Given", "I wait", "Auth"),
     ];
 
     private static FilterState DefaultState() => new();
@@ -52,14 +52,13 @@ public class FilterEngineTests
         var state = DefaultState();
         state.ToggleType("When");
         state.ToggleType("Then");
-        state.ToggleType("And");
         // Only "Given" remains
         var favs = new InMemoryFavouritesStore();
 
         var result = FilterEngine.Apply(steps, state, favs);
 
-        Assert.Single(result);
-        Assert.Equal("s1", result[0].Id);
+        Assert.Equal(2, result.Count);
+        Assert.All(result, s => Assert.Equal("Given", s.Type));
     }
 
     [Fact]
@@ -153,7 +152,6 @@ public class FilterEngineTests
         // keep only Given
         state.ToggleType("When");
         state.ToggleType("Then");
-        state.ToggleType("And");
         state.SetDomain("Auth");
         state.SetQuery("logged");
         var favs = new InMemoryFavouritesStore();

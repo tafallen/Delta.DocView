@@ -45,18 +45,17 @@ public class StepTypeFilterTests
     }
 
     [Fact]
-    public void Renders_Four_Buttons_In_Order()
+    public void Renders_Three_Buttons_In_Order()
     {
         var (ctx, _, _) = Setup();
         using var _c = ctx;
         var cut = ctx.RenderComponent<StepTypeFilter>();
 
         var buttons = cut.FindAll("button.step-type");
-        Assert.Equal(4, buttons.Count);
+        Assert.Equal(3, buttons.Count);
         Assert.Equal("Given", buttons[0].GetAttribute("data-type"));
         Assert.Equal("When", buttons[1].GetAttribute("data-type"));
         Assert.Equal("Then", buttons[2].GetAttribute("data-type"));
-        Assert.Equal("And", buttons[3].GetAttribute("data-type"));
     }
 
     [Fact]
@@ -70,11 +69,10 @@ public class StepTypeFilterTests
         Assert.Equal("3", buttons[0].QuerySelector(".count")!.TextContent);
         Assert.Equal("2", buttons[1].QuerySelector(".count")!.TextContent);
         Assert.Equal("1", buttons[2].QuerySelector(".count")!.TextContent);
-        Assert.Equal("0", buttons[3].QuerySelector(".count")!.TextContent);
     }
 
     [Fact]
-    public void All_Four_Are_Active_By_Default()
+    public void All_Three_Are_Active_By_Default()
     {
         var (ctx, _, _) = Setup();
         using var _c = ctx;
@@ -107,20 +105,19 @@ public class StepTypeFilterTests
         using var _c = ctx;
         var cut = ctx.RenderComponent<StepTypeFilter>();
 
-        // Deselect Given, When, Then — leave only And active.
+        // Deselect Given and When — leave only Then active.
         cut.Find("button.step-type[data-type=\"Given\"]").Click();
         cut.Find("button.step-type[data-type=\"When\"]").Click();
+
+        Assert.Single(state.Types);
+        Assert.Contains("Then", state.Types);
+
+        // Click last remaining — must be a no-op.
         cut.Find("button.step-type[data-type=\"Then\"]").Click();
 
         Assert.Single(state.Types);
-        Assert.Contains("And", state.Types);
-
-        // Click last remaining — must be a no-op.
-        cut.Find("button.step-type[data-type=\"And\"]").Click();
-
-        Assert.Single(state.Types);
-        Assert.Contains("And", state.Types);
-        var andBtn = cut.Find("button.step-type[data-type=\"And\"]");
-        Assert.Contains("is-active", andBtn.GetAttribute("class"));
+        Assert.Contains("Then", state.Types);
+        var thenBtn = cut.Find("button.step-type[data-type=\"Then\"]");
+        Assert.Contains("is-active", thenBtn.GetAttribute("class"));
     }
 }

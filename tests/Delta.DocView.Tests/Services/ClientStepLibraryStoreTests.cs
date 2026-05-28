@@ -73,8 +73,7 @@ public class ClientStepLibraryStoreTests
         Assert.Equal(2, store.CountByType["Given"]);
         Assert.Equal(0, store.CountByType["When"]);
         Assert.Equal(1, store.CountByType["Then"]);
-        Assert.Equal(0, store.CountByType["And"]);
-        Assert.Equal(4, store.CountByType.Count);
+        Assert.Equal(3, store.CountByType.Count);
     }
 
     [Fact]

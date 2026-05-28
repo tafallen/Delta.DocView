@@ -98,7 +98,7 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [x] **Step type** row shows four toggle buttons: Given · When · Then · And, each with a count badge. At least one type must remain selected (toggle is blocked if it would deselect all).
+- [x] **Step type** row shows three toggle buttons: Given · When · Then (And was dropped — SpecFlow step definitions are always Given/When/Then; "And" is feature-file syntax only), each with a count badge. At least one type must remain selected (toggle is blocked if it would deselect all).
 - [x] **Domain** section shows "All domains N" plus one button per domain, each with a coloured dot and count. Selecting a domain activates it; selecting "All" clears domain filter.
 - [x] **Parameter type** grid shows `string`, `int`, `decimal`, `DocString` chips; multi-select; selects only steps that have at least one param of that type. Deselecting all = no filter.
 - [x] **Favourites** toggle button shows a star icon and count; when active shows only favourited steps.
@@ -109,7 +109,7 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 #### Implementation tasks
 
 1. `FilterState` record (or service) holding: `ISet<string> Types`, `string? Domain`, `ISet<string> ParamTypes`, `bool FavsOnly`.
-2. `StepTypeFilter.razor` — four toggle buttons with counts.
+2. `StepTypeFilter.razor` — three toggle buttons with counts.
 3. `DomainFilter.razor` — domain list built from `step.domain` values in the library.
 4. `ParamTypeFilter.razor` — chips from distinct param types in library.
 5. `FavouritesToggle.razor`.

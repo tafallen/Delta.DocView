@@ -32,7 +32,6 @@
   --chip-given-bg: #0d9488;   /* teal */
   --chip-when-bg:  #f59e0b;   /* amber */
   --chip-then-bg:  #7c3aed;   /* violet */
-  --chip-and-bg:   #64748b;   /* slate */
   --chip-fg:       #ffffff;
 
   /* Row interaction states */
@@ -377,7 +376,6 @@ html, body {
 .chip-given { background: var(--chip-given-bg); color: var(--chip-fg); }
 .chip-when  { background: var(--chip-when-bg); color: var(--chip-fg); }
 .chip-then  { background: var(--chip-then-bg); color: var(--chip-fg); }
-.chip-and   { background: var(--chip-and-bg); color: var(--chip-fg); }
 
 /* ── Step body / meta ─────────────────────────────────────────────── */
 .step-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }

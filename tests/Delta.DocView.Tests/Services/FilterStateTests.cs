@@ -5,14 +5,13 @@ namespace Delta.DocView.Tests.Services;
 public class FilterStateTests
 {
     [Fact]
-    public void Default_SelectsAllFourTypes()
+    public void Default_SelectsAllThreeTypes()
     {
         var state = new FilterState();
-        Assert.Equal(4, state.Types.Count);
+        Assert.Equal(3, state.Types.Count);
         Assert.Contains("Given", state.Types);
         Assert.Contains("When", state.Types);
         Assert.Contains("Then", state.Types);
-        Assert.Contains("And", state.Types);
     }
 
     [Fact]
@@ -21,14 +20,13 @@ public class FilterStateTests
         var state = new FilterState();
         state.ToggleType("Given");
         state.ToggleType("When");
-        state.ToggleType("Then");
         var raised = 0;
         state.Changed += () => raised++;
 
-        state.ToggleType("And");
+        state.ToggleType("Then");
 
         Assert.Single(state.Types);
-        Assert.Contains("And", state.Types);
+        Assert.Contains("Then", state.Types);
         Assert.Equal(0, raised);
     }
 

@@ -68,7 +68,7 @@ public class FilterStackTests
             new Step
             {
                 Id = "g6",
-                Type = "And",
+                Type = "Then",
                 Domain = "Billing",
                 Pattern = "I receive a receipt for {string}",
                 Params = [new StepParam { Name = "ref", Type = "string" }]
@@ -303,7 +303,6 @@ public class FilterStackTests
         // Deselect all types except Given.
         rail.Find("button.step-type[data-type='When']").Click();
         rail.Find("button.step-type[data-type='Then']").Click();
-        rail.Find("button.step-type[data-type='And']").Click();
 
         rail.Find("button.domain-row[data-domain='Auth']").Click();
         header.Find("input.search-input").Input("logged");

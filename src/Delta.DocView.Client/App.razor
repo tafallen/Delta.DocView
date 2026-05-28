@@ -10,8 +10,7 @@ else if (LibraryClient.State == LoadingState.Error)
 }
 else
 {
-    @* Main app rendered in US-02 — placeholder for now *@
-    <p>Library loaded: @LibraryClient.State</p>
+    <MainLayout Warning="@LibraryClient.WarningMessage" />
 }
 
 @code {

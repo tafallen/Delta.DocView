@@ -85,6 +85,7 @@ public class FilterStackTests
         ctx.Services.AddScoped(_ => store);
         ctx.Services.AddScoped<FilterState>();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
+        ctx.Services.AddScoped<SelectionState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();
@@ -171,6 +172,121 @@ public class FilterStackTests
         var projected = FilterEngine.Apply(store.Steps, state, favs);
         Assert.Single(projected);
         Assert.Equal("g3", projected[0].Id);
+    }
+
+    [Fact]
+    public void StepList_TypeClick_NarrowsRenderedRows()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        var rail = ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+
+        Assert.Equal(6, list.FindAll(".step-row").Count);
+
+        rail.Find("button.step-type[data-type='When']").Click();
+
+        list.WaitForAssertion(
+            () => Assert.Equal(4, list.FindAll(".step-row").Count),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void StepList_DomainClick_HidesGroupHeaders()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        var rail = ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+
+        Assert.NotEmpty(list.FindAll(".step-group-header"));
+
+        rail.Find("button.domain-row[data-domain='Auth']").Click();
+
+        list.WaitForAssertion(
+            () => Assert.Empty(list.FindAll(".step-group-header")),
+            timeout: TimeSpan.FromMilliseconds(500));
+        Assert.Equal(3, list.FindAll(".step-row").Count);
+    }
+
+    [Fact]
+    public void StepList_NoMatchQuery_RendersEmptyState()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+
+        header.Find("input.search-input").Input("xyzzy");
+
+        list.WaitForAssertion(
+            () =>
+            {
+                Assert.NotNull(list.Find(".step-list-empty"));
+                Assert.Empty(list.FindAll(".step-row"));
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void StepList_MatchingQuery_HighlightsMatchesWithMark()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+
+        header.Find("input.search-input").Input("logged");
+
+        list.WaitForAssertion(
+            () =>
+            {
+                var marks = list.FindAll(".step-pattern mark");
+                Assert.NotEmpty(marks);
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void StepList_RowClick_SelectsStep()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        Assert.Null(selection.Selected);
+        var row = list.FindAll(".step-row").First();
+        var expectedId = row.GetAttribute("data-step-id");
+        row.Click();
+
+        Assert.NotNull(selection.Selected);
+        Assert.Equal(expectedId, selection.Selected!.Id);
+    }
+
+    [Fact]
+    public void StepList_StarClick_TogglesFavouriteWithoutSelecting()
+    {
+        var (ctx, _, _, favs) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        var list = ctx.RenderComponent<StepList>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        Assert.Null(selection.Selected);
+        var row = list.FindAll(".step-row").First();
+        var stepId = row.GetAttribute("data-step-id")!;
+        row.QuerySelector(".row-star")!.Click();
+
+        Assert.Null(selection.Selected);
+        Assert.True(favs.Has(stepId));
     }
 
     [Fact]

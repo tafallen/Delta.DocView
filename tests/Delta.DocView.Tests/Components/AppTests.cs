@@ -49,6 +49,7 @@ public class AppTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -105,6 +106,7 @@ public class AppTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         return ctx;
     }

@@ -31,6 +31,7 @@ public class MainLayoutTests : TestContext
         Services.AddSingleton<SelectionState>();
         Services.AddSingleton<FilteredStepsProvider>();
         Services.AddSingleton<IKeyboardActions, KeyboardActions>();
+        Services.AddSingleton<PaletteState>();
         Services.AddSingleton(_ => Substitute.For<IPlatform>());
         JSInterop.Mode = JSRuntimeMode.Loose;
         JSInterop.SetupVoid("docview.setDark", _ => true);

@@ -20,7 +20,13 @@
 
   /* Fonts */
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-mono: "Cascadia Code", "Fira Code", Consolas, monospace;
+  --font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* Syntax highlight palette (light mode) */
+  --syntax-kw:      #7c3aed;   /* violet — keywords */
+  --syntax-string:  #16a34a;   /* green — string literals */
+  --syntax-comment: #64748b;   /* slate — comments */
+  --syntax-number:  #f59e0b;   /* amber — numeric literals */
 
   /* Step-type chip palette */
   --chip-given-bg: #0d9488;   /* teal */
@@ -48,6 +54,12 @@
   --border:     #334155;
   --text:       #f1f5f9;
   --text-muted: #94a3b8;
+
+  /* Syntax highlight palette (dark-mode overrides) */
+  --syntax-kw:      #a78bfa;   /* lighter violet */
+  --syntax-string:  #4ade80;   /* lighter green */
+  --syntax-comment: #94a3b8;   /* lighter slate — critical: was near-invisible */
+  --syntax-number:  #fbbf24;   /* lighter amber */
 }
 
 /* ── Accent variants ──────────────────────────────────────────────── */
@@ -369,7 +381,7 @@ html, body {
 
 /* ── Step body / meta ─────────────────────────────────────────────── */
 .step-body { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
-.step-pattern { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 0.9rem; line-height: 1.4; }
+.step-pattern { font-family: var(--font-mono); font-size: 0.9rem; line-height: 1.4; }
 .step-meta { display: flex; gap: 0.5rem; font-size: 0.75rem; opacity: 0.7; flex-wrap: wrap; }
 
 /* ── Param pills ──────────────────────────────────────────────────── */
@@ -422,7 +434,7 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   cursor: not-allowed; opacity: .5;
 }
 .detail-pattern {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: 1.1rem; line-height: 1.5;
   margin: 1rem .75rem .5rem;
 }
@@ -457,7 +469,7 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
 .composed-line {
   background: var(--pill-bg, rgba(0,0,0,0.05));
   padding: .5rem .75rem; border-radius: .25rem;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: .9rem; white-space: pre-wrap; word-break: break-word; margin: 0;
 }
 .try-it-actions { display: flex; align-items: center; gap: .5rem; margin-top: .5rem; }
@@ -478,13 +490,13 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
 .cs-source {
   background: var(--pill-bg, rgba(0,0,0,0.05));
   padding: .75rem; border-radius: .25rem; overflow-x: auto;
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: .85rem; line-height: 1.5; margin: .5rem 0 0;
 }
-.cs-kw { color: #7c3aed; font-weight: 600; }
-.cs-string { color: #16a34a; }
-.cs-comment { color: #64748b; font-style: italic; }
-.cs-number { color: #f59e0b; }
+.cs-kw      { color: var(--syntax-kw);      font-weight: 600; }
+.cs-string  { color: var(--syntax-string);             }
+.cs-comment { color: var(--syntax-comment); font-style: italic; }
+.cs-number  { color: var(--syntax-number);             }
 .cs-text { color: inherit; }
 
 .related-steps {
@@ -505,6 +517,6 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
 }
 .related-card:hover { background: var(--row-hover-bg, rgba(0,0,0,0.03)); }
 .related-pattern {
-  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-family: var(--font-mono);
   font-size: .85rem; opacity: .85;
 }

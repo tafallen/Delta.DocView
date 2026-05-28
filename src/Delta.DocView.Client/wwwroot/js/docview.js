@@ -52,21 +52,21 @@ window.docview = {
         }
     },
     focus: {
-        _lastFocused: null,
+        _stack: [],
         element: function (id) {
             try {
-                this._lastFocused = document.activeElement;
+                this._stack.push(document.activeElement);
                 const el = document.getElementById(id);
                 if (el) el.focus();
             } catch (e) { /* swallow */ }
         },
         restorePrevious: function () {
             try {
-                if (this._lastFocused && typeof this._lastFocused.focus === 'function') {
-                    this._lastFocused.focus();
+                const prev = this._stack.pop();
+                if (prev && typeof prev.focus === 'function') {
+                    prev.focus();
                 }
             } catch (e) { /* swallow */ }
-            this._lastFocused = null;
         }
     },
     scrollIntoViewIfNeeded: function (selector) {

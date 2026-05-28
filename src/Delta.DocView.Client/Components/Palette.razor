@@ -74,6 +74,7 @@
 @code {
     private string _inputId = "";
     private bool _wasOpen;
+    private int _lastScrolledIndex = -1;
 
     protected override void OnInitialized()
     {
@@ -110,7 +111,7 @@
             try { await JS.InvokeVoidAsync("docview.focus.restorePrevious"); } catch { }
         }
 
-        if (State.IsOpen && State.Results.Count > 0)
+        if (State.IsOpen && State.Results.Count > 0 && _lastScrolledIndex != State.SelectedIndex)
         {
             try
             {
@@ -119,6 +120,11 @@
                     $"[data-testid='palette'] [data-result-index='{State.SelectedIndex}']");
             }
             catch { }
+            _lastScrolledIndex = State.SelectedIndex;
+        }
+        else if (!State.IsOpen)
+        {
+            _lastScrolledIndex = -1;  // reset when closed so next open re-scrolls
         }
 
         _wasOpen = State.IsOpen;

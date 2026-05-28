@@ -13,7 +13,7 @@
                 {
                     <tr>
                         <td class="param-cell-name"><code>@p.Name</code></td>
-                        <td class="param-cell-type"><span class="param-type-chip param-@p.Type.ToLowerInvariant()">@p.Type</span></td>
+                        <td class="param-cell-type"><span class="param-type-chip param-@UiStrings.DisplayParamType(p.Type).ToLowerInvariant()">@UiStrings.DisplayParamType(p.Type)</span></td>
                         <td class="param-cell-example"><code>"@p.Example"</code></td>
                     </tr>
                 }

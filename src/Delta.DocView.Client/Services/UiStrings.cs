@@ -5,4 +5,6 @@ namespace Delta.DocView.Client.Services;
 /// </summary>
 public static class UiStrings
 {
+    public static string DisplayParamType(string type) =>
+        type.Equals("DocString", StringComparison.OrdinalIgnoreCase) ? "string" : type;
 }

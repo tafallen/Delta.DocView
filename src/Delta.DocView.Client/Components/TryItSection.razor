@@ -26,7 +26,7 @@
                             <label for="@inputId" class="try-it-param-name">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</label>
                             @if (param is not null)
                             {
-                                <span class="param-type-chip param-@param.Type.ToLowerInvariant()">@param.Type</span>
+                                <span class="param-type-chip param-@UiStrings.DisplayParamType(param.Type).ToLowerInvariant()">@UiStrings.DisplayParamType(param.Type)</span>
                             }
                         </div>
                         <input id="@inputId" type="text" class="try-it-field" value="@_inputs[idx]" @oninput="e => OnInput(idx, e)" />

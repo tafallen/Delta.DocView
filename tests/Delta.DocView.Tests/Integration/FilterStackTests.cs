@@ -88,6 +88,7 @@ public class FilterStackTests
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
+        ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();
@@ -375,6 +376,219 @@ public class FilterStackTests
                 Assert.Contains("is-fav", fav.GetAttribute("class") ?? "");
             },
             timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void J_With_No_Selection_Selects_First_Filtered()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var provider = ctx.Services.GetRequiredService<FilteredStepsProvider>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        keyboard.Instance.OnKey("select-next");
+
+        Assert.NotNull(selection.Selected);
+        Assert.Equal(provider.Filtered[0].Id, selection.Selected!.Id);
+    }
+
+    [Fact]
+    public void J_Then_J_Moves_To_Second_Row()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var provider = ctx.Services.GetRequiredService<FilteredStepsProvider>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        keyboard.Instance.OnKey("select-next");
+        keyboard.Instance.OnKey("select-next");
+
+        Assert.Equal(provider.Filtered[1].Id, selection.Selected!.Id);
+    }
+
+    [Fact]
+    public void K_From_First_Item_Is_NoOp()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var provider = ctx.Services.GetRequiredService<FilteredStepsProvider>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        selection.Select(provider.Filtered[0]);
+        keyboard.Instance.OnKey("select-prev");
+
+        Assert.Equal(provider.Filtered[0].Id, selection.Selected!.Id);
+    }
+
+    [Fact]
+    public void J_At_Last_Item_Is_NoOp_NoWrap()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var provider = ctx.Services.GetRequiredService<FilteredStepsProvider>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        var last = provider.Filtered[^1];
+        selection.Select(last);
+        keyboard.Instance.OnKey("select-next");
+
+        Assert.Equal(last.Id, selection.Selected!.Id);
+    }
+
+    [Fact]
+    public void F_With_Selection_Toggles_Favourite()
+    {
+        var (ctx, _, _, favs) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var detail = ctx.RenderComponent<DetailPanel>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var provider = ctx.Services.GetRequiredService<FilteredStepsProvider>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        var target = provider.Filtered[0];
+        selection.Select(target);
+
+        keyboard.Instance.OnKey("toggle-fav");
+
+        Assert.True(favs.Has(target.Id));
+        detail.WaitForAssertion(
+            () => Assert.Contains("is-fav", detail.Find("[data-testid='detail-favourite']").GetAttribute("class") ?? ""),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void F_With_No_Selection_Does_Not_Toggle_Anything()
+    {
+        var (ctx, _, _, favs) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+
+        keyboard.Instance.OnKey("toggle-fav");
+
+        Assert.Equal(0, favs.Count);
+    }
+
+    [Fact]
+    public void OpenPalette_Raises_OpenPaletteRequested()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var actions = ctx.Services.GetRequiredService<IKeyboardActions>();
+
+        var count = 0;
+        actions.OpenPaletteRequested += () => count++;
+
+        keyboard.Instance.OnKey("open-palette");
+
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public void OpenShortcuts_Raises_OpenShortcutsRequested()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var actions = ctx.Services.GetRequiredService<IKeyboardActions>();
+
+        var count = 0;
+        actions.OpenShortcutsRequested += () => count++;
+
+        keyboard.Instance.OnKey("open-shortcuts");
+
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public void ToggleComposer_Raises_ToggleComposerRequested()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var actions = ctx.Services.GetRequiredService<IKeyboardActions>();
+
+        var count = 0;
+        actions.ToggleComposerRequested += () => count++;
+
+        keyboard.Instance.OnKey("toggle-composer");
+
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public void CloseOverlay_Raises_CloseOverlayRequested()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var actions = ctx.Services.GetRequiredService<IKeyboardActions>();
+
+        var count = 0;
+        actions.CloseOverlayRequested += () => count++;
+
+        keyboard.Instance.OnKey("close-overlay");
+
+        Assert.Equal(1, count);
+    }
+
+    [Fact]
+    public void SelectNext_After_Filter_Excludes_Current_Selection_Picks_First_Filtered()
+    {
+        var (ctx, _, state, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        var provider = ctx.Services.GetRequiredService<FilteredStepsProvider>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        // Select an Auth step.
+        var authStep = provider.Filtered.First(s => s.Domain == "Auth");
+        selection.Select(authStep);
+
+        // Filter to Billing — selection is no longer in the filtered list.
+        state.SetDomain("Billing");
+
+        keyboard.Instance.OnKey("select-next");
+
+        Assert.Equal(provider.Filtered[0].Id, selection.Selected!.Id);
+        Assert.Equal("Billing", selection.Selected!.Domain);
     }
 
     [Fact]

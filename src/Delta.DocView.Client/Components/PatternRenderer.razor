@@ -1,0 +1,74 @@
+@using System.Text.RegularExpressions
+@foreach (var seg in GetSegments())
+{
+    if (seg.IsToken)
+    {
+        var typeLower = seg.Type!.ToLowerInvariant();
+        <span class="param-pill param-@typeLower">
+            @if (!string.IsNullOrEmpty(seg.Name))
+            {
+                <em class="param-name">@seg.Name</em>@(":")<span class="param-type">@seg.Type</span>
+            }
+            else
+            {
+                <span class="param-type">@seg.Type</span>
+            }
+        </span>
+    }
+    else
+    {
+        <HighlightRenderer Text="@seg.Text" Query="@Query" />
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public string Pattern { get; set; } = "";
+    [Parameter] public string? Query { get; set; }
+
+    private static readonly Regex TokenRegex = new(@"\{([^}]*)\}", RegexOptions.Compiled);
+
+    private IEnumerable<Segment> GetSegments()
+    {
+        if (string.IsNullOrEmpty(Pattern))
+        {
+            yield break;
+        }
+
+        var lastEnd = 0;
+        foreach (Match m in TokenRegex.Matches(Pattern))
+        {
+            if (m.Index > lastEnd)
+            {
+                yield return new Segment(Pattern.Substring(lastEnd, m.Index - lastEnd), false, null, null);
+            }
+
+            var inner = m.Groups[1].Value;
+            var colonIdx = inner.IndexOf(':');
+            string? name = null;
+            string type;
+            if (colonIdx >= 0)
+            {
+                name = inner.Substring(0, colonIdx).Trim();
+                type = inner.Substring(colonIdx + 1).Trim();
+                if (string.IsNullOrEmpty(name))
+                {
+                    name = null;
+                }
+            }
+            else
+            {
+                type = inner.Trim();
+            }
+
+            yield return new Segment(null, true, name, type);
+            lastEnd = m.Index + m.Length;
+        }
+
+        if (lastEnd < Pattern.Length)
+        {
+            yield return new Segment(Pattern.Substring(lastEnd), false, null, null);
+        }
+    }
+
+    private readonly record struct Segment(string? Text, bool IsToken, string? Name, string? Type);
+}

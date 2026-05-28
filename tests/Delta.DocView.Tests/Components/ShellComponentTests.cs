@@ -32,7 +32,10 @@ public class ShellComponentTests : TestContext
     [Fact]
     public void DetailPanel_Renders()
     {
+        Services.AddScoped<ClientStepLibraryStore>();
+        Services.AddScoped<SelectionState>();
+        Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         var cut = RenderComponent<DetailPanel>();
-        Assert.Contains("detail-panel-shell", cut.Markup);
+        Assert.Contains("detail-empty", cut.Markup);
     }
 }

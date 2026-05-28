@@ -27,6 +27,8 @@ public class MainLayoutTests : TestContext
         Services.AddSingleton(MakeStore());
         Services.AddSingleton<FilterState>();
         Services.AddSingleton<IFavouritesStore, InMemoryFavouritesStore>();
+        Services.AddSingleton<SelectionState>();
+        JSInterop.Mode = JSRuntimeMode.Loose;
         JSInterop.SetupVoid("docview.setDark", _ => true);
     }
 

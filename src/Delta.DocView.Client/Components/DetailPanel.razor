@@ -1,2 +1,60 @@
-<div class="detail-panel-shell">
-</div>
+@using Delta.DocView.Client.Services
+@using Delta.DocView.Shared.Models
+@inject SelectionState Selection
+@inject IFavouritesStore Favs
+@inject ClientStepLibraryStore Store
+@implements IDisposable
+
+@if (Selection.Selected is null)
+{
+    <div class="detail-empty" data-testid="detail-empty">
+        <p>Select a step to see details.</p>
+    </div>
+}
+else
+{
+    var step = Selection.Selected;
+    <div class="detail-panel" data-step-id="@step.Id" data-testid="detail-panel">
+        <div class="detail-header">
+            <span class="type-chip chip-@step.Type.ToLowerInvariant()">@step.Type</span>
+            <span class="domain-dot" style="background: var(@DomainPalette.CssVarName(step.Domain));"></span>
+            <span class="domain-label">@DomainLabel(step.Domain)</span>
+            <button class="detail-favourite @(Favs.Has(step.Id) ? "is-fav" : "")"
+                    data-testid="detail-favourite"
+                    @onclick="() => Favs.Toggle(step.Id)">★</button>
+            <button class="detail-add-primary"
+                    data-testid="detail-add-primary"
+                    disabled
+                    title="@UiStrings.AddToScenarioComingSoon">Add to scenario</button>
+        </div>
+        <PatternHeading Step="@step" />
+        @if (!string.IsNullOrWhiteSpace(step.Description))
+        {
+            <p class="detail-description">@step.Description</p>
+        }
+        <StatsStrip Step="@step" />
+        <ParamsTable Step="@step" />
+        <TryItSection Step="@step" />
+        <CSharpBlock Source="@step.Source" />
+        <RelatedSteps Step="@step" />
+    </div>
+}
+
+@code {
+    protected override void OnInitialized()
+    {
+        Selection.Changed += OnChanged;
+        Favs.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private string DomainLabel(string id) =>
+        Store.Domains.FirstOrDefault(d => d.Id == id)?.Label ?? id;
+
+    public void Dispose()
+    {
+        Selection.Changed -= OnChanged;
+        Favs.Changed -= OnChanged;
+    }
+}

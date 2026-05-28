@@ -112,6 +112,38 @@ public class LocalStorageFavouritesStoreTests
         Assert.Equal("[\"a\",\"b\"]", lastJson);
     }
 
+    [Fact]
+    public async Task InitializeAsync_JsThrows_LeavesStoreEmpty_NoThrow()
+    {
+        var js = Substitute.For<IJSRuntime>();
+        js.InvokeAsync<string>("docview.favourites.read", Arg.Any<object?[]?>())
+            .Returns<ValueTask<string>>(_ => throw new JSException("simulated JS failure"));
+
+        var store = new LocalStorageFavouritesStore(js);
+        await store.InitializeAsync();
+
+        Assert.Equal(0, store.Count);
+    }
+
+    [Fact]
+    public async Task Toggle_AfterInitWithStoredIds_WritesMergedSortedJson()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "[\"a\",\"b\"]" };
+        var store = new LocalStorageFavouritesStore(js);
+
+        await store.InitializeAsync();
+
+        store.Toggle("c");
+
+        // Let fire-and-forget writes settle.
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.NotEmpty(js.WriteCalls);
+        var lastJson = js.WriteCalls[^1];
+        Assert.Equal("[\"a\",\"b\",\"c\"]", lastJson);
+    }
+
     /// <summary>
     /// Hand-rolled <see cref="IJSRuntime"/> stub for the write-assertion test.
     /// NSubstitute's <c>params object?[]?</c> capture for <c>InvokeVoidAsync</c>
@@ -121,11 +153,17 @@ public class LocalStorageFavouritesStoreTests
     {
         public List<string> WriteCalls { get; } = new();
 
+        public string? ReadResponse { get; set; }
+
         public ValueTask<TValue> InvokeAsync<TValue>(string identifier, object?[]? args)
         {
             if (identifier == "docview.favourites.write" && args is { Length: > 0 } && args[0] is string s)
             {
                 WriteCalls.Add(s);
+            }
+            if (identifier == "docview.favourites.read" && ReadResponse is not null && ReadResponse is TValue tv)
+            {
+                return new ValueTask<TValue>(tv);
             }
             return new ValueTask<TValue>(default(TValue)!);
         }

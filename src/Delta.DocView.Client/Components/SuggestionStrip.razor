@@ -29,7 +29,7 @@
     private void OnComposerChanged()
     {
         Recompute();
-        StateHasChanged();
+        InvokeAsync(StateHasChanged);
     }
 
     private void Recompute()

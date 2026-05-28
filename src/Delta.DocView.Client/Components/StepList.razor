@@ -8,7 +8,7 @@
         <span class="step-list-count" data-testid="step-list-count">
             @Provider.Filtered.Count of @Store.Steps.Count matching@(string.IsNullOrWhiteSpace(State.Query) ? "" : $" for \"{State.Query.Trim()}\"")
         </span>
-        <button class="sort-button" disabled title="Sorted by most used (no alternative sort in v1)">↓ Sorted by most used</button>
+        <button class="sort-button" disabled title="Sorted by most used (no alternative sort in v1)">sorted by &nbsp;<strong>most used</strong> ∨</button>
     </div>
     @if (Store.Steps.Count == 0)
     {

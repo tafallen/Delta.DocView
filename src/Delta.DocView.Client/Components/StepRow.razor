@@ -10,12 +10,18 @@
     <div class="step-body">
         <div class="step-pattern"><PatternRenderer Pattern="@Step.Pattern" Query="@Query" /></div>
         <div class="step-meta">
-            <span class="step-file">@Step.File:@Step.Line</span>
-            @if (Step.Tags.Count > 0)
-            {
-                <span class="step-tags">@(string.Join(" · ", Step.Tags.Take(3)))@(Step.Tags.Count > 3 ? $" +{Step.Tags.Count - 3}" : "")</span>
-            }
-            <span class="step-used">@(Step.Used)×</span>
+            <span class="step-file"><span class="file-icon">&#x25A1;</span> @Step.File :@Step.Line</span>
+            <div class="step-tags-row">
+                @foreach (var tag in Step.Tags.Take(3))
+                {
+                    <span class="tag-pill">@tag</span>
+                }
+                @if (Step.Tags.Count > 3)
+                {
+                    <span class="tag-pill">+@(Step.Tags.Count - 3)</span>
+                }
+                <span class="step-used">@Step.Used uses</span>
+            </div>
         </div>
     </div>
     <div class="step-actions">

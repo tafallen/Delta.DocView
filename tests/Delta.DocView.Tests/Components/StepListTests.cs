@@ -101,6 +101,24 @@ public class StepListTests
     }
 
     [Fact]
+    public void Renders_EmptyLibrary_Card_When_Store_Has_No_Steps()
+    {
+        var ctx = new TestContext();
+        ctx.Services.AddScoped<ClientStepLibraryStore>();
+        ctx.Services.AddScoped<FilterState>();
+        ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
+        ctx.Services.AddScoped<SelectionState>();
+        ctx.JSInterop.Mode = JSRuntimeMode.Loose;
+        using var _c = ctx;
+
+        var cut = ctx.RenderComponent<StepList>();
+
+        Assert.NotNull(cut.Find("[data-testid='step-list-empty-library']"));
+        Assert.Empty(cut.FindAll("[data-testid='step-list-empty']"));
+        Assert.Empty(cut.FindAll(".step-row"));
+    }
+
+    [Fact]
     public void Domain_Set_Renders_Flat_Without_Group_Headers()
     {
         var lib = Library(new[]

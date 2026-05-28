@@ -10,7 +10,14 @@
         </span>
         <button class="sort-button" disabled title="Sorted by most used (no alternative sort in v1)">↓ Sorted by most used</button>
     </div>
-    @if (_filtered.Count == 0)
+    @if (Store.Steps.Count == 0)
+    {
+        <div class="step-list-empty" data-testid="step-list-empty-library">
+            <p>No steps in library.</p>
+            <p class="hint">Check that <code>DOCVIEW_LIBRARY_PATH</code> points to a populated <code>step-library.v1.json</code>.</p>
+        </div>
+    }
+    else if (_filtered.Count == 0)
     {
         <div class="step-list-empty" data-testid="step-list-empty">
             <p>No steps match your filters.</p>

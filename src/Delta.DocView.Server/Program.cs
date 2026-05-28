@@ -9,21 +9,22 @@ builder.Services.AddSingleton<IStartupError>(sp => sp.GetRequiredService<Startup
 builder.Services.AddSingleton<StepLibraryStore>();
 builder.Services.AddSingleton<IStepLibraryStore>(sp => sp.GetRequiredService<StepLibraryStore>());
 
+// Loader/validator are stateless — register so startup resolves them from DI
+builder.Services.AddSingleton<StepLibraryLoader>();
+builder.Services.AddSingleton<StepLibraryValidator>();
+
 var app = builder.Build();
 
 // ── Load the step library at startup ────────────────────────────────────────
 var libraryPath = app.Configuration["DOCVIEW_LIBRARY_PATH"]
     ?? Path.Combine(app.Environment.ContentRootPath, "data", "step-library.json");
 
-var startupError  = app.Services.GetRequiredService<StartupError>();
-var startupStore  = app.Services.GetRequiredService<StepLibraryStore>();
+var startupError = app.Services.GetRequiredService<StartupError>();
+var startupStore = app.Services.GetRequiredService<StepLibraryStore>();
+var loader       = app.Services.GetRequiredService<StepLibraryLoader>();
+var validator    = app.Services.GetRequiredService<StepLibraryValidator>();
 
-StartupLoader.Run(
-    libraryPath,
-    new StepLibraryLoader(),
-    new StepLibraryValidator(),
-    startupError,
-    startupStore);
+StartupLoader.Run(libraryPath, loader, validator, startupError, startupStore);
 
 if (startupError.HasError)
     app.Logger.LogError("Startup error: {Error}", startupError.ErrorMessage);

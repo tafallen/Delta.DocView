@@ -1,0 +1,35 @@
+@using Delta.DocView.Client.Services
+@implements IDisposable
+@inject FilterState State
+@inject ClientStepLibraryStore Store
+
+<div class="step-type-filter">
+    @foreach (var type in Types)
+    {
+        var t = type;
+        var isActive = State.Types.Contains(t);
+        var count = Store.Steps.Count(s => s.Type == t);
+        <button class="step-type @(isActive ? "is-active" : "")"
+                data-type="@t"
+                type="button"
+                @onclick="() => State.ToggleType(t)">
+            @t <span class="count">@count</span>
+        </button>
+    }
+</div>
+
+@code {
+    private static readonly string[] Types = ["Given", "When", "Then", "And"];
+
+    protected override void OnInitialized()
+    {
+        State.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose()
+    {
+        State.Changed -= OnChanged;
+    }
+}

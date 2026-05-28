@@ -256,3 +256,13 @@ html, body {
   right: 0.75rem;
   top: 0.5rem;
 }
+
+/* ── Step type filter ─────────────────────────────────────────────── */
+.step-type-filter { display: flex; gap: 0.25rem; }
+.step-type {
+  flex: 1; padding: 0.25rem 0.5rem; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text-muted); border-radius: 4px;
+  cursor: pointer; font-size: 0.85rem;
+}
+.step-type.is-active { background: var(--accent-500); color: white; border-color: var(--accent-500); }
+.step-type .count { opacity: 0.7; margin-left: 0.25rem; font-size: 0.75rem; }

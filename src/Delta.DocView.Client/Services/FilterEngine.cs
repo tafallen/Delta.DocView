@@ -2,8 +2,16 @@ using Delta.DocView.Shared.Models;
 
 namespace Delta.DocView.Client.Services;
 
+/// <summary>
+/// Pure filter projection over the step library, driven by <see cref="FilterState"/> and
+/// <see cref="IFavouritesStore"/>.
+/// </summary>
 public static class FilterEngine
 {
+    /// <summary>
+    /// Applies all active filters in narrowing order: type → domain → param types → favourites-only
+    /// → query substring (case-insensitive ordinal).
+    /// </summary>
     public static IReadOnlyList<Step> Apply(
         IEnumerable<Step> steps,
         FilterState state,

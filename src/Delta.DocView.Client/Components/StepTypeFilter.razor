@@ -4,7 +4,7 @@
 @inject ClientStepLibraryStore Store
 
 <div class="step-type-filter">
-    @foreach (var type in Types)
+    @foreach (var type in GherkinStepTypes.All)
     {
         var t = type;
         var isActive = State.Types.Contains(t);
@@ -19,8 +19,6 @@
 </div>
 
 @code {
-    private static readonly string[] Types = ["Given", "When", "Then", "And"];
-
     protected override void OnInitialized()
     {
         State.Changed += OnChanged;

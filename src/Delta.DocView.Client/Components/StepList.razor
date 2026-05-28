@@ -35,10 +35,7 @@
 
     private void Recompute()
     {
-        _filtered = FilterEngine.Apply(Store.Steps, State, Favs)
-            .OrderByDescending(s => s.Used)
-            .ThenBy(s => s.Pattern, StringComparer.Ordinal)
-            .ToList();
+        _filtered = StepRanking.Rank(FilterEngine.Apply(Store.Steps, State, Favs));
     }
 
     private void OnChanged()

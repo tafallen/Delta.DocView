@@ -1,0 +1,12 @@
+@using Delta.DocView.Client.Services
+@inject ClientStepLibraryStore Store
+
+<style>
+    :root {
+    @foreach (var domain in Store.Domains)
+    {
+        var id = domain.Id.ToLowerInvariant();
+        @:    --dom-@(id): @DomainPalette.CssVarValue(id);
+    }
+    }
+</style>

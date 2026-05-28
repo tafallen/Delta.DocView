@@ -88,6 +88,20 @@ public class CSharpBlockTests : TestContext
     }
 
     [Fact]
+    public void Toggle_Has_Aria_Expanded_State()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<CSharpBlock>(p => p.Add(c => c.Source, "public void Foo()"));
+
+        Assert.Equal("false", cut.Find("[data-testid='cs-toggle']").GetAttribute("aria-expanded"));
+
+        cut.Find("[data-testid='cs-toggle']").Click();
+
+        Assert.Equal("true", cut.Find("[data-testid='cs-toggle']").GetAttribute("aria-expanded"));
+    }
+
+    [Fact]
     public void Source_Renders_Highlighted_Tokens()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;

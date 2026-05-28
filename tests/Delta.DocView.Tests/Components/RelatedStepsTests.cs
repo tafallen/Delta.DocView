@@ -116,6 +116,22 @@ public class RelatedStepsTests
     }
 
     [Fact]
+    public void Card_Aria_Label_Contains_Full_Pattern()
+    {
+        var longPattern = new string('x', 80);
+        var related = S("l1", pattern: longPattern);
+        var root = S("root", suggestsNext: new[] { "l1" });
+        var (ctx, _, _) = Setup(new[] { related, root });
+
+        var cut = ctx.RenderComponent<RelatedSteps>(p => p.Add(c => c.Step, root));
+
+        var card = cut.Find("[data-testid='related-card']");
+        var ariaLabel = card.GetAttribute("aria-label") ?? "";
+        Assert.Contains(longPattern, ariaLabel);
+        Assert.DoesNotContain("…", ariaLabel);
+    }
+
+    [Fact]
     public void Card_Click_Selects_Related_Step()
     {
         var a = S("a", pattern: "pa");

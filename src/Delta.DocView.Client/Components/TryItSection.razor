@@ -9,16 +9,18 @@
             {
                 var idx = i; // closure capture
                 var param = (idx < Step.Params.Count) ? Step.Params[idx] : null;
-                <label class="try-it-input">
-                    <span class="try-it-label">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</span>
-                    <input type="text"
+                var inputId = $"try-it-{_uid}-{idx}";
+                <div class="try-it-input">
+                    <label for="@inputId" class="try-it-label">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</label>
+                    <input id="@inputId"
+                           type="text"
                            value="@_inputs[idx]"
                            @oninput="e => OnInput(idx, e)" />
-                </label>
+                </div>
             }
         </div>
     }
-    <pre class="composed-line" data-testid="composed-line">@_composed</pre>
+    <pre class="composed-line" data-testid="composed-line" aria-label="Composed line preview" aria-live="polite">@_composed</pre>
     <div class="try-it-actions">
         <CopyButton Text="@_composed" Label="Copy" ConfirmLabel="✓ line copied" />
     </div>
@@ -31,6 +33,12 @@
     private List<int> _paramIndices = new();
     private string[] _inputs = Array.Empty<string>();
     private string _composed = "";
+    private string _uid = "";
+
+    protected override void OnInitialized()
+    {
+        _uid = Guid.NewGuid().ToString("N")[..8];
+    }
 
     protected override void OnParametersSet()
     {

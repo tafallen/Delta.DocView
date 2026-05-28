@@ -14,17 +14,20 @@
 else
 {
     var step = Selection.Selected;
-    <div class="detail-panel" data-step-id="@step.Id" data-testid="detail-panel">
+    <div class="detail-panel" data-step-id="@step.Id" data-testid="detail-panel" aria-label="Step detail">
         <div class="detail-header">
             <span class="type-chip chip-@step.Type.ToLowerInvariant()">@step.Type</span>
             <span class="domain-dot" style="background: var(@DomainPalette.CssVarName(step.Domain));"></span>
             <span class="domain-label">@DomainLabel(step.Domain)</span>
             <button class="detail-favourite @(Favs.Has(step.Id) ? "is-fav" : "")"
                     data-testid="detail-favourite"
+                    aria-label="Toggle favourite"
+                    aria-pressed="@(Favs.Has(step.Id) ? "true" : "false")"
                     @onclick="() => Favs.Toggle(step.Id)">★</button>
             <button class="detail-add-primary"
                     data-testid="detail-add-primary"
                     disabled
+                    aria-disabled="true"
                     title="@UiStrings.AddToScenarioComingSoon">Add to scenario</button>
         </div>
         <PatternHeading Step="@step" />

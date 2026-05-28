@@ -164,6 +164,24 @@ public class DetailPanelTests
     }
 
     [Fact]
+    public void Favourite_Button_Has_Aria_Label_And_Pressed_State()
+    {
+        var step = MakeStepA();
+        var (ctx, _, sel, _) = Setup(new[] { step });
+        sel.Select(step);
+
+        var cut = ctx.RenderComponent<DetailPanel>();
+
+        var btn = cut.Find("[data-testid='detail-favourite']");
+        Assert.Equal("Toggle favourite", btn.GetAttribute("aria-label"));
+        Assert.Equal("false", btn.GetAttribute("aria-pressed"));
+
+        btn.Click();
+
+        Assert.Equal("true", cut.Find("[data-testid='detail-favourite']").GetAttribute("aria-pressed"));
+    }
+
+    [Fact]
     public void Description_Hidden_When_Empty()
     {
         var step = MakeStepB(); // Description = ""

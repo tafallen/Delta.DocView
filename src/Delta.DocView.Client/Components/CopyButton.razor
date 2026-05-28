@@ -1,10 +1,10 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<button class="copy-button" data-testid="copy-button" @onclick="OnClick">@Label</button>
+<button class="copy-button" data-testid="copy-button" aria-label="@Label" @onclick="OnClick">@Label</button>
 @if (_confirmed)
 {
-    <span class="copy-confirmation" data-testid="copy-confirmation">@ConfirmLabel</span>
+    <span class="copy-confirmation" data-testid="copy-confirmation" role="status">@ConfirmLabel</span>
 }
 
 @code {

@@ -49,6 +49,18 @@ public class CopyButtonTests : TestContext
     }
 
     [Fact]
+    public void Button_Has_Aria_Label_From_Label_Parameter()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<CopyButton>(p => p
+            .Add(c => c.Text, "x")
+            .Add(c => c.Label, "Copy code"));
+
+        Assert.Equal("Copy code", cut.Find("[data-testid='copy-button']").GetAttribute("aria-label"));
+    }
+
+    [Fact]
     public void Confirmation_Label_Is_Configurable()
     {
         JSInterop.Setup<bool>("docview.copyText", _ => true).SetResult(true);

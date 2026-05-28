@@ -84,6 +84,24 @@ public class TryItSectionTests : TestContext
     }
 
     [Fact]
+    public void Inputs_Are_Paired_With_Labels_Via_For_Id()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, MakeLoggedInStep()));
+
+        var inputs = cut.FindAll("input");
+        Assert.NotEmpty(inputs);
+        foreach (var input in inputs)
+        {
+            var id = input.GetAttribute("id");
+            Assert.False(string.IsNullOrEmpty(id), "input must have id");
+            var label = cut.Find($"label[for='{id}']");
+            Assert.NotNull(label);
+        }
+    }
+
+    [Fact]
     public void No_Params_Step_Skips_Inputs_And_Composes_From_Static_Text()
     {
         JSInterop.Mode = JSRuntimeMode.Loose;

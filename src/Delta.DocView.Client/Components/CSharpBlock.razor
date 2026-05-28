@@ -2,7 +2,11 @@
 
 <div class="cs-block" data-testid="cs-block">
     <div class="cs-block-header">
-        <button class="cs-toggle" data-testid="cs-toggle" @onclick="OnToggleClick">
+        <button class="cs-toggle"
+                data-testid="cs-toggle"
+                aria-expanded="@(_expanded ? "true" : "false")"
+                aria-controls="@($"cs-source-{_sourceId}")"
+                @onclick="OnToggleClick">
             @(_expanded ? "▾ Hide C# step definition" : "▸ Show C# step definition")
         </button>
         @if (_expanded)
@@ -12,7 +16,7 @@
     </div>
     @if (_expanded)
     {
-        <pre class="cs-source" data-testid="cs-source">@foreach (var t in CSharpHighlighter.Tokenise(Source))
+        <pre class="cs-source" data-testid="cs-source" id="@($"cs-source-{_sourceId}")" role="region">@foreach (var t in CSharpHighlighter.Tokenise(Source))
 {<span class="@t.CssClass">@t.Text</span>}</pre>
     }
 </div>
@@ -22,6 +26,12 @@
     public string Source { get; set; } = "";
 
     private bool _expanded;
+    private string _sourceId = "";
+
+    protected override void OnInitialized()
+    {
+        _sourceId = Guid.NewGuid().ToString("N")[..8];
+    }
 
     private void OnToggleClick() => _expanded = !_expanded;
 }

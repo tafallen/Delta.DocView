@@ -1,4 +1,54 @@
 @using Delta.DocView.Client.Services
 @inject ComposerState Composer
 @inject ClientStepLibraryStore Store
-@* Stub — full implementation in Task 5 *@
+@implements IDisposable
+
+@if (_suggestions.Count > 0)
+{
+    <div class="suggestion-strip" aria-label="Suggested next steps">
+        @foreach (var step in _suggestions)
+        {
+            var s = step;
+            <button class="suggestion-chip"
+                    type="button"
+                    title="@s.Pattern"
+                    @onclick="() => Composer.AddStep(s)">@s.Pattern</button>
+        }
+    </div>
+}
+
+@code {
+    private List<Delta.DocView.Shared.Models.Step> _suggestions = [];
+
+    protected override void OnInitialized()
+    {
+        Recompute();
+        Composer.Changed += OnComposerChanged;
+    }
+
+    private void OnComposerChanged()
+    {
+        Recompute();
+        StateHasChanged();
+    }
+
+    private void Recompute()
+    {
+        if (Composer.Steps.Count == 0) { _suggestions = []; return; }
+
+        var last = Composer.Steps[^1].Step;
+        var alreadyAdded = Composer.Steps.Select(x => x.Step.Id).ToHashSet();
+
+        _suggestions = last.SuggestsNext
+            .Where(id => !alreadyAdded.Contains(id))
+            .Select(id => Store.ById.TryGetValue(id, out var s) ? s : null)
+            .OfType<Delta.DocView.Shared.Models.Step>()
+            .Take(4)
+            .ToList();
+    }
+
+    void IDisposable.Dispose()
+    {
+        Composer.Changed -= OnComposerChanged;
+    }
+}

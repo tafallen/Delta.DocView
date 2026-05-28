@@ -3,6 +3,7 @@ using Delta.DocView.Client.Components;
 using Delta.DocView.Client.Layout;
 using Delta.DocView.Client.Services;
 using Delta.DocView.Shared.Models;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
 
@@ -32,7 +33,8 @@ public class FilterStackTests
                 Domain = "Auth",
                 Pattern = "I am logged in as {string}",
                 Params = [new StepParam { Name = "user", Type = "string" }],
-                SuggestsNext = ["g2"]
+                SuggestsNext = ["g2"],
+                Used = 5
             },
             new Step
             {
@@ -40,7 +42,8 @@ public class FilterStackTests
                 Type = "Given",
                 Domain = "Auth",
                 Pattern = "I have {int} active sessions",
-                Params = [new StepParam { Name = "count", Type = "int" }]
+                Params = [new StepParam { Name = "count", Type = "int" }],
+                Used = 3
             },
             new Step
             {
@@ -48,7 +51,8 @@ public class FilterStackTests
                 Type = "When",
                 Domain = "Billing",
                 Pattern = "I add card ending {string}",
-                Params = [new StepParam { Name = "last4", Type = "string" }]
+                Params = [new StepParam { Name = "last4", Type = "string" }],
+                Used = 99
             },
             new Step
             {
@@ -56,7 +60,8 @@ public class FilterStackTests
                 Type = "When",
                 Domain = "Billing",
                 Pattern = "I post a payment of {decimal}",
-                Params = [new StepParam { Name = "amount", Type = "decimal" }]
+                Params = [new StepParam { Name = "amount", Type = "decimal" }],
+                Used = 7
             },
             new Step
             {
@@ -64,7 +69,8 @@ public class FilterStackTests
                 Type = "Then",
                 Domain = "Auth",
                 Pattern = "I see the dashboard",
-                Params = []
+                Params = [],
+                Used = 2
             },
             new Step
             {
@@ -72,7 +78,8 @@ public class FilterStackTests
                 Type = "Then",
                 Domain = "Billing",
                 Pattern = "I receive a receipt for {string}",
-                Params = [new StepParam { Name = "ref", Type = "string" }]
+                Params = [new StepParam { Name = "ref", Type = "string" }],
+                Used = 1
             }
         ],
         Signature = new StepSignature { Algorithm = "SHA-256", Digest = new string('0', 64) }
@@ -90,6 +97,7 @@ public class FilterStackTests
         ctx.Services.AddScoped<SelectionState>();
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
+        ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
@@ -618,6 +626,217 @@ public class FilterStackTests
                 Assert.NotNull(selection.Selected);
                 Assert.Equal("g2", selection.Selected!.Id);
                 Assert.Equal("g2", detail.Find("[data-testid='detail-panel']").GetAttribute("data-step-id"));
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Opens_When_Keyboard_Handler_Receives_OpenPalette()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+
+        keyboard.Instance.OnKey(KeyboardActionNames.OpenPalette);
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Opens_When_QuickFind_Button_Clicked()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Typing_Filters_Results()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        palette.Find("[data-testid='palette-input']").Input("dashboard");
+
+        palette.WaitForAssertion(
+            () =>
+            {
+                var results = palette.FindAll("[data-testid='palette-result']");
+                Assert.Single(results);
+                Assert.Equal("g5", results[0].GetAttribute("data-step-id"));
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Enter_Selects_And_Closes()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        var detail = ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        palette.Find("[data-testid='palette-input']")
+               .KeyDown(new KeyboardEventArgs { Key = "Enter" });
+
+        palette.WaitForAssertion(
+            () => Assert.Empty(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        Assert.NotNull(selection.Selected);
+        Assert.Equal("g3", selection.Selected!.Id);
+
+        detail.WaitForAssertion(
+            () => Assert.Equal("g3", detail.Find("[data-testid='detail-panel']").GetAttribute("data-step-id")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Escape_Closes_Without_Selection()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+        var selection = ctx.Services.GetRequiredService<SelectionState>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        Assert.Null(selection.Selected);
+
+        palette.Find("[data-testid='palette-input']")
+               .KeyDown(new KeyboardEventArgs { Key = "Escape" });
+
+        palette.WaitForAssertion(
+            () => Assert.Empty(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        Assert.Null(selection.Selected);
+    }
+
+    [Fact]
+    public void Palette_Backdrop_Click_Closes()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        palette.Find("[data-testid='palette-backdrop']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Empty(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Empty_Result_Shows_Hint()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () => Assert.Single(palette.FindAll("[data-testid='palette']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        palette.Find("[data-testid='palette-input']").Input("qqqzzzxxx");
+
+        palette.WaitForAssertion(
+            () =>
+            {
+                Assert.Single(palette.FindAll("[data-testid='palette-empty']"));
+                Assert.Empty(palette.FindAll("[data-testid='palette-result']"));
+            },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Palette_Default_Shows_Top_Usage_When_Empty_Query()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        ctx.RenderComponent<LeftRail>();
+        ctx.RenderComponent<StepList>();
+        ctx.RenderComponent<DetailPanel>();
+        var palette = ctx.RenderComponent<Palette>();
+        ctx.RenderComponent<KeyboardHandler>();
+
+        header.Find("[data-testid='quick-find']").Click();
+
+        palette.WaitForAssertion(
+            () =>
+            {
+                var results = palette.FindAll("[data-testid='palette-result']");
+                Assert.NotEmpty(results);
+                Assert.Equal("g3", results[0].GetAttribute("data-step-id"));
             },
             timeout: TimeSpan.FromMilliseconds(500));
     }

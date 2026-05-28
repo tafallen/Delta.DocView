@@ -16,7 +16,12 @@ namespace Delta.DocView.Client.Services;
 /// </remarks>
 public sealed class PaletteState : IDisposable
 {
-    private const int MaxResults = 50;
+    /// <summary>
+    /// Maximum number of results shown in the palette. The palette container
+    /// CSS (max-height: 70vh) is sized assuming this cap; raising the value
+    /// significantly may require CSS adjustments.
+    /// </summary>
+    public const int MaxResults = 50;
 
     private readonly ClientStepLibraryStore _store;
     private readonly IKeyboardActions _actions;
@@ -45,6 +50,17 @@ public sealed class PaletteState : IDisposable
         _actions.CloseOverlayRequested += Close;
     }
 
+    /// <summary>
+    /// Opens the palette and seeds the result list with the top steps by usage.
+    /// </summary>
+    /// <remarks>
+    /// Designed to be called after the library has finished loading
+    /// (App.razor gates MainLayout rendering on Task.WhenAll over
+    /// LibraryClient.LoadAsync and Favourites.InitializeAsync, both of which
+    /// must complete before any keyboard or click can reach this method).
+    /// Calling Open() with an empty store produces an empty result list and
+    /// does not throw, but is not the expected runtime path.
+    /// </remarks>
     public void Open()
     {
         if (IsOpen) return;

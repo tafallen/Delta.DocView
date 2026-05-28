@@ -69,7 +69,7 @@ public class PaletteStateTests
 
         Assert.True(state.IsOpen);
         Assert.True(state.Results.Count > 0);
-        Assert.True(state.Results.Count <= 50);
+        Assert.True(state.Results.Count <= PaletteState.MaxResults);
     }
 
     [Fact]
@@ -86,6 +86,25 @@ public class PaletteStateTests
     }
 
     [Fact]
+    public void Open_With_Empty_Library_Produces_Empty_Results_No_Throw()
+    {
+        var store = new ClientStepLibraryStore();
+        // Do NOT call store.Populate — store.Steps is empty.
+        var selection = new SelectionState();
+        var favs = new InMemoryFavouritesStore();
+        var filterState = new FilterState();
+        var provider = new FilteredStepsProvider(store, filterState, favs);
+        var actions = new KeyboardActions(selection, favs, provider);
+        var state = new PaletteState(store, actions, selection);
+
+        var ex = Record.Exception(() => state.Open());
+
+        Assert.Null(ex);
+        Assert.True(state.IsOpen);
+        Assert.Empty(state.Results);
+    }
+
+    [Fact]
     public void Default_Results_Top50_By_Used_Desc()
     {
         var steps = Enumerable.Range(1, 60)
@@ -95,7 +114,7 @@ public class PaletteStateTests
 
         state.Open();
 
-        Assert.Equal(50, state.Results.Count);
+        Assert.Equal(PaletteState.MaxResults, state.Results.Count);
         Assert.Equal(60, state.Results[0].Used);
         Assert.Equal(59, state.Results[1].Used);
     }

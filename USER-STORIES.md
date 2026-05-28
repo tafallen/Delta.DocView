@@ -130,7 +130,7 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 - [x] "Sorted by most used" button is present (v1: display only, no alternative sort required).
 - [x] When "All domains" is selected, steps are grouped by domain; each group has a coloured dot, domain label, and count. Groups are ordered by descending step count.
 - [x] When a specific domain is selected, no grouping header is shown (flat list).
-- [x] Each row shows: type chip (Given/When/Then/And colour-coded), step pattern with `{param : type}` highlighted, file path + line number, up to 3 tags, usage count.
+- [x] Each row shows: type chip (Given/When/Then colour-coded), step pattern with `{param : type}` highlighted, file path + line number, up to 3 tags, usage count.
 - [x] The active query highlights matching substrings in the pattern text.
 - [x] Each row has a star (favourite) button and a `+` (add to composer) button; both fire without selecting the row. *— `+` button is rendered disabled with "coming soon" tooltip; wired in US-09.*
 - [x] Clicking a row selects it and opens its detail in the right panel. *— click writes to SelectionState; detail panel content lands in US-06.*

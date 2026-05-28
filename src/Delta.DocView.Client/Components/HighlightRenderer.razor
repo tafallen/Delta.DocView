@@ -1,0 +1,54 @@
+@foreach (var seg in GetSegments())
+{
+    if (seg.IsMatch)
+    {
+        <mark>@seg.Value</mark>
+    }
+    else
+    {
+        @seg.Value
+    }
+}
+
+@code {
+    [Parameter, EditorRequired] public string Text { get; set; } = "";
+    [Parameter] public string? Query { get; set; }
+
+    private IEnumerable<Segment> GetSegments()
+    {
+        if (string.IsNullOrEmpty(Text) || string.IsNullOrWhiteSpace(Query))
+        {
+            if (!string.IsNullOrEmpty(Text))
+            {
+                yield return new Segment(Text, false);
+            }
+            yield break;
+        }
+
+        var q = Query!.Trim();
+        if (q.Length == 0)
+        {
+            yield return new Segment(Text, false);
+            yield break;
+        }
+
+        var i = 0;
+        while (i < Text.Length)
+        {
+            var idx = Text.IndexOf(q, i, StringComparison.OrdinalIgnoreCase);
+            if (idx < 0)
+            {
+                yield return new Segment(Text.Substring(i), false);
+                yield break;
+            }
+            if (idx > i)
+            {
+                yield return new Segment(Text.Substring(i, idx - i), false);
+            }
+            yield return new Segment(Text.Substring(idx, q.Length), true);
+            i = idx + q.Length;
+        }
+    }
+
+    private readonly record struct Segment(string Value, bool IsMatch);
+}

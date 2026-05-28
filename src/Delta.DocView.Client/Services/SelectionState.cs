@@ -14,6 +14,11 @@ public sealed class SelectionState
     public Step? Selected { get; private set; }
 
     /// <summary>Raised when <see cref="Selected"/> changes to a different reference (or to/from null).</summary>
+    /// <remarks>
+    /// Subscribers MUST unsubscribe on disposal (e.g. components implementing IDisposable
+    /// and calling -= in Dispose). Failing to do so leaks the closure for the lifetime of
+    /// this scoped service.
+    /// </remarks>
     public event Action? Changed;
 
     /// <summary>

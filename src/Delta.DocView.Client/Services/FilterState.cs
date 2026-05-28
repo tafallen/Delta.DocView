@@ -16,6 +16,11 @@ public sealed class FilterState
     public string Query { get; private set; } = "";
 
     /// <summary>Raised when any filter axis or the query changes.</summary>
+    /// <remarks>
+    /// Subscribers MUST unsubscribe on disposal (e.g. components implementing IDisposable
+    /// and calling -= in Dispose). Failing to do so leaks the closure for the lifetime of
+    /// this scoped service.
+    /// </remarks>
     public event Action? Changed;
 
     /// <summary>Toggles a step type on or off.</summary>

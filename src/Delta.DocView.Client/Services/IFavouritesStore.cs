@@ -27,5 +27,10 @@ public interface IFavouritesStore
     IReadOnlyCollection<string> All { get; }
 
     /// <summary>Raised when the set of favourites changes.</summary>
+    /// <remarks>
+    /// Subscribers MUST unsubscribe on disposal (e.g. components implementing IDisposable
+    /// and calling -= in Dispose). Failing to do so leaks the closure for the lifetime of
+    /// this scoped service.
+    /// </remarks>
     event Action? Changed;
 }

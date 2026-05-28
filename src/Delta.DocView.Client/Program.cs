@@ -11,10 +11,7 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
 });
 
-builder.Services.AddSingleton<ClientStepLibraryStore>();
-builder.Services.AddSingleton<LibraryApiClient>(sp =>
-    new LibraryApiClient(
-        sp.GetRequiredService<HttpClient>(),
-        sp.GetRequiredService<ClientStepLibraryStore>()));
+builder.Services.AddScoped<ClientStepLibraryStore>();
+builder.Services.AddScoped<LibraryApiClient>();
 
 await builder.Build().RunAsync();

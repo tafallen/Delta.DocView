@@ -61,6 +61,19 @@ public class LocalStorageFavouritesStoreTests
     }
 
     [Fact]
+    public async Task InitializeAsync_CalledTwice_Throws()
+    {
+        var js = Substitute.For<IJSRuntime>();
+        js.InvokeAsync<string>("docview.favourites.read", Arg.Any<object?[]?>())
+            .Returns(ValueTask.FromResult("[]"));
+
+        var store = new LocalStorageFavouritesStore(js);
+        await store.InitializeAsync();
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() => store.InitializeAsync());
+    }
+
+    [Fact]
     public async Task Toggle_AddsThenRemoves_RaisesChangedEachTime()
     {
         var js = Substitute.For<IJSRuntime>();

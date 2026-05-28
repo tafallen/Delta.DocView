@@ -11,6 +11,8 @@ window.docview = {
         }
         el.textContent = css;
     },
+    // Storage key 'docview.favs.v1' is the contract with LocalStorageFavouritesStore.cs.
+    // Payload: JSON string[] of step ids, ordinal-sorted on write. Bump key suffix on schema change.
     favourites: {
         read: function () {
             try {

@@ -1,12 +1,12 @@
 @implements IDisposable
 @inject ClientStepLibraryStore Store
 @inject FilterState State
-@inject IFavouritesStore Favs
+@inject FilteredStepsProvider Provider
 
 <div class="step-list">
     <div class="step-list-header">
         <span class="step-list-count" data-testid="step-list-count">
-            @_filtered.Count of @Store.Steps.Count matching@(string.IsNullOrWhiteSpace(State.Query) ? "" : $" for \"{State.Query.Trim()}\"")
+            @Provider.Filtered.Count of @Store.Steps.Count matching@(string.IsNullOrWhiteSpace(State.Query) ? "" : $" for \"{State.Query.Trim()}\"")
         </span>
         <button class="sort-button" disabled title="Sorted by most used (no alternative sort in v1)">↓ Sorted by most used</button>
     </div>
@@ -17,7 +17,7 @@
             <p class="hint">Check that <code>DOCVIEW_LIBRARY_PATH</code> points to a populated <code>step-library.v1.json</code>.</p>
         </div>
     }
-    else if (_filtered.Count == 0)
+    else if (Provider.Filtered.Count == 0)
     {
         <div class="step-list-empty" data-testid="step-list-empty">
             <p>No steps match your filters.</p>
@@ -26,34 +26,23 @@
     }
     else
     {
-        <GroupedList Steps="_filtered" Query="@State.Query" Grouped="@(State.Domain is null)" Domains="Store.Domains" />
+        <GroupedList Steps="Provider.Filtered" Query="@State.Query" Grouped="@(State.Domain is null)" Domains="Store.Domains" />
     }
 </div>
 
 @code {
-    private IReadOnlyList<Step> _filtered = [];
-
     protected override void OnInitialized()
     {
-        Recompute();
-        State.Changed += OnChanged;
-        Favs.Changed += OnChanged;
-    }
-
-    private void Recompute()
-    {
-        _filtered = StepRanking.Rank(FilterEngine.Apply(Store.Steps, State, Favs));
+        Provider.Changed += OnChanged;
     }
 
     private void OnChanged()
     {
-        Recompute();
         InvokeAsync(StateHasChanged);
     }
 
     public void Dispose()
     {
-        State.Changed -= OnChanged;
-        Favs.Changed -= OnChanged;
+        Provider.Changed -= OnChanged;
     }
 }

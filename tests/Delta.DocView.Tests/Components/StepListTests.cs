@@ -36,6 +36,7 @@ public class StepListTests
         ctx.Services.AddScoped<FilterState>();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
+        ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var store = ctx.Services.GetRequiredService<ClientStepLibraryStore>();
@@ -108,6 +109,7 @@ public class StepListTests
         ctx.Services.AddScoped<FilterState>();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
+        ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
         using var _c = ctx;
 

@@ -24,6 +24,7 @@ public class ShellComponentTests : TestContext
         Services.AddScoped<FilterState>();
         Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         Services.AddScoped<SelectionState>();
+        Services.AddScoped<FilteredStepsProvider>();
         JSInterop.Mode = JSRuntimeMode.Loose;
         var cut = RenderComponent<StepList>();
         Assert.Contains("step-list", cut.Markup);

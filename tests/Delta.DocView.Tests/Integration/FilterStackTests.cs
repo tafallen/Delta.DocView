@@ -87,6 +87,7 @@ public class FilterStackTests
         ctx.Services.AddScoped<FilterState>();
         ctx.Services.AddScoped<IFavouritesStore, InMemoryFavouritesStore>();
         ctx.Services.AddScoped<SelectionState>();
+        ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();

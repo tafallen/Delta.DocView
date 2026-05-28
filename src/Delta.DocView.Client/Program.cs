@@ -16,5 +16,6 @@ builder.Services.AddScoped<LibraryApiClient>();
 builder.Services.AddScoped<FilterState>();
 builder.Services.AddScoped<SelectionState>();
 builder.Services.AddScoped<IFavouritesStore, LocalStorageFavouritesStore>();
+builder.Services.AddScoped<FilteredStepsProvider>();
 
 await builder.Build().RunAsync();

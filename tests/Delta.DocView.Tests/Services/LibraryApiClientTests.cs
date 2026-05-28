@@ -4,6 +4,8 @@ using System.Text.Json;
 using Delta.DocView.Client.Services;
 using Delta.DocView.Shared;
 using Delta.DocView.Shared.Models;
+using Microsoft.JSInterop;
+using NSubstitute;
 
 namespace Delta.DocView.Tests.Services;
 
@@ -34,7 +36,7 @@ public class LibraryApiClientTests
         var response = new LibraryResponse(SampleLibrary, null);
         var http = CreateMockHttpClient(HttpStatusCode.OK, response);
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 
@@ -49,7 +51,7 @@ public class LibraryApiClientTests
         var response = new LibraryResponse(SampleLibrary, "Signature mismatch.");
         var http = CreateMockHttpClient(HttpStatusCode.OK, response);
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 
@@ -63,7 +65,7 @@ public class LibraryApiClientTests
         var body = new { error = "Library file not found." };
         var http = CreateMockHttpClient(HttpStatusCode.ServiceUnavailable, body);
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 
@@ -77,7 +79,7 @@ public class LibraryApiClientTests
         var response = new LibraryResponse(SampleLibrary, null);
         var http = CreateMockHttpClient(HttpStatusCode.OK, response);
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
         await client.LoadAsync(); // second call should be a no-op
@@ -93,7 +95,7 @@ public class LibraryApiClientTests
             BaseAddress = new Uri("http://localhost/")
         };
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 
@@ -109,7 +111,7 @@ public class LibraryApiClientTests
             BaseAddress = new Uri("http://localhost/")
         };
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 
@@ -123,7 +125,7 @@ public class LibraryApiClientTests
         var body = new { detail = "some other shape" };
         var http = CreateMockHttpClient(HttpStatusCode.InternalServerError, body);
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 
@@ -139,7 +141,7 @@ public class LibraryApiClientTests
             BaseAddress = new Uri("http://localhost/")
         };
         var store = new ClientStepLibraryStore();
-        var client = new LibraryApiClient(http, store);
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
 
         await client.LoadAsync();
 

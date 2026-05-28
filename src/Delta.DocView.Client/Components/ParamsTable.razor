@@ -2,21 +2,24 @@
 
 @if (Step.Params.Count > 0)
 {
-    <table class="params-table" data-testid="params-table">
-        <thead>
-            <tr><th>Name</th><th>Type</th><th>Example</th></tr>
-        </thead>
-        <tbody>
-            @foreach (var p in Step.Params)
-            {
-                <tr>
-                    <td class="param-cell-name"><code>@p.Name</code></td>
-                    <td class="param-cell-type"><span class="param-type-chip param-@p.Type.ToLowerInvariant()">@p.Type</span></td>
-                    <td class="param-cell-example"><code>@p.Example</code></td>
-                </tr>
-            }
-        </tbody>
-    </table>
+    <div class="params-section">
+        <h3 class="detail-section-title">Parameters</h3>
+        <table class="params-table" data-testid="params-table">
+            <thead>
+                <tr><th>Name</th><th>Type</th><th>Example</th></tr>
+            </thead>
+            <tbody>
+                @foreach (var p in Step.Params)
+                {
+                    <tr>
+                        <td class="param-cell-name"><code>@p.Name</code></td>
+                        <td class="param-cell-type"><span class="param-type-chip param-@p.Type.ToLowerInvariant()">@p.Type</span></td>
+                        <td class="param-cell-example"><code>"@p.Example"</code></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 }
 
 @code {

@@ -6,18 +6,19 @@
 @if (_related.Count > 0)
 {
     <section class="related-steps" data-testid="related-steps" aria-label="Likely next steps">
-        <h3 class="related-steps-title">Likely next steps</h3>
+        <h3 class="detail-section-title">Likely next steps</h3>
         <div class="related-cards">
             @foreach (var related in _related)
             {
-                var r = related; // closure capture
+                var r = related;
                 <button class="related-card"
                         data-step-id="@r.Id"
                         data-testid="related-card"
                         aria-label="@($"Select related step: {r.Pattern}")"
                         @onclick="() => OnSelect(r)">
                     <span class="type-chip chip-@r.Type.ToLowerInvariant()">@r.Type</span>
-                    <span class="related-pattern">@Truncate(r.Pattern, 60)</span>
+                    <span class="related-pattern">@Truncate(r.Pattern, 50)</span>
+                    <span class="related-arrow">→</span>
                 </button>
             }
         </div>

@@ -7,11 +7,16 @@
                 aria-expanded="@(_expanded ? "true" : "false")"
                 aria-controls="@($"cs-source-{_sourceId}")"
                 @onclick="OnToggleClick">
-            @(_expanded ? "▾ Hide C# step definition" : "▸ Show C# step definition")
+            <span class="cs-toggle-arrow">@(_expanded ? "▾" : "▸")</span>
+            <span class="cs-toggle-label">C# step definition</span>
+            @if (!string.IsNullOrWhiteSpace(FileRef))
+            {
+                <span class="cs-toggle-file">@FileRef</span>
+            }
         </button>
         @if (_expanded)
         {
-            <CopyButton Text="@Source" Label="Copy source" ConfirmLabel="✓ source copied" />
+            <CopyButton Text="@Source" Label="Copy" ConfirmLabel="✓ copied" />
         }
     </div>
     @if (_expanded)
@@ -22,8 +27,8 @@
 </div>
 
 @code {
-    [Parameter, EditorRequired]
-    public string Source { get; set; } = "";
+    [Parameter, EditorRequired] public string Source { get; set; } = "";
+    [Parameter] public string? FileRef { get; set; }
 
     private bool _expanded;
     private string _sourceId = "";

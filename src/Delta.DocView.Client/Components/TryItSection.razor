@@ -2,35 +2,43 @@
 @using Delta.DocView.Shared.Models
 
 <div class="try-it" data-testid="try-it">
+    <div class="try-it-heading">
+        <span class="detail-section-title">Try it</span>
+        <span class="try-it-hint">edit the values to see the resulting Gherkin line</span>
+    </div>
     @if (_hasMismatch)
     {
-        <div class="try-it-mismatch"
-             data-testid="try-it-mismatch"
-             role="alert">
+        <div class="try-it-mismatch" data-testid="try-it-mismatch" role="alert">
             ⚠ This step has @_expectedParamCount parameter @(_expectedParamCount == 1 ? "token" : "tokens") in its pattern but @_actualParamCount @(_actualParamCount == 1 ? "param" : "params") defined. The composed line below may be incomplete.
         </div>
     }
-    @if (_paramIndices.Count > 0)
-    {
-        <div class="try-it-inputs">
-            @for (var i = 0; i < _paramIndices.Count; i++)
-            {
-                var idx = i; // closure capture
-                var param = (idx < Step.Params.Count) ? Step.Params[idx] : null;
-                var inputId = $"try-it-{_uid}-{idx}";
-                <div class="try-it-input">
-                    <label for="@inputId" class="try-it-label">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</label>
-                    <input id="@inputId"
-                           type="text"
-                           value="@_inputs[idx]"
-                           @oninput="e => OnInput(idx, e)" />
-                </div>
-            }
+    <div class="try-it-body">
+        @if (_paramIndices.Count > 0)
+        {
+            <div class="try-it-inputs">
+                @for (var i = 0; i < _paramIndices.Count; i++)
+                {
+                    var idx = i;
+                    var param = (idx < Step.Params.Count) ? Step.Params[idx] : null;
+                    var inputId = $"try-it-{_uid}-{idx}";
+                    <div class="try-it-row">
+                        <label for="@inputId" class="try-it-param-name">@(param?.Name is { Length: > 0 } n ? n : (param?.Type ?? "value"))</label>
+                        @if (param is not null)
+                        {
+                            <span class="param-type-chip param-@param.Type.ToLowerInvariant()">@param.Type</span>
+                        }
+                        <input id="@inputId" type="text" class="try-it-field" value="@_inputs[idx]" @oninput="e => OnInput(idx, e)" />
+                    </div>
+                }
+            </div>
+        }
+        <div class="try-it-output">
+            <div class="try-it-output-header">
+                <span class="try-it-output-label">Composed line</span>
+                <CopyButton Text="@_composed" Label="Copy" ConfirmLabel="✓ copied" />
+            </div>
+            <pre class="composed-line" data-testid="composed-line" aria-label="Composed line preview" aria-live="polite">@_composed</pre>
         </div>
-    }
-    <pre class="composed-line" data-testid="composed-line" aria-label="Composed line preview" aria-live="polite">@_composed</pre>
-    <div class="try-it-actions">
-        <CopyButton Text="@_composed" Label="Copy" ConfirmLabel="✓ line copied" />
     </div>
 </div>
 

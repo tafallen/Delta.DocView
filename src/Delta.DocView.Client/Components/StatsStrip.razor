@@ -1,11 +1,20 @@
 @using Delta.DocView.Shared.Models
 
 <div class="stats-strip">
-    <span class="stat-used" data-testid="stat-used">Used in @Step.Used scenarios</span>
-    <span class="stat-source" data-testid="stat-source">Source: <code>@Step.File:@Step.Line</code></span>
+    <div class="stat-col">
+        <span class="stat-label">Used in</span>
+        <span class="stat-value" data-testid="stat-used">@Step.Used scenarios</span>
+    </div>
+    <div class="stat-col">
+        <span class="stat-label">Source</span>
+        <code class="stat-value" data-testid="stat-source">@Step.File:@Step.Line</code>
+    </div>
     @if (Step.Tags.Count > 0)
     {
-        <span class="stat-tags" data-testid="stat-tags">Tags: @(string.Join(" · ", Step.Tags))</span>
+        <div class="stat-col">
+            <span class="stat-label">Tags</span>
+            <span class="stat-value" data-testid="stat-tags">@(string.Join(" · ", Step.Tags))</span>
+        </div>
     }
 </div>
 

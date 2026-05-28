@@ -17,17 +17,23 @@ else
     var step = Selection.Selected;
     <div class="detail-panel" data-step-id="@step.Id" data-testid="detail-panel" aria-label="Step detail">
         <div class="detail-header">
-            <span class="type-chip chip-@step.Type.ToLowerInvariant()">@step.Type</span>
-            <span class="domain-dot" style="background: var(@DomainPalette.CssVarName(step.Domain));"></span>
-            <span class="domain-label">@DomainLabel(step.Domain)</span>
-            <button class="detail-favourite @(Favs.Has(step.Id) ? "is-fav" : "")"
-                    data-testid="detail-favourite"
-                    aria-label="Toggle favourite"
-                    aria-pressed="@(Favs.Has(step.Id) ? "true" : "false")"
-                    @onclick="() => Favs.Toggle(step.Id)">★</button>
-            <button class="detail-add-primary"
-                    data-testid="detail-add-primary"
-                    @onclick="() => Composer.AddStep(step)">Add to scenario</button>
+            <div class="detail-header-left">
+                <span class="type-chip chip-@step.Type.ToLowerInvariant()">@step.Type</span>
+                <span class="domain-dot" style="background: var(@DomainPalette.CssVarName(step.Domain));"></span>
+                <span class="domain-label">@DomainLabel(step.Domain)</span>
+            </div>
+            <div class="detail-header-right">
+                <button class="detail-favourite @(Favs.Has(step.Id) ? "is-fav" : "")"
+                        data-testid="detail-favourite"
+                        aria-label="Toggle favourite"
+                        aria-pressed="@(Favs.Has(step.Id) ? "true" : "false")"
+                        @onclick="() => Favs.Toggle(step.Id)">
+                    ☆ Favorite
+                </button>
+                <button class="detail-add-primary"
+                        data-testid="detail-add-primary"
+                        @onclick="() => Composer.AddStep(step)">＋ Add to scenario</button>
+            </div>
         </div>
         <PatternHeading Step="@step" />
         @if (!string.IsNullOrWhiteSpace(step.Description))
@@ -37,7 +43,7 @@ else
         <StatsStrip Step="@step" />
         <ParamsTable Step="@step" />
         <TryItSection Step="@step" />
-        <CSharpBlock Source="@step.Source" />
+        <CSharpBlock Source="@step.Source" FileRef="@($"{step.File}:{step.Line}")" />
         <RelatedSteps Step="@step" />
     </div>
 }

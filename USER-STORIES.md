@@ -264,17 +264,17 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] Composer docks to the bottom of the viewport; a tab bar shows the beaker icon, "Scenario Composer", step count, and a chevron toggle.
-- [ ] `C` keyboard shortcut or clicking the tab toggles open/closed.
-- [ ] Clicking `+` on a step row or "Add to scenario" in the detail panel adds the step and opens the composer.
-- [ ] **Edit column**: scenario name input; ordered list of added steps.
-- [ ] Each step row: drag handle, keyword (Given/When/Then or "And" when same type follows same type), step pattern, navigate-to button, remove button.
-- [ ] Steps are reorderable by drag-and-drop; drag state applies `is-drag` CSS class.
-- [ ] **Suggested next** strip: up to 4 chips derived from `suggestsNext` of the most-recently-added steps, deduped against already-added steps; clicking a chip adds it.
-- [ ] **Output column**: live `.feature` preview (Feature + Scenario header, indented steps); "Copy .feature" button; "Clear" button (with confirmation dialog).
-- [ ] Copy button is disabled when composer is empty.
-- [ ] Scenario name defaults blank; when blank the preview reads `Feature: Untitled scenario`.
-- [ ] The composed `.feature` text uses `And` keyword when consecutive steps have the same Gherkin type.
+- [x] Composer docks to the bottom of the viewport; a tab bar shows the beaker icon, "Scenario Composer", step count, and a chevron toggle.
+- [x] `C` keyboard shortcut or clicking the tab toggles open/closed.
+- [x] Clicking `+` on a step row or "Add to scenario" in the detail panel adds the step and opens the composer.
+- [x] **Edit column**: scenario name input; ordered list of added steps.
+- [x] Each step row: drag handle, keyword (Given/When/Then or "And" when same type follows same type), step pattern, navigate-to button, remove button. *— plus move-up/down buttons for keyboard-accessible reorder.*
+- [x] Steps are reorderable by drag-and-drop; drag state applies `is-drag` CSS class.
+- [x] **Suggested next** strip: up to 4 chips derived from `suggestsNext` of the most-recently-added steps, deduped against already-added steps; clicking a chip adds it.
+- [x] **Output column**: live `.feature` preview (Feature + Scenario header, indented steps); "Copy .feature" button; "Clear" button (with confirmation dialog). *— also a "Save .feature" button (downloads to drive).*
+- [x] Copy button is disabled when composer is empty.
+- [x] Scenario name defaults blank; when blank the preview reads `Feature: Untitled scenario`.
+- [x] The composed `.feature` text uses `And` keyword when consecutive steps have the same Gherkin type.
 
 #### Implementation tasks
 

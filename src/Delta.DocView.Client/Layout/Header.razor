@@ -1,9 +1,9 @@
 @inject ClientStepLibraryStore Store
-@inject IJSRuntime JS
 @inject FilterState Filter
 @inject IPlatform Platform
 @inject IKeyboardActions Actions
 @inject TweaksPanelState Panel
+@inject TweaksStore Tweaks
 @implements IDisposable
 
 <header class="app-header">
@@ -46,8 +46,8 @@
         <button class="btn-icon" type="button"
                 data-testid="dark-toggle"
                 title="Toggle dark mode" aria-label="Toggle dark mode"
-                @onclick="ToggleDarkAsync">
-            @(_isDark ? "☀" : "🌙")
+                @onclick="() => Tweaks.SetDark(!Tweaks.Dark)">
+            @(Tweaks.Dark ? "☀" : "🌙")
         </button>
         <div class="avatar-chip" aria-label="User avatar">QA</div>
     </div>
@@ -56,23 +56,17 @@
 @code {
     private const int SearchDebounceMs = 150;
 
-    private bool _isDark;
     private System.Threading.Timer? _searchDebounce;
     private string? _pendingValue;
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender) return;
-        _isDark = await JS.InvokeAsync<bool>("docview.prefersDark");
-        await JS.InvokeVoidAsync("docview.setDark", _isDark);
-        StateHasChanged();
-    }
 
     protected override void OnInitialized()
     {
         Filter.Changed += OnFilterChanged;
+        Tweaks.Changed += OnTweaksChanged;
         _searchDebounce = new System.Threading.Timer(_ => DispatchPendingQuery(), null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
+
+    private void OnTweaksChanged() => InvokeAsync(StateHasChanged);
 
     private void OnSearchInput(ChangeEventArgs e)
     {
@@ -87,15 +81,10 @@
 
     private void OnFilterChanged() => InvokeAsync(StateHasChanged);
 
-    private async Task ToggleDarkAsync()
-    {
-        _isDark = !_isDark;
-        await JS.InvokeVoidAsync("docview.setDark", _isDark);
-    }
-
     public void Dispose()
     {
         Filter.Changed -= OnFilterChanged;
+        Tweaks.Changed -= OnTweaksChanged;
         _searchDebounce?.Dispose();
     }
 }

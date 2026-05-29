@@ -1,21 +1,38 @@
 using Bunit;
 using Delta.DocView.Client.Components;
+using Delta.DocView.Client.Services;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Delta.DocView.Tests.Components;
 
 public class CSharpBlockTests : TestContext
 {
+    public CSharpBlockTests()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        Services.AddScoped<TweaksStore>();
+    }
+
     [Fact]
     public void Collapsed_By_Default()
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
-
         var cut = RenderComponent<CSharpBlock>(p => p.Add(c => c.Source, "public void Foo()"));
 
         Assert.Empty(cut.FindAll("[data-testid='cs-source']"));
         var toggleText = cut.Find("[data-testid='cs-toggle']").TextContent;
         Assert.Contains("▸", toggleText);
         Assert.Contains("C# step definition", toggleText);
+    }
+
+    [Fact]
+    public void Expanded_When_SourceDefault_Is_Expanded()
+    {
+        var tweaks = Services.GetRequiredService<TweaksStore>();
+        tweaks.SetSourceDefault(SourceDefaultOption.Expanded);
+
+        var cut = RenderComponent<CSharpBlock>(p => p.Add(c => c.Source, "public void Foo()"));
+
+        Assert.NotEmpty(cut.FindAll("[data-testid='cs-source']"));
     }
 
     [Fact]

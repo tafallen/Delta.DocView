@@ -54,6 +54,7 @@ public class DetailPanelTests
         ctx.Services.AddScoped<FilteredStepsProvider>();
         ctx.Services.AddScoped<IKeyboardActions, KeyboardActions>();
         ctx.Services.AddScoped<ComposerState>();
+        ctx.Services.AddScoped<TweaksStore>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var store = ctx.Services.GetRequiredService<ClientStepLibraryStore>();

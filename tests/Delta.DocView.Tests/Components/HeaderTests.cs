@@ -27,15 +27,15 @@ public class HeaderTests : TestContext
         return store;
     }
 
-    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null, bool prefersDark = false)
+    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null)
     {
+        JSInterop.Mode = JSRuntimeMode.Loose;
         Services.AddSingleton(store);
         Services.AddSingleton<FilterState>();
         Services.AddSingleton(_ => platform ?? Substitute.For<IPlatform>());
         Services.AddSingleton(_ => actions ?? Substitute.For<IKeyboardActions>());
         Services.AddScoped<TweaksPanelState>();
-        JSInterop.Setup<bool>("docview.prefersDark").SetResult(prefersDark);
-        JSInterop.SetupVoid("docview.setDark", _ => true);
+        Services.AddScoped<TweaksStore>();
     }
 
     [Fact]
@@ -69,15 +69,29 @@ public class HeaderTests : TestContext
     }
 
     [Fact]
-    public void Header_DarkToggle_CallsSetDark()
+    public void Header_DarkToggle_TogglesTweaksStoreDark()
     {
         Register(MakeStore());
 
         var cut = RenderComponent<Header>();
+        var tweaks = Services.GetRequiredService<TweaksStore>();
+        var initial = tweaks.Dark;
+
         cut.Find("[data-testid='dark-toggle']").Click();
 
-        // once from init (OS preference), once from the toggle click
-        JSInterop.VerifyInvoke("docview.setDark", 2);
+        Assert.Equal(!initial, tweaks.Dark);
+    }
+
+    [Fact]
+    public void Header_DarkIcon_Reflects_TweaksStore_Dark()
+    {
+        Register(MakeStore());
+        var tweaks = Services.GetRequiredService<TweaksStore>();
+        tweaks.SetDark(true);
+
+        var cut = RenderComponent<Header>();
+
+        Assert.Contains("☀", cut.Find("[data-testid='dark-toggle']").TextContent);
     }
 
     [Fact]
@@ -191,30 +205,6 @@ public class HeaderTests : TestContext
         var cut = RenderComponent<Header>();
 
         Assert.Equal("Quick find (⌘K)", cut.Find("[data-testid='quick-find']").GetAttribute("aria-label"));
-    }
-
-    [Fact]
-    public void Header_Init_AppliesDark_WhenOsPrefersDark()
-    {
-        Register(MakeStore(), prefersDark: true);
-
-        RenderComponent<Header>();
-
-        var calls = JSInterop.Invocations["docview.setDark"];
-        Assert.True(calls.Count >= 1);
-        Assert.Equal(true, calls[0].Arguments[0]);
-    }
-
-    [Fact]
-    public void Header_Init_AppliesLight_WhenOsDoesNotPreferDark()
-    {
-        Register(MakeStore(), prefersDark: false);
-
-        RenderComponent<Header>();
-
-        var calls = JSInterop.Invocations["docview.setDark"];
-        Assert.True(calls.Count >= 1);
-        Assert.Equal(false, calls[0].Arguments[0]);
     }
 
     [Fact]

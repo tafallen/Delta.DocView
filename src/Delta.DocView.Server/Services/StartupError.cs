@@ -2,11 +2,25 @@ namespace Delta.DocView.Server.Services;
 
 public sealed class StartupError : IStartupError
 {
-    public bool HasError { get; private set; }
-    public string? ErrorMessage { get; private set; }
-    public bool HasWarning { get; private set; }
-    public string? WarningMessage { get; private set; }
+    private enum LoadState { None, Warning, Error }
+    private LoadState _state;
+    private string? _message;
 
-    public void SetError(string message) { HasError = true; ErrorMessage = message; }
-    public void SetWarning(string message) { HasWarning = true; WarningMessage = message; }
+    public bool HasError   => _state == LoadState.Error;
+    public bool HasWarning => _state == LoadState.Warning;
+    public string? ErrorMessage   => _state == LoadState.Error   ? _message : null;
+    public string? WarningMessage => _state == LoadState.Warning ? _message : null;
+
+    public void SetError(string message)
+    {
+        _state   = LoadState.Error;
+        _message = message;
+    }
+
+    public void SetWarning(string message)
+    {
+        if (_state == LoadState.Error) return; // errors win; ignore subsequent warnings
+        _state   = LoadState.Warning;
+        _message = message;
+    }
 }

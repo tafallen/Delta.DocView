@@ -29,11 +29,12 @@ public class StartupLoaderTests
     {
         var (error, store) = CreateDeps();
 
-        StartupLoader.Run("/no/such/file.json",
+        var missingPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString(), "library.json");
+        StartupLoader.Run(missingPath,
             new StepLibraryLoader(), new StepLibraryValidator(), error, store);
 
         Assert.True(error.HasError);
-        Assert.Contains("/no/such/file.json", error.ErrorMessage);
+        Assert.Contains(missingPath, error.ErrorMessage);
         Assert.False(store.IsLoaded);
     }
 

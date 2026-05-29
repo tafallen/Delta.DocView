@@ -198,6 +198,144 @@ public class TweaksStoreTests
         Assert.Equal(1, js.ReadCalls);
     }
 
+    [Fact]
+    public void Defaults_Before_Init_FollowOs_False()
+    {
+        var store = new TweaksStore(Substitute.For<IJSRuntime>());
+        Assert.False(store.FollowOs);
+    }
+
+    [Fact]
+    public async Task SetFollowOs_True_CallsWatchOs_AndRaisesChanged()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        var changed = 0;
+        store.Changed += () => changed++;
+
+        store.SetFollowOs(true);
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.True(store.FollowOs);
+        Assert.Equal(1, changed);
+        Assert.Equal(1, js.WatchOsCalls);
+    }
+
+    [Fact]
+    public async Task SetFollowOs_False_CallsUnwatchOs_AndRaisesChanged()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        store.SetFollowOs(true);
+        await Task.Yield();
+        await Task.Yield();
+        var changed = 0;
+        store.Changed += () => changed++;
+
+        store.SetFollowOs(false);
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.False(store.FollowOs);
+        Assert.Equal(1, changed);
+        Assert.Equal(1, js.UnwatchOsCalls);
+    }
+
+    [Fact]
+    public async Task SetFollowOs_SameValue_NoChange_NoEvent()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        var changed = 0;
+        store.Changed += () => changed++;
+
+        store.SetFollowOs(false); // already false
+
+        Assert.Equal(0, changed);
+        Assert.Equal(0, js.WatchOsCalls);
+    }
+
+    [Fact]
+    public async Task OnOsColorSchemeChanged_WhenFollowOs_SetsDark()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        store.SetFollowOs(true);
+
+        store.OnOsColorSchemeChanged(true);
+
+        Assert.True(store.Dark);
+    }
+
+    [Fact]
+    public async Task OnOsColorSchemeChanged_WhenNotFollowOs_IsNoOp()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        // FollowOs defaults to false
+
+        store.OnOsColorSchemeChanged(true);
+
+        Assert.False(store.Dark); // unchanged
+    }
+
+    [Fact]
+    public async Task Dispose_CallsUnwatchOs()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        store.SetFollowOs(true);
+        await Task.Yield();
+        await Task.Yield();
+
+        store.Dispose();
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.True(js.UnwatchOsCalls >= 1);
+    }
+
+    [Fact]
+    public async Task InitializeAsync_WithFollowOs_RestoresListenerAndUsesOsDark()
+    {
+        var js = new RecordingJsRuntime
+        {
+            ReadResponse = "{\"dark\":false,\"followOs\":true,\"accent\":\"orange\",\"density\":\"comfortable\",\"rowEmphasis\":\"pattern\",\"source\":\"collapsed\"}",
+            PrefersDarkResponse = true
+        };
+        var store = new TweaksStore(js);
+
+        await store.InitializeAsync();
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.True(store.FollowOs);
+        Assert.True(store.Dark);   // from OS preference, not stored dark:false
+        Assert.Equal(1, js.WatchOsCalls);
+    }
+
+    [Fact]
+    public async Task SetFollowOs_Persists_FollowOs_InJson()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+
+        store.SetFollowOs(true);
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.NotEmpty(js.WriteCalls);
+        Assert.Contains("\"followOs\":true", js.WriteCalls[^1]);
+    }
+
     /// <summary>
     /// Hand-rolled <see cref="IJSRuntime"/> stub: returns a preset string for
     /// <c>docview.tweaks.read</c>, a bool for <c>docview.prefersDark</c>, and records
@@ -211,6 +349,8 @@ public class TweaksStoreTests
 
         public int ReadCalls { get; private set; }
         public int PrefersDarkCalls { get; private set; }
+        public int WatchOsCalls { get; private set; }
+        public int UnwatchOsCalls { get; private set; }
         public List<string> WriteCalls { get; } = new();
         public List<(bool dark, string accent, string density, string rowEmphasis)> ApplyRootCalls { get; } = new();
 
@@ -236,6 +376,12 @@ public class TweaksStoreTests
                     {
                         ApplyRootCalls.Add((dark, accent, density, rowEmphasis));
                     }
+                    break;
+                case "docview.tweaks.watchOs":
+                    WatchOsCalls++;
+                    break;
+                case "docview.tweaks.unwatchOs":
+                    UnwatchOsCalls++;
                     break;
             }
             return new ValueTask<TValue>(default(TValue)!);

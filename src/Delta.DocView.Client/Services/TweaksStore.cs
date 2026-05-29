@@ -18,12 +18,18 @@ namespace Delta.DocView.Client.Services;
 /// <b>Persistence contract (mirrored in <c>docview.js</c>).</b>
 /// <list type="bullet">
 /// <item><description>Storage key: <c>docview.tweaks.v1</c></description></item>
-/// <item><description>Payload shape: JSON <c>{ dark, accent, density, rowEmphasis, source }</c>
+/// <item><description>Payload shape: JSON <c>{ dark, followOs, accent, density, rowEmphasis, source }</c>
 /// with enum values as lowercase strings.</description></item>
 /// <item><description>Malformed JSON / JS errors: treated as defaults, logged.</description></item>
 /// <item><description>Migration policy: changing the payload shape requires bumping the
 /// key suffix (e.g. <c>.v2</c>) in both this class's JS helpers and <c>docview.js</c>.</description></item>
 /// </list>
+/// </para>
+/// <para>
+/// <b>Follow OS contract.</b> When <see cref="FollowOs"/> is true a JS <c>matchMedia</c> listener
+/// is active; OS colour-scheme changes call back into <see cref="OnOsColorSchemeChanged"/>. The
+/// <see cref="DotNetObjectReference{T}"/> used for the callback is created lazily and disposed in
+/// <see cref="Dispose"/>.
 /// </para>
 /// </summary>
 /// <remarks>
@@ -31,27 +37,28 @@ namespace Delta.DocView.Client.Services;
 /// (typically components) MUST unsubscribe (e.g. in <c>Dispose</c>) to avoid leaking, since
 /// this store is scoped and outlives transient components.
 /// </remarks>
-public sealed class TweaksStore
+public sealed class TweaksStore : IDisposable
 {
     private readonly IJSRuntime _js;
     private bool _initialized;
+    private DotNetObjectReference<TweaksStore>? _dotNetRef;
 
     public TweaksStore(IJSRuntime js)
     {
         _js = js;
     }
 
-    public bool Dark { get; private set; }
-    public AccentOption Accent { get; private set; } = AccentOption.Orange;
-    public DensityOption Density { get; private set; } = DensityOption.Comfortable;
-    public RowEmphasisOption RowEmphasis { get; private set; } = RowEmphasisOption.Pattern;
+    public bool Dark       { get; private set; }
+    public bool FollowOs   { get; private set; }
+    public AccentOption        Accent        { get; private set; } = AccentOption.Orange;
+    public DensityOption       Density       { get; private set; } = DensityOption.Comfortable;
+    public RowEmphasisOption   RowEmphasis   { get; private set; } = RowEmphasisOption.Pattern;
     public SourceDefaultOption SourceDefault { get; private set; } = SourceDefaultOption.Collapsed;
 
     public event Action? Changed;
 
     public async Task InitializeAsync()
     {
-        // Idempotent: repeat calls no-op (App.razor awaits this once at boot).
         if (_initialized) return;
 
         try
@@ -66,10 +73,21 @@ public sealed class TweaksStore
                 });
             }
 
-            if (dto?.dark is bool dark)
-                Dark = dark;
-            else
+            if (dto?.followOs is true)
+            {
+                FollowOs = true;
                 Dark = await _js.InvokeAsync<bool>("docview.prefersDark");
+                _dotNetRef ??= DotNetObjectReference.Create(this);
+                _ = WatchOsAsync();
+            }
+            else if (dto?.dark is bool dark)
+            {
+                Dark = dark;
+            }
+            else
+            {
+                Dark = await _js.InvokeAsync<bool>("docview.prefersDark");
+            }
 
             if (Enum.TryParse<AccentOption>(dto?.accent, ignoreCase: true, out var accent))
                 Accent = accent;
@@ -97,6 +115,23 @@ public sealed class TweaksStore
         Dark = value;
         _ = PersistAsync();
         _ = ApplyRootAsync();
+        Changed?.Invoke();
+    }
+
+    public void SetFollowOs(bool value)
+    {
+        if (value == FollowOs) return;
+        FollowOs = value;
+        if (value)
+        {
+            _dotNetRef ??= DotNetObjectReference.Create(this);
+            _ = WatchOsAsync();
+        }
+        else
+        {
+            _ = UnwatchOsAsync();
+        }
+        _ = PersistAsync();
         Changed?.Invoke();
     }
 
@@ -132,17 +167,37 @@ public sealed class TweaksStore
         if (value == SourceDefault) return;
         SourceDefault = value;
         _ = PersistAsync();
-        // No DOM attribute for the source-section default.
         Changed?.Invoke();
+    }
+
+    [JSInvokable]
+    public void OnOsColorSchemeChanged(bool isDark)
+    {
+        if (!FollowOs) return;
+        SetDark(isDark);
+    }
+
+    public (bool Dark, string Accent, string Density, string RowEmphasis) RootAttributes()
+        => (Dark,
+            Accent.ToString().ToLowerInvariant(),
+            Density.ToString().ToLowerInvariant(),
+            RowEmphasis.ToString().ToLowerInvariant());
+
+    public void Dispose()
+    {
+        _ = UnwatchOsAsync();
+        _dotNetRef?.Dispose();
+        _dotNetRef = null;
     }
 
     private string ToJson() => JsonSerializer.Serialize(new
     {
-        dark = Dark,
-        accent = Accent.ToString().ToLowerInvariant(),
-        density = Density.ToString().ToLowerInvariant(),
+        dark     = Dark,
+        followOs = FollowOs,
+        accent   = Accent.ToString().ToLowerInvariant(),
+        density  = Density.ToString().ToLowerInvariant(),
         rowEmphasis = RowEmphasis.ToString().ToLowerInvariant(),
-        source = SourceDefault.ToString().ToLowerInvariant()
+        source   = SourceDefault.ToString().ToLowerInvariant()
     });
 
     private async Task PersistAsync()
@@ -158,12 +213,6 @@ public sealed class TweaksStore
     /// the C# side of the user-visible DOM contract; assert against it to pin the
     /// token mapping without a browser.
     /// </summary>
-    public (bool Dark, string Accent, string Density, string RowEmphasis) RootAttributes()
-        => (Dark,
-            Accent.ToString().ToLowerInvariant(),
-            Density.ToString().ToLowerInvariant(),
-            RowEmphasis.ToString().ToLowerInvariant());
-
     private async Task ApplyRootAsync()
     {
         try
@@ -176,12 +225,25 @@ public sealed class TweaksStore
         catch { /* best-effort */ }
     }
 
+    private async Task WatchOsAsync()
+    {
+        try { await _js.InvokeVoidAsync("docview.tweaks.watchOs", _dotNetRef); }
+        catch { /* best-effort */ }
+    }
+
+    private async Task UnwatchOsAsync()
+    {
+        try { await _js.InvokeVoidAsync("docview.tweaks.unwatchOs"); }
+        catch { /* best-effort */ }
+    }
+
     private sealed class Dto
     {
-        public bool? dark { get; set; }
-        public string? accent { get; set; }
-        public string? density { get; set; }
+        public bool?   dark        { get; set; }
+        public bool?   followOs    { get; set; }
+        public string? accent      { get; set; }
+        public string? density     { get; set; }
         public string? rowEmphasis { get; set; }
-        public string? source { get; set; }
+        public string? source      { get; set; }
     }
 }

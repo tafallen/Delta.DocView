@@ -27,7 +27,7 @@ public class HeaderTests : TestContext
         return store;
     }
 
-    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null)
+    private void Register(ClientStepLibraryStore store, IPlatform? platform = null, IKeyboardActions? actions = null, UserClient? userClient = null)
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
         Services.AddSingleton(store);
@@ -36,6 +36,28 @@ public class HeaderTests : TestContext
         Services.AddSingleton(_ => actions ?? Substitute.For<IKeyboardActions>());
         Services.AddScoped<TweaksPanelState>();
         Services.AddScoped<TweaksStore>();
+        Services.AddSingleton(_ => userClient ?? MakeUserClient("""{"name":"QA","initials":"QA","authenticated":false}"""));
+    }
+
+    private static UserClient MakeUserClient(string responseJson)
+    {
+        var http = new System.Net.Http.HttpClient(new JsonStubHandler(responseJson))
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        return new UserClient(http);
+    }
+
+    private sealed class JsonStubHandler : System.Net.Http.HttpMessageHandler
+    {
+        private readonly string _json;
+        public JsonStubHandler(string json) => _json = json;
+        protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
+            System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new System.Net.Http.StringContent(_json, System.Text.Encoding.UTF8, "application/json")
+            });
     }
 
     [Fact]
@@ -112,6 +134,18 @@ public class HeaderTests : TestContext
         var cut = RenderComponent<Header>();
 
         Assert.Contains("avatar-chip", cut.Markup);
+    }
+
+    [Fact]
+    public async Task Header_Avatar_Shows_User_Initials()
+    {
+        var userClient = MakeUserClient("""{"name":"Ada Lovelace","initials":"AL","authenticated":true}""");
+        await userClient.LoadAsync();
+        Register(MakeStore(), userClient: userClient);
+
+        var cut = RenderComponent<Header>();
+
+        Assert.Contains("AL", cut.Find(".avatar-chip").TextContent);
     }
 
     [Fact]

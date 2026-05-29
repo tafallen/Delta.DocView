@@ -4,6 +4,7 @@
 @inject IKeyboardActions Actions
 @inject TweaksPanelState Panel
 @inject TweaksStore Tweaks
+@inject Delta.DocView.Client.Services.UserClient User
 @implements IDisposable
 
 <header class="app-header">
@@ -49,7 +50,7 @@
                 @onclick="() => Tweaks.SetDark(!Tweaks.Dark)">
             @(Tweaks.Dark ? "☀" : "🌙")
         </button>
-        <div class="avatar-chip" aria-label="User avatar">QA</div>
+        <a href="/logout" class="avatar-chip" aria-label="@User.Current.Name" title="@User.Current.Name (sign out)">@User.Current.Initials</a>
     </div>
 </header>
 

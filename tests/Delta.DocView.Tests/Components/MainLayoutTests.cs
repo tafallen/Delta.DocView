@@ -37,7 +37,22 @@ public class MainLayoutTests : TestContext
         Services.AddSingleton<ShortcutsState>();
         Services.AddSingleton<TweaksStore>();
         Services.AddSingleton<TweaksPanelState>();
+        Services.AddSingleton(_ => new UserClient(
+            new System.Net.Http.HttpClient(new FallbackUserHandler())
+            { BaseAddress = new Uri("http://localhost/") }));
         JSInterop.Mode = JSRuntimeMode.Loose;
+    }
+
+    private sealed class FallbackUserHandler : System.Net.Http.HttpMessageHandler
+    {
+        protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
+            System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new System.Net.Http.StringContent(
+                    """{"name":"QA","initials":"QA","authenticated":false}""",
+                    System.Text.Encoding.UTF8, "application/json")
+            });
     }
 
     [Fact]

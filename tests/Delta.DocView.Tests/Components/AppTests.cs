@@ -55,6 +55,7 @@ public class AppTests
         ctx.Services.AddScoped<ShortcutsState>();
         ctx.Services.AddScoped<TweaksStore>();
         ctx.Services.AddScoped<TweaksPanelState>();
+        ctx.Services.AddScoped<UserClient>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var cut = ctx.RenderComponent<Delta.DocView.Client.App>();
@@ -116,6 +117,7 @@ public class AppTests
         ctx.Services.AddScoped<ShortcutsState>();
         ctx.Services.AddScoped<TweaksStore>();
         ctx.Services.AddScoped<TweaksPanelState>();
+        ctx.Services.AddScoped<UserClient>();
         return ctx;
     }
 

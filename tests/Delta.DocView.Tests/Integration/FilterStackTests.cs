@@ -103,6 +103,9 @@ public class FilterStackTests
         ctx.Services.AddScoped<ShortcutsState>();
         ctx.Services.AddScoped<TweaksStore>();
         ctx.Services.AddScoped<TweaksPanelState>();
+        ctx.Services.AddScoped(_ => new Delta.DocView.Client.Services.UserClient(
+            new System.Net.Http.HttpClient(new FallbackUserHandler())
+            { BaseAddress = new Uri("http://localhost/") }));
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();
@@ -993,5 +996,17 @@ public class FilterStackTests
         panel.WaitForAssertion(
             () => Assert.Empty(panel.FindAll("[data-testid='tweaks-panel']")),
             timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    private sealed class FallbackUserHandler : System.Net.Http.HttpMessageHandler
+    {
+        protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(
+            System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken) =>
+            Task.FromResult(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.OK)
+            {
+                Content = new System.Net.Http.StringContent(
+                    """{"name":"QA","initials":"QA","authenticated":false}""",
+                    System.Text.Encoding.UTF8, "application/json")
+            });
     }
 }

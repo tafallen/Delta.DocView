@@ -24,5 +24,6 @@ builder.Services.AddScoped<ComposerState>();
 builder.Services.AddScoped<IPlatform, PlatformService>();
 builder.Services.AddScoped<TweaksStore>();
 builder.Services.AddScoped<TweaksPanelState>();
+builder.Services.AddScoped<UserClient>();
 
 await builder.Build().RunAsync();

@@ -1,0 +1,5 @@
+services:
+  docview:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DOCVIEW_LIBRARY_PATH=/data/step-library.json

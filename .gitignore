@@ -8,3 +8,7 @@ obj/
 .vs/
 *.user
 *.suo
+
+# Docker runtime data mount — keep the dir, ignore dropped library files
+/data/*
+!/data/.gitkeep

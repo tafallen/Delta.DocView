@@ -1,0 +1,16 @@
+services:
+  docview:
+    build: .
+    image: docview:latest
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data:ro
+    environment:
+      - DOCVIEW_LIBRARY_PATH=/data/step-library.json
+      # Production auth (US-12) — set these via your secret store, do NOT commit real values:
+      # - ASPNETCORE_ENVIRONMENT=Production
+      # - AzureAd__TenantId=...
+      # - AzureAd__ClientId=...
+      # - AzureAd__ClientSecret=...
+    restart: unless-stopped

@@ -95,4 +95,43 @@ public class FeatureTextBuilderTests
         ComposerItem[] items = [Item("Given", "step a"), Item("When", "step b")];
         Assert.Equal("When", FeatureTextBuilder.GetKeyword(1, items));
     }
+
+    private static ComposerItem ItemWithValues(string type, string pattern, params string[] values) =>
+        new(Guid.NewGuid(), MakeStep(type, pattern), values);
+
+    [Fact]
+    public void Build_SubstitutesConcreteValues()
+    {
+        var item = ItemWithValues("Given", "I am logged in as {username : string}", "admin");
+        var result = FeatureTextBuilder.Build("Test", [item]);
+        Assert.Contains("Given I am logged in as admin", result);
+    }
+
+    [Fact]
+    public void Build_EmptyValue_EmitsEmptyString()
+    {
+        // Two items so the empty-param line is not the last line (TrimEnd would strip trailing space)
+        var itemWithEmpty = ItemWithValues("Given", "I am logged in as {username : string}", "");
+        var itemAfter = ItemWithValues("When", "I do something");
+        var result = FeatureTextBuilder.Build("Test", [itemWithEmpty, itemAfter]);
+        Assert.Contains("Given I am logged in as ", result);
+    }
+
+    [Fact]
+    public void Build_NoParams_RendersPatternVerbatim()
+    {
+        var item = ItemWithValues("Given", "the system is ready");
+        var result = FeatureTextBuilder.Build("Test", [item]);
+        Assert.Contains("Given the system is ready", result);
+    }
+
+    [Fact]
+    public void Build_MoreTokensThanParamValues_ExtraTokensEmpty()
+    {
+        // Two items so the line with empty trailing param is not the last (TrimEnd strips trailing space)
+        var item = ItemWithValues("Given", "from {src : string} to {dst : string}", "London");
+        var itemAfter = ItemWithValues("When", "I continue");
+        var result = FeatureTextBuilder.Build("Test", [item, itemAfter]);
+        Assert.Contains("Given from London to ", result);
+    }
 }

@@ -16,6 +16,9 @@ public sealed class LibraryApiClient
     public string? ErrorMessage { get; private set; }
     public string? WarningMessage { get; private set; }
 
+    /// <summary>Raised when State transitions. Subscribers must unsubscribe on disposal.</summary>
+    public event Action? StateChanged;
+
     public LibraryApiClient(HttpClient http, ClientStepLibraryStore store, IJSRuntime js)
     {
         _http = http;
@@ -33,12 +36,20 @@ public sealed class LibraryApiClient
 
             if (!response.IsSuccessStatusCode)
             {
-                var err = await response.Content
-                    .ReadFromJsonAsync<JsonElement>();
-                ErrorMessage = err.TryGetProperty("error", out var prop)
-                    ? prop.GetString() ?? $"Server returned {(int)response.StatusCode}."
-                    : $"Server returned {(int)response.StatusCode}.";
+                var raw = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    using var doc = System.Text.Json.JsonDocument.Parse(raw);
+                    ErrorMessage = doc.RootElement.TryGetProperty("error", out var prop)
+                        ? prop.GetString() ?? $"Server returned {(int)response.StatusCode}."
+                        : $"Server returned {(int)response.StatusCode}.";
+                }
+                catch (System.Text.Json.JsonException)
+                {
+                    ErrorMessage = $"Server returned {(int)response.StatusCode}.";
+                }
                 State = LoadingState.Error;
+                StateChanged?.Invoke();
                 return;
             }
 
@@ -47,12 +58,14 @@ public sealed class LibraryApiClient
             {
                 ErrorMessage = "Server returned an empty response.";
                 State = LoadingState.Error;
+                StateChanged?.Invoke();
                 return;
             }
 
             _store.Populate(result.Library);
             WarningMessage = result.Warning;
             State = LoadingState.Loaded;
+            StateChanged?.Invoke();
 
             try
             {
@@ -67,6 +80,7 @@ public sealed class LibraryApiClient
         {
             ErrorMessage = $"Failed to load step library: {ex.Message}";
             State = LoadingState.Error;
+            StateChanged?.Invoke();
         }
     }
 

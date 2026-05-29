@@ -149,6 +149,22 @@ public class LibraryApiClientTests
         Assert.False(string.IsNullOrEmpty(client.ErrorMessage));
     }
 
+    [Fact]
+    public async Task LoadAsync_HtmlErrorBody_FallsBackToStatusCodeMessage()
+    {
+        var http = new HttpClient(new RawHandler(HttpStatusCode.ServiceUnavailable, "<html>Bad Gateway</html>"))
+        {
+            BaseAddress = new Uri("http://localhost/")
+        };
+        var store = new ClientStepLibraryStore();
+        var client = new LibraryApiClient(http, store, Substitute.For<IJSRuntime>());
+
+        await client.LoadAsync();
+
+        Assert.Equal(LoadingState.Error, client.State);
+        Assert.Contains("503", client.ErrorMessage);
+    }
+
     // ── helpers ──────────────────────────────────────────────────────────────
 
     private static HttpClient CreateMockHttpClient(HttpStatusCode status, object body)

@@ -3,6 +3,7 @@
 @inject FilterState Filter
 @inject IPlatform Platform
 @inject IKeyboardActions Actions
+@inject TweaksPanelState Panel
 @implements IDisposable
 
 <header class="app-header">
@@ -38,6 +39,10 @@
                 data-testid="shortcuts-button"
                 title="Keyboard shortcuts" aria-label="Keyboard shortcuts"
                 @onclick="Actions.OpenShortcuts">?</button>
+        <button class="btn-icon" type="button"
+                data-testid="tweaks-button"
+                title="Appearance settings" aria-label="Appearance settings"
+                @onclick="Panel.Toggle">⚙</button>
         <button class="btn-icon" type="button"
                 data-testid="dark-toggle"
                 title="Toggle dark mode" aria-label="Toggle dark mode"

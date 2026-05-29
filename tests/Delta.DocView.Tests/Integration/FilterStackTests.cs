@@ -101,6 +101,8 @@ public class FilterStackTests
         ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.Services.AddScoped<ShortcutsState>();
+        ctx.Services.AddScoped<TweaksStore>();
+        ctx.Services.AddScoped<TweaksPanelState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();

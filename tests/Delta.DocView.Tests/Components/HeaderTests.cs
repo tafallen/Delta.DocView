@@ -33,6 +33,7 @@ public class HeaderTests : TestContext
         Services.AddSingleton<FilterState>();
         Services.AddSingleton(_ => platform ?? Substitute.For<IPlatform>());
         Services.AddSingleton(_ => actions ?? Substitute.For<IKeyboardActions>());
+        Services.AddScoped<TweaksPanelState>();
         JSInterop.Setup<bool>("docview.prefersDark").SetResult(prefersDark);
         JSInterop.SetupVoid("docview.setDark", _ => true);
     }

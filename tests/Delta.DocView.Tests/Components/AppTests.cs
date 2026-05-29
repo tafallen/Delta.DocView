@@ -54,6 +54,7 @@ public class AppTests
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.Services.AddScoped<ShortcutsState>();
         ctx.Services.AddScoped<TweaksStore>();
+        ctx.Services.AddScoped<TweaksPanelState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var cut = ctx.RenderComponent<Delta.DocView.Client.App>();
@@ -114,6 +115,7 @@ public class AppTests
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
         ctx.Services.AddScoped<ShortcutsState>();
         ctx.Services.AddScoped<TweaksStore>();
+        ctx.Services.AddScoped<TweaksPanelState>();
         return ctx;
     }
 

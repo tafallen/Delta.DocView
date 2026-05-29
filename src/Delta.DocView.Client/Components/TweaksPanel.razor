@@ -1,0 +1,138 @@
+@using Delta.DocView.Client.Services
+@inject TweaksStore Tweaks
+@inject TweaksPanelState Panel
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+@if (Panel.IsOpen)
+{
+    <div class="tweaks-backdrop" data-testid="tweaks-backdrop" @onclick="Panel.Close">
+        <div class="tweaks-panel" id="@_dialogId" data-testid="tweaks-panel"
+             role="dialog" aria-modal="true" aria-label="Appearance settings"
+             @onclick:stopPropagation="true" @onkeydown="OnKey">
+            <h2 class="tweaks-title">Appearance</h2>
+
+            <label class="tweak-row">
+                <span>Dark mode</span>
+                <input type="checkbox" data-testid="tweaks-dark"
+                       checked="@Tweaks.Dark"
+                       @onchange="e => Tweaks.SetDark((bool)e.Value!)" />
+            </label>
+
+            <fieldset class="tweak-group">
+                <legend>Accent</legend>
+                <label class="tweak-row">
+                    <span>Orange</span>
+                    <input type="radio" name="tweaks-accent" data-testid="tweaks-accent-orange"
+                           checked="@(Tweaks.Accent == AccentOption.Orange)"
+                           @onchange="() => Tweaks.SetAccent(AccentOption.Orange)" />
+                </label>
+                <label class="tweak-row">
+                    <span>Blue</span>
+                    <input type="radio" name="tweaks-accent" data-testid="tweaks-accent-blue"
+                           checked="@(Tweaks.Accent == AccentOption.Blue)"
+                           @onchange="() => Tweaks.SetAccent(AccentOption.Blue)" />
+                </label>
+                <label class="tweak-row">
+                    <span>Violet</span>
+                    <input type="radio" name="tweaks-accent" data-testid="tweaks-accent-violet"
+                           checked="@(Tweaks.Accent == AccentOption.Violet)"
+                           @onchange="() => Tweaks.SetAccent(AccentOption.Violet)" />
+                </label>
+            </fieldset>
+
+            <fieldset class="tweak-group">
+                <legend>Density</legend>
+                <label class="tweak-row">
+                    <span>Comfortable</span>
+                    <input type="radio" name="tweaks-density" data-testid="tweaks-density-comfortable"
+                           checked="@(Tweaks.Density == DensityOption.Comfortable)"
+                           @onchange="() => Tweaks.SetDensity(DensityOption.Comfortable)" />
+                </label>
+                <label class="tweak-row">
+                    <span>Compact</span>
+                    <input type="radio" name="tweaks-density" data-testid="tweaks-density-compact"
+                           checked="@(Tweaks.Density == DensityOption.Compact)"
+                           @onchange="() => Tweaks.SetDensity(DensityOption.Compact)" />
+                </label>
+            </fieldset>
+
+            <fieldset class="tweak-group">
+                <legend>Row emphasis</legend>
+                <label class="tweak-row">
+                    <span>Pattern</span>
+                    <input type="radio" name="tweaks-row" data-testid="tweaks-row-pattern"
+                           checked="@(Tweaks.RowEmphasis == RowEmphasisOption.Pattern)"
+                           @onchange="() => Tweaks.SetRowEmphasis(RowEmphasisOption.Pattern)" />
+                </label>
+                <label class="tweak-row">
+                    <span>Meta</span>
+                    <input type="radio" name="tweaks-row" data-testid="tweaks-row-meta"
+                           checked="@(Tweaks.RowEmphasis == RowEmphasisOption.Meta)"
+                           @onchange="() => Tweaks.SetRowEmphasis(RowEmphasisOption.Meta)" />
+                </label>
+            </fieldset>
+
+            <fieldset class="tweak-group">
+                <legend>C# source default</legend>
+                <label class="tweak-row">
+                    <span>Collapsed</span>
+                    <input type="radio" name="tweaks-source" data-testid="tweaks-source-collapsed"
+                           checked="@(Tweaks.SourceDefault == SourceDefaultOption.Collapsed)"
+                           @onchange="() => Tweaks.SetSourceDefault(SourceDefaultOption.Collapsed)" />
+                </label>
+                <label class="tweak-row">
+                    <span>Expanded</span>
+                    <input type="radio" name="tweaks-source" data-testid="tweaks-source-expanded"
+                           checked="@(Tweaks.SourceDefault == SourceDefaultOption.Expanded)"
+                           @onchange="() => Tweaks.SetSourceDefault(SourceDefaultOption.Expanded)" />
+                </label>
+            </fieldset>
+
+            <button class="tweaks-close" data-testid="tweaks-close"
+                    type="button" @onclick="Panel.Close" aria-label="Close">Close</button>
+        </div>
+    </div>
+}
+
+@code {
+    private string _dialogId = "";
+    private bool _wasOpen;
+
+    protected override void OnInitialized()
+    {
+        _dialogId = "tweaks-panel-" + Guid.NewGuid().ToString("N")[..8];
+        Panel.Changed += OnChanged;
+        Tweaks.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") Panel.Close();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (Panel.IsOpen && !_wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focusTrap.activate", _dialogId); } catch { }
+        }
+        else if (!Panel.IsOpen && _wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+        }
+        _wasOpen = Panel.IsOpen;
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        Panel.Changed -= OnChanged;
+        Tweaks.Changed -= OnChanged;
+        if (_wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+        }
+    }
+}

@@ -38,7 +38,6 @@ public class MainLayoutTests : TestContext
         Services.AddSingleton<TweaksStore>();
         Services.AddSingleton<TweaksPanelState>();
         JSInterop.Mode = JSRuntimeMode.Loose;
-        JSInterop.SetupVoid("docview.setDark", _ => true);
     }
 
     [Fact]

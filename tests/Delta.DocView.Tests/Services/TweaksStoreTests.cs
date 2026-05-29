@@ -114,7 +114,19 @@ public class TweaksStoreTests
 
         Assert.NotEmpty(js.WriteCalls);
         Assert.Equal(applyBefore, js.ApplyRootCalls.Count);
+        Assert.Contains("\"source\":\"expanded\"", js.WriteCalls[^1]);
     }
+
+    [Theory]
+    [InlineData(AccentOption.Orange, "orange")]
+    [InlineData(AccentOption.Blue, "blue")]
+    [InlineData(AccentOption.Violet, "violet")]
+    [InlineData(DensityOption.Comfortable, "comfortable")]
+    [InlineData(DensityOption.Compact, "compact")]
+    [InlineData(RowEmphasisOption.Pattern, "pattern")]
+    [InlineData(RowEmphasisOption.Meta, "meta")]
+    public void Enum_ToString_Lowercase_Matches_Css_Token(Enum value, string expectedToken)
+        => Assert.Equal(expectedToken, value.ToString().ToLowerInvariant());
 
     [Fact]
     public async Task Setter_SameValue_NoChange_NoEvent()

@@ -34,6 +34,9 @@
     private bool _expanded;
     private string _sourceId = "";
 
+    // Read once at creation. Re-selecting a step recreates this block, so it
+    // picks up the current default; already-mounted blocks intentionally do NOT
+    // react to later SourceDefault changes (US-11 design decision).
     protected override void OnInitialized()
     {
         _sourceId = Guid.NewGuid().ToString("N")[..8];

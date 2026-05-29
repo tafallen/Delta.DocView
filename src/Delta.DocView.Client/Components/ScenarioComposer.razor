@@ -56,7 +56,8 @@
                                          OnNavigate="@(() => Selection.Select(item.Step))"
                                          OnDragStart="@(() => _draggingId = capturedId)"
                                          OnDragEnd="@(() => _draggingId = null)"
-                                         OnDrop="@(() => OnDropOnItem(capturedId))" />
+                                         OnDrop="@(() => OnDropOnItem(capturedId))"
+                                         OnParamValueChanged="@(e => Composer.SetParamValue(capturedId, e.Index, e.Value))" />
                         }
                     </ol>
                     <SuggestionStrip />

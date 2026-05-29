@@ -275,6 +275,47 @@ public class ScenarioComposerTests : TestContext
         Assert.True(btn.HasAttribute("disabled"));
     }
 
+    private static Step MakeParamStep() => new()
+    {
+        Id = "sp1", Type = "Given",
+        Pattern = "I am {actor : string}",
+        Domain = "Auth", File = "T.cs", Line = 1,
+        Params = [new StepParam { Name = "actor", Type = "string", Example = "alice" }]
+    };
+
+    [Fact]
+    public void Composer_Value_Input_Updates_Preview()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeParamStep());
+        var cut = RenderComponent<ScenarioComposer>();
+
+        cut.Find("[data-testid='param-value-input']").Input("bob");
+
+        cut.WaitForAssertion(() =>
+        {
+            var preview = cut.Find("[data-testid='feature-preview']").TextContent;
+            Assert.Contains("bob", preview);
+            Assert.DoesNotContain("alice", preview);
+        });
+    }
+
+    [Fact]
+    public void Composer_Empty_Value_Clears_Param_In_Preview()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeParamStep());
+        var cut = RenderComponent<ScenarioComposer>();
+
+        cut.Find("[data-testid='param-value-input']").Input("");
+
+        cut.WaitForAssertion(() =>
+        {
+            Assert.Contains("Given I am", composer.FeatureText);
+            Assert.DoesNotContain("alice", composer.FeatureText);
+        });
+    }
+
     [Fact]
     public void ScenarioComposer_SaveClick_Invokes_SaveTextFile_With_Filename_And_Content()
     {

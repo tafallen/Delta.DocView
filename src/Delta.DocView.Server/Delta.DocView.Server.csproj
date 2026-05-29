@@ -16,4 +16,14 @@
     <EmbeddedResource Include="Schemas\step-library.v1.schema.json"
                       LogicalName="step-library.v1.schema.json" />
   </ItemGroup>
+  <!-- Keep the dev-sample step library out of build/publish output: it must
+       never be baked into the image. The runtime library is supplied at
+       deploy time via the /data bind mount (DOCVIEW_LIBRARY_PATH). The schema
+       is consumed as an EmbeddedResource above, so its loose copy under
+       Schemas\ is redundant in the publish output and removed here too. -->
+  <ItemGroup>
+    <Content Remove="data\**" />
+    <None Include="data\**" />
+    <Content Remove="Schemas\**" />
+  </ItemGroup>
 </Project>

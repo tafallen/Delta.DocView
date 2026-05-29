@@ -149,7 +149,6 @@ public class TweaksPanelTests
 
         var checkbox = cut.Find("[data-testid='tweaks-follow-os']");
 
-        Assert.NotNull(checkbox);
         Assert.False(checkbox.HasAttribute("checked"));
     }
 
@@ -176,5 +175,19 @@ public class TweaksPanelTests
         var darkToggle = cut.Find("[data-testid='tweaks-dark']");
 
         Assert.True(darkToggle.HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void DarkToggle_Enabled_When_FollowOs_False()
+    {
+        var (ctx, store, panel) = Setup();
+        store.SetFollowOs(true);
+        store.SetFollowOs(false);
+        panel.Open();
+        var cut = ctx.RenderComponent<TweaksPanel>();
+
+        var darkToggle = cut.Find("[data-testid='tweaks-dark']");
+
+        Assert.False(darkToggle.HasAttribute("disabled"));
     }
 }

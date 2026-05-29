@@ -418,9 +418,9 @@ html, body {
 
 /* ── Step body / meta ─────────────────────────────────────────────── */
 .step-body { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
-.step-pattern { font-family: var(--font-mono); font-size: 0.92rem; line-height: 1.5; }
-.step-meta { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.75rem; color: var(--text-muted); }
-.step-file { font-size: 0.72rem; font-family: var(--font-mono); }
+.step-pattern { font-family: var(--font-mono); font-size: 0.92rem; line-height: 1.5; overflow-wrap: anywhere; }
+.step-meta { display: flex; flex-direction: column; gap: 0.3rem; font-size: 0.75rem; color: var(--text-muted); min-width: 0; }
+.step-file { font-size: 0.72rem; font-family: var(--font-mono); overflow-wrap: anywhere; }
 .file-icon { font-size: 0.65rem; opacity: 0.6; }
 .step-tags-row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.3rem; }
 .tag-pill {

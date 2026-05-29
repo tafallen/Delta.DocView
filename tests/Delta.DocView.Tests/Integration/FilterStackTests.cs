@@ -937,4 +937,61 @@ public class FilterStackTests
             () => Assert.Equal(7, overlay.FindAll("[data-testid='shortcut-row']").Count),
             timeout: TimeSpan.FromMilliseconds(500));
     }
+
+    [Fact]
+    public void Tweaks_Opens_When_Gear_Clicked()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        var panel = ctx.RenderComponent<TweaksPanel>();
+
+        header.Find("[data-testid='tweaks-button']").Click();
+
+        panel.WaitForAssertion(
+            () => Assert.Single(panel.FindAll("[data-testid='tweaks-panel']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Tweaks_Accent_Change_Updates_Store()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        var panel = ctx.RenderComponent<TweaksPanel>();
+        var tweaks = ctx.Services.GetRequiredService<TweaksStore>();
+
+        header.Find("[data-testid='tweaks-button']").Click();
+
+        panel.WaitForAssertion(
+            () => Assert.Single(panel.FindAll("[data-testid='tweaks-panel']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        panel.Find("[data-testid='tweaks-accent-blue']").Change(true);
+
+        Assert.Equal(AccentOption.Blue, tweaks.Accent);
+    }
+
+    [Fact]
+    public void Tweaks_Escape_Closes()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var header = ctx.RenderComponent<Header>();
+        var panel = ctx.RenderComponent<TweaksPanel>();
+
+        header.Find("[data-testid='tweaks-button']").Click();
+
+        panel.WaitForAssertion(
+            () => Assert.Single(panel.FindAll("[data-testid='tweaks-panel']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        panel.Find("[data-testid='tweaks-panel']")
+             .KeyDown(new KeyboardEventArgs { Key = "Escape" });
+
+        panel.WaitForAssertion(
+            () => Assert.Empty(panel.FindAll("[data-testid='tweaks-panel']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
 }

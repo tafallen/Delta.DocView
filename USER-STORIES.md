@@ -318,15 +318,15 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] Dark mode toggle in the header switches the `data-dark` attribute on the root element.
-- [ ] Tweaks panel (gear/settings icon, or triggered by the header) offers:
+- [x] Dark mode toggle in the header switches the `data-dark` attribute on the root element.
+- [x] Tweaks panel (gear/settings icon, or triggered by the header) offers:
   - **Dark mode** toggle.
-  - **Accent** radio: Teal / Amber / Violet (maps to `data-accent` on root).
+  - **Accent** radio: Orange / Blue / Violet (brand-aligned; replaces the spec's Teal/Amber/Violet to match the Trinitatum palette) — maps to data-accent on root.
   - **Density** radio: Comfortable / Compact (maps to `data-density`).
   - **Row emphasis** radio: Pattern / Meta.
   - **Source** radio: Collapsed / Expanded (default for the C# source block).
-- [ ] All tweaks are persisted in `localStorage` under `docview.tweaks.v1` as a JSON object.
-- [ ] Tweaks are restored on next load before first paint to avoid flash.
+- [x] All tweaks are persisted in `localStorage` under `docview.tweaks.v1` as a JSON object.
+- [x] Tweaks are restored on next load before first paint to avoid flash.
 
 #### Implementation tasks
 

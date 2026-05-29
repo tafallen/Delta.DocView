@@ -108,6 +108,33 @@ public class ScenarioComposerTests : TestContext
     }
 
     [Fact]
+    public void ClearDialog_Escape_Cancels()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep());
+        var cut = RenderComponent<ScenarioComposer>();
+        cut.Find("[data-testid='clear-composer']").Click();
+
+        cut.Find("[role='dialog']").KeyDown(key: "Escape");
+
+        Assert.Empty(cut.FindAll("[data-testid='confirm-clear']"));
+        Assert.Single(composer.Steps);
+    }
+
+    [Fact]
+    public void ClearDialog_Has_Dialog_Role_And_AriaModal()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep());
+        var cut = RenderComponent<ScenarioComposer>();
+        cut.Find("[data-testid='clear-composer']").Click();
+
+        var dialog = cut.Find(".composer-clear-dialog");
+        Assert.Equal("dialog", dialog.GetAttribute("role"));
+        Assert.Equal("true", dialog.GetAttribute("aria-modal"));
+    }
+
+    [Fact]
     public void ScenarioComposer_ConsecutiveSameType_ShowsAndKeyword()
     {
         var composer = MakeComposer();

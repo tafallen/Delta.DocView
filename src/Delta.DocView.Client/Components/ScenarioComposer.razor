@@ -95,9 +95,11 @@
 @if (_confirmingClear)
 {
     <div class="composer-clear-dialog"
+         id="@_clearDialogId"
          role="dialog"
          aria-modal="true"
-         aria-label="Confirm clear">
+         aria-label="Confirm clear"
+         @onkeydown="OnClearDialogKey">
         <div class="composer-clear-inner">
             <p>Remove all @Composer.StepCount step(s) from the composer?</p>
             <div class="composer-clear-actions">
@@ -117,9 +119,33 @@
 @code {
     private Guid? _draggingId;
     private bool _confirmingClear;
+    private string _clearDialogId = "";
+    private bool _clearTrapActive;
 
-    protected override void OnInitialized() =>
+    protected override void OnInitialized()
+    {
+        _clearDialogId = "composer-clear-" + Guid.NewGuid().ToString("N")[..8];
         Composer.Changed += OnComposerChanged;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (_confirmingClear && !_clearTrapActive)
+        {
+            _clearTrapActive = true;
+            try { await JS.InvokeVoidAsync("docview.focusTrap.activate", _clearDialogId); } catch { }
+        }
+        else if (!_confirmingClear && _clearTrapActive)
+        {
+            _clearTrapActive = false;
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+        }
+    }
+
+    private void OnClearDialogKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") CancelClear();
+    }
 
     private void OnComposerChanged() => InvokeAsync(StateHasChanged);
 
@@ -153,5 +179,13 @@
 
     private void CancelClear() => _confirmingClear = false;
 
-    public void Dispose() => Composer.Changed -= OnComposerChanged;
+    public void Dispose()
+    {
+        Composer.Changed -= OnComposerChanged;
+        if (_clearTrapActive)
+        {
+            _clearTrapActive = false;
+            try { _ = JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+        }
+    }
 }

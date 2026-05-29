@@ -93,6 +93,46 @@ window.docview = {
             } catch (e) { /* swallow */ }
         }
     },
+    focusTrap: {
+        _container: null,
+        _handler: null,
+        activate: function (containerId) {
+            if (this._handler) return; // idempotent — already trapping
+            const el = document.getElementById(containerId);
+            if (!el) return;
+            this._container = el;
+            window.docview.focus._stack.push(document.activeElement);
+            const focusables = function () {
+                return el.querySelectorAll(
+                    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+            };
+            const first = focusables()[0];
+            if (first) first.focus();
+            this._handler = function (e) {
+                if (e.key !== 'Tab') return;
+                const items = focusables();
+                if (items.length === 0) return;
+                const firstEl = items[0];
+                const lastEl = items[items.length - 1];
+                if (e.shiftKey && document.activeElement === firstEl) {
+                    e.preventDefault();
+                    lastEl.focus();
+                } else if (!e.shiftKey && document.activeElement === lastEl) {
+                    e.preventDefault();
+                    firstEl.focus();
+                }
+            };
+            el.addEventListener('keydown', this._handler);
+        },
+        deactivate: function () {
+            if (this._container && this._handler) {
+                this._container.removeEventListener('keydown', this._handler);
+            }
+            this._handler = null;
+            this._container = null;
+            window.docview.focus.restorePrevious();
+        }
+    },
     scrollIntoViewIfNeeded: function (selector) {
         try {
             const el = document.querySelector(selector);

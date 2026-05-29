@@ -296,11 +296,11 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] Pressing `?` (not in input) opens a centred modal overlay.
-- [ ] Overlay lists all shortcuts with human-readable labels and `<kbd>` chips.
-- [ ] Multiple bindings for the same action shown as `<kbd>A</kbd> or <kbd>B</kbd>`.
-- [ ] Clicking outside the modal or pressing `Escape` closes it.
-- [ ] Overlay is accessible: `role="dialog"`, focus-trapped while open.
+- [x] Pressing `?` (not in input) opens a centred modal overlay. *— also opens via the header shortcuts button.*
+- [x] Overlay lists all shortcuts with human-readable labels and `<kbd>` chips.
+- [x] Multiple bindings for the same action shown as `<kbd>A</kbd> or <kbd>B</kbd>`. *— palette row is platform-aware: ⌘K on macOS, Ctrl+K elsewhere.*
+- [x] Clicking outside the modal or pressing `Escape` closes it.
+- [x] Overlay is accessible: `role="dialog"`, focus-trapped while open. *— Tab cycles within the dialog via docview.focusTrap; focus restored on close.*
 
 #### Implementation tasks
 

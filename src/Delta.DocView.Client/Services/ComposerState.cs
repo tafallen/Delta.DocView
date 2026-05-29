@@ -81,6 +81,21 @@ public sealed class ComposerState : IDisposable
         Notify();
     }
 
+    /// <summary>
+    /// Updates a single parameter value on the identified item.
+    /// No-op if the id, paramIndex, or value is invalid.
+    /// </summary>
+    public void SetParamValue(Guid itemId, int paramIndex, string value)
+    {
+        var idx = _steps.FindIndex(x => x.Id == itemId);
+        if (idx < 0) return;
+        var item = _steps[idx];
+        if (paramIndex < 0 || paramIndex >= item.ParamValues.Count) return;
+        var updated = new List<string>(item.ParamValues) { [paramIndex] = value };
+        _steps[idx] = item with { ParamValues = updated };
+        Notify();
+    }
+
     public void MoveStep(Guid id, int targetIndex)
     {
         var idx = _steps.FindIndex(x => x.Id == id);

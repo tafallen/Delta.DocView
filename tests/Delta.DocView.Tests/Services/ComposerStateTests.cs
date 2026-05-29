@@ -187,6 +187,46 @@ public class ComposerStateTests
         Assert.NotEqual(before, after);
     }
 
+    private static Step MakeParamStep() => new()
+    {
+        Id = "s1", Type = "Given", Pattern = "I am {actor : string}",
+        Domain = "Auth", File = "T.cs", Line = 1,
+        Params = [new StepParam { Name = "actor", Type = "string", Example = "admin" }]
+    };
+
+    [Fact]
+    public void SetParamValue_UpdatesValueAndNotifies()
+    {
+        var (state, _) = Create();
+        state.AddStep(MakeParamStep());
+        var id = state.Steps[0].Id;
+        var changed = false;
+        state.Changed += () => changed = true;
+        state.SetParamValue(id, 0, "hello");
+        Assert.Equal("hello", state.Steps[0].ParamValues[0]);
+        Assert.True(changed);
+    }
+
+    [Fact]
+    public void SetParamValue_OutOfRange_IsNoOp()
+    {
+        var (state, _) = Create();
+        state.AddStep(MakeParamStep());
+        var id = state.Steps[0].Id;
+        state.SetParamValue(id, -1, "x");
+        state.SetParamValue(id, 99, "x");
+        Assert.Equal("admin", state.Steps[0].ParamValues[0]);
+    }
+
+    [Fact]
+    public void SetParamValue_UnknownId_IsNoOp()
+    {
+        var (state, _) = Create();
+        state.AddStep(MakeParamStep());
+        state.SetParamValue(Guid.NewGuid(), 0, "x");
+        Assert.Single(state.Steps);
+    }
+
     private sealed class FakeKeyboardActions : IKeyboardActions
     {
         public event Action? OpenPaletteRequested;

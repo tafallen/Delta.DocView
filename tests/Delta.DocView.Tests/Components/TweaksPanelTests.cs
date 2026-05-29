@@ -139,4 +139,42 @@ public class TweaksPanelTests
         var blue = cut.Find("[data-testid='tweaks-accent-blue']");
         Assert.True(blue.HasAttribute("checked"));
     }
+
+    [Fact]
+    public void FollowOs_Checkbox_Renders_Unchecked_By_Default()
+    {
+        var (ctx, _, panel) = Setup();
+        var cut = ctx.RenderComponent<TweaksPanel>();
+        panel.Open();
+
+        var checkbox = cut.Find("[data-testid='tweaks-follow-os']");
+
+        Assert.NotNull(checkbox);
+        Assert.False(checkbox.HasAttribute("checked"));
+    }
+
+    [Fact]
+    public void FollowOs_Checkbox_Calls_SetFollowOs_When_Checked()
+    {
+        var (ctx, store, panel) = Setup();
+        var cut = ctx.RenderComponent<TweaksPanel>();
+        panel.Open();
+
+        cut.Find("[data-testid='tweaks-follow-os']").Change(true);
+
+        Assert.True(store.FollowOs);
+    }
+
+    [Fact]
+    public void DarkToggle_Disabled_When_FollowOs_True()
+    {
+        var (ctx, store, panel) = Setup();
+        store.SetFollowOs(true);
+        var cut = ctx.RenderComponent<TweaksPanel>();
+        panel.Open();
+
+        var darkToggle = cut.Find("[data-testid='tweaks-dark']");
+
+        Assert.True(darkToggle.HasAttribute("disabled"));
+    }
 }

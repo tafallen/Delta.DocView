@@ -16,7 +16,14 @@
                 <span>Dark mode</span>
                 <input type="checkbox" data-testid="tweaks-dark"
                        checked="@Tweaks.Dark"
+                       disabled="@Tweaks.FollowOs"
                        @onchange="e => Tweaks.SetDark((bool)e.Value!)" />
+            </label>
+            <label class="tweak-row">
+                <span>Follow OS</span>
+                <input type="checkbox" data-testid="tweaks-follow-os"
+                       checked="@Tweaks.FollowOs"
+                       @onchange="e => Tweaks.SetFollowOs((bool)e.Value!)" />
             </label>
 
             <fieldset class="tweak-group">

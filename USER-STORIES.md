@@ -407,13 +407,13 @@ The current composer adds steps using their raw pattern text (e.g. `I am logged 
 
 #### Acceptance criteria
 
-**Phase 1 — Concrete values (`Scenario:`)**
+**Phase 1 — Concrete values (`Scenario:`) ✓**
 
-- [ ] Each composer row shows an editable value field per `{param : type}` token in the step pattern, pre-filled with the param's `example` value from the library.
-- [ ] The live `.feature` preview substitutes the entered values, producing e.g. `Given I am logged in as "admin@triangle.io"` instead of `Given I am logged in as {username : string}`.
-- [ ] Steps with no parameters render their pattern text as-is (no input fields shown).
-- [ ] Copy .feature and Save .feature export the substituted text.
-- [ ] An empty value field is preserved as an empty string in the output (not the `{...}` token).
+- [x] Each composer row shows an editable value field per `{param : type}` token in the step pattern, pre-filled with the param's `example` value from the library.
+- [x] The live `.feature` preview substitutes the entered values, producing e.g. `Given I am logged in as "admin@triangle.io"` instead of `Given I am logged in as {username : string}`.
+- [x] Steps with no parameters render their pattern text as-is (no input fields shown).
+- [x] Copy .feature and Save .feature export the substituted text.
+- [x] An empty value field is preserved as an empty string in the output (not the `{...}` token).
 
 **Phase 2 — Variable mode (`Scenario Outline:`)**
 

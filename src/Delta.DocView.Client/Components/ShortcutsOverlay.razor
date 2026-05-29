@@ -2,7 +2,7 @@
 @inject ShortcutsState State
 @inject IPlatform Platform
 @inject IJSRuntime JS
-@implements IDisposable
+@implements IAsyncDisposable
 
 @if (State.IsOpen)
 {
@@ -67,5 +67,12 @@
         _wasOpen = State.IsOpen;
     }
 
-    public void Dispose() => State.Changed -= OnChanged;
+    public async ValueTask DisposeAsync()
+    {
+        State.Changed -= OnChanged;
+        if (_wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+        }
+    }
 }

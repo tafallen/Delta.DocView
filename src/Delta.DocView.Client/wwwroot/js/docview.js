@@ -160,6 +160,9 @@ window.docview = {
                 const lower = key.length === 1 ? key.toLowerCase() : key;
                 let action = null;
 
+                // NOTE: This key map is the source of truth for keyboard HANDLING.
+                // The shortcuts OVERLAY display list lives in ShortcutDefinitions.cs —
+                // if you add/change/remove a binding here, update that file too.
                 if ((e.ctrlKey || e.metaKey) && lower === 'k') action = 'open-palette';
                 else if (key === '/') action = 'open-palette';
                 else if (key === '?') action = 'open-shortcuts';

@@ -152,7 +152,12 @@
         if (e.Key == "Escape") CancelClear();
     }
 
-    private void OnComposerChanged() => InvokeAsync(StateHasChanged);
+    private void OnComposerChanged()
+    {
+        // Clear stale drag state when the composer is closed mid-drag.
+        if (!Composer.IsOpen) _draggingId = null;
+        InvokeAsync(StateHasChanged);
+    }
 
     private void OnNameInput(ChangeEventArgs e) =>
         Composer.SetScenarioName(e.Value?.ToString() ?? "");
@@ -160,7 +165,10 @@
     private void OnDropOnItem(Guid targetId)
     {
         if (_draggingId is null || _draggingId == targetId) return;
-        var targetIdx = Composer.Steps.ToList().FindIndex(x => x.Id == targetId);
+        // Avoid the ToList().FindIndex() allocation — iterate directly.
+        var steps = Composer.Steps;
+        int targetIdx = -1;
+        for (int i = 0; i < steps.Count; i++) { if (steps[i].Id == targetId) { targetIdx = i; break; } }
         if (targetIdx >= 0) Composer.MoveStep(_draggingId.Value, targetIdx);
         _draggingId = null;
     }

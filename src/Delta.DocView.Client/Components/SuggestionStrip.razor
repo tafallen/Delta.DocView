@@ -39,11 +39,12 @@
         var last = Composer.Steps[^1].Step;
         var alreadyAdded = Composer.Steps.Select(x => x.Step.Id).ToHashSet();
 
+        const int MaxSuggestions = 4;
         _suggestions = last.SuggestsNext
             .Where(id => !alreadyAdded.Contains(id))
             .Select(id => Store.ById.TryGetValue(id, out var s) ? s : null)
             .OfType<Delta.DocView.Shared.Models.Step>()
-            .Take(4)
+            .Take(MaxSuggestions)
             .ToList();
     }
 

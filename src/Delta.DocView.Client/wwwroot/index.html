@@ -26,6 +26,24 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
+    <script>
+        // Pre-paint theme restore. Mirrors docview.tweaks.applyRoot (js/docview.js)
+        // and the localStorage key in TweaksStore.cs — keep the three in sync.
+        (function () {
+            try {
+                var raw = localStorage.getItem('docview.tweaks.v1');
+                var t = raw ? JSON.parse(raw) : {};
+                var root = document.documentElement;
+                var dark = (typeof t.dark === 'boolean')
+                    ? t.dark
+                    : (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                root.setAttribute('data-dark', dark ? 'true' : 'false');
+                root.setAttribute('data-accent', t.accent || 'orange');
+                root.setAttribute('data-density', t.density || 'comfortable');
+                root.setAttribute('data-row-emphasis', t.rowEmphasis || 'pattern');
+            } catch (e) { /* CSS defaults already cover this */ }
+        })();
+    </script>
 </head>
 <body>
     <div id="app">

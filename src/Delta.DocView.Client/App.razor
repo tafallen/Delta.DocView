@@ -1,6 +1,7 @@
 @inject LibraryApiClient LibraryClient
 @inject IFavouritesStore Favourites
 @inject IPlatform Platform
+@inject Delta.DocView.Client.Services.TweaksStore Tweaks
 
 @if (LibraryClient.State == LoadingState.Loading)
 {
@@ -18,6 +19,6 @@ else
 @code {
     protected override async Task OnInitializedAsync()
     {
-        await Task.WhenAll(LibraryClient.LoadAsync(), Favourites.InitializeAsync(), Platform.InitializeAsync());
+        await Task.WhenAll(LibraryClient.LoadAsync(), Favourites.InitializeAsync(), Platform.InitializeAsync(), Tweaks.InitializeAsync());
     }
 }

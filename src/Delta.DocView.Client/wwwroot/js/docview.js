@@ -202,6 +202,28 @@ window.docview = {
             r.setAttribute('data-accent', accent || 'orange');
             r.setAttribute('data-density', density || 'comfortable');
             r.setAttribute('data-row-emphasis', rowEmphasis || 'pattern');
+        },
+        _mql: null,
+        _mqlListener: null,
+        watchOs: function (dotNetRef) {
+            try {
+                if (this._mqlListener) return; // idempotent — already watching
+                this._mql = window.matchMedia('(prefers-color-scheme: dark)');
+                var self = this;
+                this._mqlListener = function (e) {
+                    dotNetRef.invokeMethodAsync('OnOsColorSchemeChanged', e.matches);
+                };
+                this._mql.addEventListener('change', this._mqlListener);
+            } catch (e) { console.warn('docview.tweaks.watchOs failed', e); }
+        },
+        unwatchOs: function () {
+            try {
+                if (this._mql && this._mqlListener) {
+                    this._mql.removeEventListener('change', this._mqlListener);
+                }
+                this._mql = null;
+                this._mqlListener = null;
+            } catch (e) { console.warn('docview.tweaks.unwatchOs failed', e); }
         }
     }
 };

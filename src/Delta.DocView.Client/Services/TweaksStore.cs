@@ -151,16 +151,27 @@ public sealed class TweaksStore
         catch { /* JS helper already warns */ }
     }
 
+    /// <summary>
+    /// The exact <c>(dark, accent, density, rowEmphasis)</c> token tuple fed to
+    /// <c>docview.tweaks.applyRoot</c>, which the JS side writes verbatim to the
+    /// document element's <c>data-*</c> attributes. This is the single source of
+    /// the C# side of the user-visible DOM contract; assert against it to pin the
+    /// token mapping without a browser.
+    /// </summary>
+    public (bool Dark, string Accent, string Density, string RowEmphasis) RootAttributes()
+        => (Dark,
+            Accent.ToString().ToLowerInvariant(),
+            Density.ToString().ToLowerInvariant(),
+            RowEmphasis.ToString().ToLowerInvariant());
+
     private async Task ApplyRootAsync()
     {
         try
         {
+            var a = RootAttributes();
             await _js.InvokeVoidAsync(
                 "docview.tweaks.applyRoot",
-                Dark,
-                Accent.ToString().ToLowerInvariant(),
-                Density.ToString().ToLowerInvariant(),
-                RowEmphasis.ToString().ToLowerInvariant());
+                a.Dark, a.Accent, a.Density, a.RowEmphasis);
         }
         catch { /* best-effort */ }
     }

@@ -128,6 +128,47 @@ public class TweaksStoreTests
     public void Enum_ToString_Lowercase_Matches_Css_Token(Enum value, string expectedToken)
         => Assert.Equal(expectedToken, value.ToString().ToLowerInvariant());
 
+    // RootAttributes() pins the C# side of the user-visible DOM contract: the exact
+    // (dark, accent, density, rowEmphasis) token tuple fed to docview.tweaks.applyRoot.
+    // bUnit has no JS engine, so it cannot execute the real applyRoot setAttribute calls
+    // nor the index.html pre-paint script — those remain browser-only and are verified
+    // manually until an integration harness lands. These tests pin everything up to the
+    // call boundary; the JS setAttribute side is the only genuinely-untested seam.
+
+    [Fact]
+    public void RootAttributes_Defaults()
+    {
+        var store = new TweaksStore(Substitute.For<IJSRuntime>());
+
+        Assert.Equal((false, "orange", "comfortable", "pattern"), store.RootAttributes());
+    }
+
+    [Fact]
+    public async Task RootAttributes_After_SetAccent_Blue()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+
+        store.SetAccent(AccentOption.Blue);
+
+        Assert.Equal((false, "blue", "comfortable", "pattern"), store.RootAttributes());
+    }
+
+    [Fact]
+    public async Task RootAttributes_After_Multiple_Sets()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+
+        store.SetDark(true);
+        store.SetDensity(DensityOption.Compact);
+        store.SetRowEmphasis(RowEmphasisOption.Meta);
+
+        Assert.Equal((true, "orange", "compact", "meta"), store.RootAttributes());
+    }
+
     [Fact]
     public async Task Setter_SameValue_NoChange_NoEvent()
     {

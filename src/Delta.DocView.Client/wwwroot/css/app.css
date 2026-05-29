@@ -281,7 +281,7 @@ html, body {
 .detail-panel {
   flex: 1;
   overflow-y: auto;
-  background: var(--bg-panel);
+  background: var(--bg);
 }
 
 /* ── Responsive breakpoints ───────────────────────────────────────── */

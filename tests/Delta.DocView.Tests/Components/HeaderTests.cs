@@ -44,7 +44,7 @@ public class HeaderTests : TestContext
 
         var cut = RenderComponent<Header>();
 
-        Assert.Contains("Delta · Step Library", cut.Markup);
+        Assert.Contains("Triangle · Step Library", cut.Markup);
     }
 
     [Fact]

@@ -10,7 +10,7 @@ public class LoadingScreenTests : TestContext
     {
         var cut = RenderComponent<LoadingScreen>();
 
-        Assert.Contains("Delta", cut.Markup);
+        Assert.Contains("Triangle", cut.Markup);
         Assert.Contains("Step Library", cut.Markup);
     }
 

@@ -39,16 +39,16 @@
         <button class="btn-icon" type="button"
                 data-testid="shortcuts-button"
                 title="Keyboard shortcuts" aria-label="Keyboard shortcuts"
-                @onclick="Actions.OpenShortcuts">?</button>
+                @onclick="Actions.OpenShortcuts"><span aria-hidden="true">?</span></button>
         <button class="btn-icon" type="button"
                 data-testid="tweaks-button"
                 title="Appearance settings" aria-label="Appearance settings"
-                @onclick="Panel.Toggle">⚙</button>
+                @onclick="Panel.Toggle"><span aria-hidden="true">⚙</span></button>
         <button class="btn-icon" type="button"
                 data-testid="dark-toggle"
                 title="Toggle dark mode" aria-label="Toggle dark mode"
                 @onclick="() => Tweaks.SetDark(!Tweaks.Dark)">
-            @(Tweaks.Dark ? "☀" : "🌙")
+            <span aria-hidden="true">@(Tweaks.Dark ? "☀" : "🌙")</span>
         </button>
         <a href="/logout" class="avatar-chip" aria-label="@User.Current.Name" title="@User.Current.Name (sign out)">@User.Current.Initials</a>
     </div>

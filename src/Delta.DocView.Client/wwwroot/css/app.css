@@ -253,22 +253,26 @@ html, body {
 }
 
 /* ── Warning banner ───────────────────────────────────────────────── */
+:root {
+  --warning-bg:     #fef3c7;
+  --warning-text:   #92400e;
+  --warning-border: #fde68a;
+}
+[data-dark="true"] {
+  --warning-bg:     #451a03;
+  --warning-text:   #fde68a;
+  --warning-border: #78350f;
+}
 .warning-banner {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: #fef3c7;
-  color: #92400e;
+  background: var(--warning-bg);
+  color: var(--warning-text);
   font-size: 0.82rem;
-  border-bottom: 1px solid #fde68a;
+  border-bottom: 1px solid var(--warning-border);
   flex-shrink: 0;
-}
-
-[data-dark="true"] .warning-banner {
-  background: #451a03;
-  color: #fde68a;
-  border-color: #78350f;
 }
 
 /* ── App body (three panels) ──────────────────────────────────────── */

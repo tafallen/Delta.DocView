@@ -27,6 +27,26 @@ public class ComposerStateTests
     }
 
     [Fact]
+    public void SuggestedFileName_BlankName_FallsBackToScenario()
+    {
+        var (state, _) = Create();
+        Assert.Equal("scenario.feature", state.SuggestedFileName);
+    }
+
+    [Theory]
+    [InlineData("My Login Flow", "my-login-flow.feature")]
+    [InlineData("  Trim  Me  ", "trim-me.feature")]
+    [InlineData("Order #42: checkout!", "order-42-checkout.feature")]
+    [InlineData("___", "scenario.feature")]
+    [InlineData("Already-slug", "already-slug.feature")]
+    public void SuggestedFileName_Slugifies(string name, string expected)
+    {
+        var (state, _) = Create();
+        state.SetScenarioName(name);
+        Assert.Equal(expected, state.SuggestedFileName);
+    }
+
+    [Fact]
     public void AddStep_AddsToList_AndOpensComposer()
     {
         var (state, _) = Create();

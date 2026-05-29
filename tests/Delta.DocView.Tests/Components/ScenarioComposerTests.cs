@@ -117,4 +117,38 @@ public class ScenarioComposerTests : TestContext
         var cut = RenderComponent<ScenarioComposer>();
         Assert.Contains("And", cut.Markup);
     }
+
+    [Fact]
+    public void ScenarioComposer_SaveButton_Disabled_When_Empty()
+    {
+        MakeComposer();
+        var cut = RenderComponent<ScenarioComposer>();
+        cut.Find("[data-testid='composer-tab']").Click();
+        Assert.True(cut.Find("[data-testid='save-composer']").HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void ScenarioComposer_SaveButton_Enabled_With_Steps()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep());
+        var cut = RenderComponent<ScenarioComposer>();
+        Assert.False(cut.Find("[data-testid='save-composer']").HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void ScenarioComposer_SaveClick_Invokes_SaveTextFile_With_Filename_And_Content()
+    {
+        var composer = MakeComposer();
+        composer.SetScenarioName("My Login Flow");
+        composer.AddStep(MakeStep());
+        var planned = JSInterop.SetupVoid("docview.saveTextFile", _ => true).SetVoidResult();
+
+        var cut = RenderComponent<ScenarioComposer>();
+        cut.Find("[data-testid='save-composer']").Click();
+
+        var call = JSInterop.Invocations["docview.saveTextFile"].Single();
+        Assert.Equal("my-login-flow.feature", call.Arguments[0]);
+        Assert.Equal(composer.FeatureText, call.Arguments[1]);
+    }
 }

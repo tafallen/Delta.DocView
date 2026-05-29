@@ -16,6 +16,27 @@ public sealed class ComposerState : IDisposable
     public int StepCount => _steps.Count;
     public string FeatureText => _featureTextCache ??= FeatureTextBuilder.Build(_scenarioName, _steps);
 
+    /// <summary>
+    /// Filename suggested for "Save .feature": the scenario name slugified
+    /// (lower-case, non-alphanumeric runs collapsed to '-', trimmed) plus the
+    /// .feature extension. Falls back to "scenario.feature" when the name is
+    /// blank or slugifies to nothing.
+    /// </summary>
+    public string SuggestedFileName => Slugify(_scenarioName) + ".feature";
+
+    private static string Slugify(string name)
+    {
+        var slug = new System.Text.StringBuilder();
+        var prevDash = false;
+        foreach (var c in name.Trim().ToLowerInvariant())
+        {
+            if (char.IsLetterOrDigit(c)) { slug.Append(c); prevDash = false; }
+            else if (!prevDash && slug.Length > 0) { slug.Append('-'); prevDash = true; }
+        }
+        var result = slug.ToString().Trim('-');
+        return result.Length == 0 ? "scenario" : result;
+    }
+
     public event Action? Changed;
 
     public ComposerState(IKeyboardActions actions)

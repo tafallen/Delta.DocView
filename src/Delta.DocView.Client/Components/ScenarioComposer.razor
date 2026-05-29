@@ -1,6 +1,7 @@
 @using Delta.DocView.Client.Services
 @inject ComposerState Composer
 @inject SelectionState Selection
+@inject IJSRuntime JS
 @implements IDisposable
 
 <div class="composer-dock">
@@ -78,6 +79,11 @@
                     <button class="btn-secondary"
                             type="button"
                             disabled="@(Composer.Steps.Count == 0)"
+                            @onclick="OnSaveClick"
+                            data-testid="save-composer">Save .feature</button>
+                    <button class="btn-secondary composer-clear-btn"
+                            type="button"
+                            disabled="@(Composer.Steps.Count == 0)"
                             @onclick="OnClearClick"
                             data-testid="clear-composer">Clear</button>
                 </div>
@@ -126,6 +132,12 @@
         var targetIdx = Composer.Steps.ToList().FindIndex(x => x.Id == targetId);
         if (targetIdx >= 0) Composer.MoveStep(_draggingId.Value, targetIdx);
         _draggingId = null;
+    }
+
+    private async Task OnSaveClick()
+    {
+        if (Composer.Steps.Count == 0) return;
+        await JS.InvokeVoidAsync("docview.saveTextFile", Composer.SuggestedFileName, Composer.FeatureText);
     }
 
     private void OnClearClick()

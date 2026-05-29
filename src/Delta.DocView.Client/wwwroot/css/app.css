@@ -986,6 +986,10 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   flex-shrink: 0;
 }
 
+.composer-output-actions .composer-clear-btn {
+  margin-left: auto;
+}
+
 .btn-secondary {
   height: 30px;
   padding: 0 12px;

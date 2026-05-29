@@ -128,7 +128,7 @@
         }
         else if (!Panel.IsOpen && _wasOpen)
         {
-            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate", _dialogId); } catch { }
         }
         _wasOpen = Panel.IsOpen;
     }
@@ -139,7 +139,7 @@
         Tweaks.Changed -= OnChanged;
         if (_wasOpen)
         {
-            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate", _dialogId); } catch { }
         }
     }
 }

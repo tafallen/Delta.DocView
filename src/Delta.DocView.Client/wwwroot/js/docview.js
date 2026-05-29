@@ -76,6 +76,7 @@ window.docview = {
         _stack: [],
         element: function (id) {
             try {
+                if (this._stack.length >= 10) this._stack.shift(); // prevent unbounded growth
                 this._stack.push(document.activeElement);
                 const el = document.getElementById(id);
                 if (el) el.focus();
@@ -91,26 +92,31 @@ window.docview = {
         }
     },
     focusTrap: {
-        _container: null,
-        _handler: null,
+        _stack: [],  // array of { containerId, container, handler, previousFocus }
+
         activate: function (containerId) {
-            if (this._handler) return; // idempotent — already trapping
-            const el = document.getElementById(containerId);
+            // Idempotent: if this containerId is already in the stack, no-op
+            for (var i = 0; i < this._stack.length; i++) {
+                if (this._stack[i].containerId === containerId) return;
+            }
+            var el = document.getElementById(containerId);
             if (!el) return;
-            this._container = el;
-            window.docview.focus._stack.push(document.activeElement);
-            const focusables = function () {
+
+            var previousFocus = document.activeElement;
+
+            var focusables = function () {
                 return el.querySelectorAll(
-                    'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])');
+                    'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])');
             };
-            const first = focusables()[0];
+            var first = focusables()[0];
             if (first) first.focus();
-            this._handler = function (e) {
+
+            var handler = function (e) {
                 if (e.key !== 'Tab') return;
-                const items = focusables();
+                var items = focusables();
                 if (items.length === 0) return;
-                const firstEl = items[0];
-                const lastEl = items[items.length - 1];
+                var firstEl = items[0];
+                var lastEl = items[items.length - 1];
                 if (e.shiftKey && document.activeElement === firstEl) {
                     e.preventDefault();
                     lastEl.focus();
@@ -119,15 +125,29 @@ window.docview = {
                     firstEl.focus();
                 }
             };
-            el.addEventListener('keydown', this._handler);
+
+            el.addEventListener('keydown', handler);
+            this._stack.push({ containerId: containerId, container: el, handler: handler, previousFocus: previousFocus });
         },
-        deactivate: function () {
-            if (this._container && this._handler) {
-                this._container.removeEventListener('keydown', this._handler);
+
+        deactivate: function (containerId) {
+            var idx = -1;
+            for (var i = this._stack.length - 1; i >= 0; i--) {
+                if (this._stack[i].containerId === containerId) { idx = i; break; }
             }
-            this._handler = null;
-            this._container = null;
-            window.docview.focus.restorePrevious();
+            if (idx === -1) return; // not found — no-op (safe to call even if never activated)
+
+            var entry = this._stack.splice(idx, 1)[0];
+            try { entry.container.removeEventListener('keydown', entry.handler); } catch (e) { /* swallow */ }
+
+            // Only restore focus if this was the topmost (active) trap
+            if (idx >= this._stack.length) {
+                try {
+                    if (entry.previousFocus && typeof entry.previousFocus.focus === 'function') {
+                        entry.previousFocus.focus();
+                    }
+                } catch (e) { /* swallow */ }
+            }
         }
     },
     scrollIntoViewIfNeeded: function (selector) {

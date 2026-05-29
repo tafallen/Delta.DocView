@@ -144,7 +144,7 @@
         else if (!_confirmingClear && _clearTrapActive)
         {
             _clearTrapActive = false;
-            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate", _clearDialogId); } catch { }
         }
     }
 
@@ -199,7 +199,7 @@
         if (_clearTrapActive)
         {
             _clearTrapActive = false;
-            try { _ = JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+            try { _ = JS.InvokeVoidAsync("docview.focusTrap.deactivate", _clearDialogId); } catch { }
         }
     }
 }

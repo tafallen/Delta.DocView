@@ -20,8 +20,16 @@ public sealed class ClientStepLibraryStore
     public string Version { get; private set; } = "";
     public string GeneratedAt { get; private set; } = "";
 
+    private bool _populated;
+
+    /// <summary>
+    /// Populates the store from the loaded library. Idempotent: repeat calls are no-ops
+    /// (LibraryApiClient calls this once at boot; consistent with TweaksStore/FavouritesStore pattern).
+    /// </summary>
     public void Populate(StepLibrary library)
     {
+        if (_populated) return;
+        _populated = true;
         Steps = library.Steps;
         Domains = library.Domains;
         ById = library.Steps.ToDictionary(s => s.Id);

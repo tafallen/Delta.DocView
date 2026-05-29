@@ -4,6 +4,9 @@
 @inject Delta.DocView.Client.Services.TweaksStore Tweaks
 @inject Delta.DocView.Client.Services.UserClient UserClient
 
+@* Note: the Loading branch below is unreachable in Blazor WASM — OnInitializedAsync
+   completes before the component renders, so State is always Loaded or Error by the
+   time App.razor paints. The pre-render spinner in index.html is the visible indicator. *@
 @if (LibraryClient.State == LoadingState.Loading)
 {
     <LoadingScreen />

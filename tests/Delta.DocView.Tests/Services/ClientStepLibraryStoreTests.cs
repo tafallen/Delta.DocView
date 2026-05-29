@@ -145,8 +145,9 @@ public class ClientStepLibraryStoreTests
     }
 
     [Fact]
-    public void Populate_SecondCall_RebuildsDomainById()
+    public void Populate_SecondCall_IsNoOp_DomainByIdRetainsFirst()
     {
+        // Populate is idempotent — a second call is silently ignored.
         var first = new List<StepDomain>
         {
             new() { Id = "Auth", Label = "Auth" },
@@ -155,19 +156,15 @@ public class ClientStepLibraryStoreTests
         var second = new List<StepDomain>
         {
             new() { Id = "Reporting", Label = "Reporting" },
-            new() { Id = "Admin", Label = "Admin" },
-            new() { Id = "Search", Label = "Search" },
         };
         var store = new ClientStepLibraryStore();
         store.Populate(MakeLibraryWith(first, []));
-        store.Populate(MakeLibraryWith(second, []));
+        store.Populate(MakeLibraryWith(second, [])); // no-op
 
-        Assert.Equal(3, store.DomainById.Count);
-        Assert.False(store.DomainById.ContainsKey("Auth"));
-        Assert.False(store.DomainById.ContainsKey("Billing"));
-        Assert.True(store.DomainById.ContainsKey("Reporting"));
-        Assert.True(store.DomainById.ContainsKey("Admin"));
-        Assert.True(store.DomainById.ContainsKey("Search"));
+        Assert.Equal(2, store.DomainById.Count);
+        Assert.True(store.DomainById.ContainsKey("Auth"));
+        Assert.True(store.DomainById.ContainsKey("Billing"));
+        Assert.False(store.DomainById.ContainsKey("Reporting"));
     }
 
     [Fact]
@@ -200,5 +197,19 @@ public class ClientStepLibraryStoreTests
         Assert.Contains("Auth", hay);
         Assert.Contains("login", hay);
         Assert.Contains("username", hay);
+    }
+
+    [Fact]
+    public void Populate_SecondCall_IsNoOp()
+    {
+        var store = new ClientStepLibraryStore();
+        var lib1 = MakeLibraryWith([], [new Step { Id = "s1", Type = "Given", Pattern = "p1", Domain = "Auth" }]);
+        var lib2 = MakeLibraryWith([], [new Step { Id = "s2", Type = "Given", Pattern = "p2", Domain = "Auth" }]);
+
+        store.Populate(lib1);
+        store.Populate(lib2); // should be ignored
+
+        Assert.Single(store.Steps);
+        Assert.Equal("s1", store.Steps[0].Id);
     }
 }

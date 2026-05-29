@@ -137,6 +137,61 @@ public class ScenarioComposerTests : TestContext
     }
 
     [Fact]
+    public void Drag_Drop_Reorders_Steps()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        composer.AddStep(MakeStep("C"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        var rows = cut.FindAll(".composer-row");
+        // Drag the first row (A) and drop it onto the third row (C).
+        rows[0].QuerySelector(".drag-handle")!.DragStart();
+        cut.FindAll(".composer-row")[2].Drop();
+
+        // MoveStep(A, indexOf(C)=2) => B, C, A
+        Assert.Equal(
+            new[] { "B", "C", "A" },
+            composer.Steps.Select(s => s.Step.Id).ToArray());
+    }
+
+    [Fact]
+    public void Drag_Drop_Onto_Self_Is_NoOp()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        composer.AddStep(MakeStep("C"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        var rows = cut.FindAll(".composer-row");
+        // Drag row B and drop it on itself.
+        rows[1].QuerySelector(".drag-handle")!.DragStart();
+        cut.FindAll(".composer-row")[1].Drop();
+
+        Assert.Equal(
+            new[] { "A", "B", "C" },
+            composer.Steps.Select(s => s.Step.Id).ToArray());
+    }
+
+    [Fact]
+    public void Drop_Without_DragStart_Is_NoOp()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        // Drop without a preceding drag-start (_draggingId is null).
+        cut.FindAll(".composer-row")[1].Drop();
+
+        Assert.Equal(
+            new[] { "A", "B" },
+            composer.Steps.Select(s => s.Step.Id).ToArray());
+    }
+
+    [Fact]
     public void ScenarioComposer_SaveClick_Invokes_SaveTextFile_With_Filename_And_Content()
     {
         var composer = MakeComposer();

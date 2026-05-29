@@ -8,9 +8,9 @@ services:
       - ./data:/data:ro
     environment:
       - DOCVIEW_LIBRARY_PATH=/data/step-library.json
-      # Production auth (US-12) — set these via your secret store, do NOT commit real values:
+      # Production auth — provide these via your secret store, never commit real values:
       # - ASPNETCORE_ENVIRONMENT=Production
-      # - AzureAd__TenantId=...
-      # - AzureAd__ClientId=...
-      # - AzureAd__ClientSecret=...
+      # - AzureAd__TenantId=<your-tenant-id>
+      # - AzureAd__ClientId=<your-client-id>
+      # - AzureAd__ClientSecret=<your-client-secret>
     restart: unless-stopped

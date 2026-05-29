@@ -346,12 +346,12 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 #### Acceptance criteria
 
-- [ ] When `ASPNETCORE_ENVIRONMENT=Development` (or env var `DOCVIEW_AUTH_DISABLED=true`), all pages are accessible without login; no redirect occurs.
-- [ ] In non-Development environments, unauthenticated requests are redirected to the Entra ID login flow (OpenID Connect).
-- [ ] After login, the user's display name is shown in the header avatar chip.
-- [ ] In dev bypass mode the avatar shows `QA` (or initials derived from `DOCVIEW_DEV_USER` env var, default `QA`).
-- [ ] Required OIDC config keys: `AzureAd:TenantId`, `AzureAd:ClientId`, `AzureAd:ClientSecret`, `AzureAd:CallbackPath`.
-- [ ] Logout route `/logout` clears the session and redirects to `/`.
+- [x] When `ASPNETCORE_ENVIRONMENT=Development` (or env var `DOCVIEW_AUTH_DISABLED=true`), all pages are accessible without login; no redirect occurs.
+- [x] In non-Development environments, unauthenticated requests are redirected to the Entra ID login flow (OpenID Connect).
+- [x] After login, the user's display name is shown in the header avatar chip. — via `UserClient` fetching `/api/user` at boot; header avatar reads `UserClient.Current.Initials`.
+- [x] In dev bypass mode the avatar shows `QA` (or initials derived from `DOCVIEW_DEV_USER` env var, default `QA`). — fallback `UserInfo.Fallback = ("QA","QA",false)` when `DOCVIEW_DEV_USER` not set.
+- [x] Required OIDC config keys: `AzureAd:TenantId`, `AzureAd:ClientId`, `AzureAd:ClientSecret`, `AzureAd:CallbackPath`. — keys documented in `appsettings.Production.json` as placeholders and in `docs/docker.md`.
+- [x] Logout route `/logout` clears the session and redirects to `/`. — GET `/logout` on the server; avatar chip is a navigation link to `/logout`.
 
 #### Implementation tasks
 

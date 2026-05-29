@@ -1,7 +1,7 @@
 @inject IJSRuntime JS
 @implements IDisposable
 
-<button class="copy-button" data-testid="copy-button" aria-label="@Label" @onclick="OnClick">
+<button class="@CssClass" data-testid="copy-button" aria-label="@Label" @onclick="OnClick">
     @if (_confirmed)
     {
         <span data-testid="copy-confirmation" role="status">@ConfirmLabel</span>
@@ -21,6 +21,9 @@
 
     [Parameter]
     public string Label { get; set; } = "Copy";
+
+    [Parameter]
+    public string CssClass { get; set; } = "copy-button";
 
     [Parameter]
     public string ConfirmLabel { get; set; } = "✓ copied";

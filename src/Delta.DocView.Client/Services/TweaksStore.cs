@@ -126,6 +126,7 @@ public sealed class TweaksStore : IDisposable
         {
             _dotNetRef ??= DotNetObjectReference.Create(this);
             _ = WatchOsAsync();
+            _ = SyncOsDarkAsync();   // immediately read current OS preference
         }
         else
         {
@@ -185,7 +186,7 @@ public sealed class TweaksStore : IDisposable
 
     public void Dispose()
     {
-        _ = UnwatchOsAsync();
+        if (_dotNetRef != null) _ = UnwatchOsAsync();
         _dotNetRef?.Dispose();
         _dotNetRef = null;
     }
@@ -234,6 +235,21 @@ public sealed class TweaksStore : IDisposable
     private async Task UnwatchOsAsync()
     {
         try { await _js.InvokeVoidAsync("docview.tweaks.unwatchOs"); }
+        catch { /* best-effort */ }
+    }
+
+    private async Task SyncOsDarkAsync()
+    {
+        try
+        {
+            var isDark = await _js.InvokeAsync<bool>("docview.prefersDark");
+            if (isDark != Dark)
+            {
+                Dark = isDark;
+                _ = ApplyRootAsync();
+                Changed?.Invoke();
+            }
+        }
         catch { /* best-effort */ }
     }
 

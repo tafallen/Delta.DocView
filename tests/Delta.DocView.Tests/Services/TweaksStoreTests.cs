@@ -260,11 +260,10 @@ public class TweaksStoreTests
     }
 
     [Fact]
-    public async Task OnOsColorSchemeChanged_WhenFollowOs_SetsDark()
+    public void OnOsColorSchemeChanged_WhenFollowOs_SetsDark()
     {
         var js = new RecordingJsRuntime { ReadResponse = "" };
         var store = new TweaksStore(js);
-        await store.InitializeAsync();
         store.SetFollowOs(true);
 
         store.OnOsColorSchemeChanged(true);
@@ -273,11 +272,10 @@ public class TweaksStoreTests
     }
 
     [Fact]
-    public async Task OnOsColorSchemeChanged_WhenNotFollowOs_IsNoOp()
+    public void OnOsColorSchemeChanged_WhenNotFollowOs_IsNoOp()
     {
         var js = new RecordingJsRuntime { ReadResponse = "" };
         var store = new TweaksStore(js);
-        await store.InitializeAsync();
         // FollowOs defaults to false
 
         store.OnOsColorSchemeChanged(true);
@@ -334,6 +332,23 @@ public class TweaksStoreTests
 
         Assert.NotEmpty(js.WriteCalls);
         Assert.Contains("\"followOs\":true", js.WriteCalls[^1]);
+    }
+
+    [Fact]
+    public async Task SetFollowOs_True_ImmediatelySyncsOsDarkPreference()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "", PrefersDarkResponse = true };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync(); // Dark=true from OS, but let's override
+        store.SetDark(false);          // manually set to false
+        await Task.Yield();
+        await Task.Yield();
+
+        store.SetFollowOs(true);
+        await Task.Yield();
+        await Task.Yield();
+
+        Assert.True(store.Dark); // immediately reflects OS preference (true)
     }
 
     /// <summary>

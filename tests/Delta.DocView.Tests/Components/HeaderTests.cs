@@ -168,6 +168,18 @@ public class HeaderTests : TestContext
     }
 
     [Fact]
+    public void Shortcuts_Button_Click_Calls_OpenShortcuts()
+    {
+        var actions = Substitute.For<IKeyboardActions>();
+        Register(MakeStore(), actions: actions);
+
+        var cut = RenderComponent<Header>();
+        cut.Find("[data-testid='shortcuts-button']").Click();
+
+        actions.Received(1).OpenShortcuts();
+    }
+
+    [Fact]
     public void Quick_Find_Button_Has_Aria_Label()
     {
         var platform = Substitute.For<IPlatform>();

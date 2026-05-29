@@ -35,7 +35,9 @@
 
     <div class="header-actions">
         <button class="btn-icon" type="button"
-                title="Keyboard shortcuts" aria-label="Keyboard shortcuts">?</button>
+                data-testid="shortcuts-button"
+                title="Keyboard shortcuts" aria-label="Keyboard shortcuts"
+                @onclick="Actions.OpenShortcuts">?</button>
         <button class="btn-icon" type="button"
                 data-testid="dark-toggle"
                 title="Toggle dark mode" aria-label="Toggle dark mode"

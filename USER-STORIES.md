@@ -391,6 +391,53 @@ QA engineers and developers writing SpecFlow feature files have no fast way to d
 
 ---
 
+### US-14 · Scenario Composer — parameter values and variable mode
+
+**As a** QA engineer,  
+**I want** to fill in concrete values for step parameters inside the Scenario Composer, and optionally mark parameters as Scenario Outline variables,  
+**so that** the composed output is paste-ready Gherkin rather than raw `{param : type}` patterns.
+
+#### Background
+
+The current composer adds steps using their raw pattern text (e.g. `I am logged in as {username : string}`). This is not paste-ready because the `{...}` tokens are SpecFlow binding syntax, not valid Gherkin values. Two levels of enhancement are planned:
+
+- **Phase 1 — Concrete values** (generates a `Scenario:`): each composer row shows a value input per parameter. The user types the actual value; the live preview and exported `.feature` substitute it in.
+- **Phase 2 — Variable mode** (generates a `Scenario Outline:`): a per-parameter toggle switches from a concrete value to a `<varName>` placeholder. When any step uses a variable, the output switches to `Scenario Outline:` and appends an `Examples:` table whose columns are the unique variable names and whose rows the user fills in.
+- **Phase 3 — Data tables** (deferred): a small number of SpecFlow steps accept a `Table` multiline argument. Support requires the library schema to flag `hasTable: true` on such steps; defer until there is explicit demand.
+
+#### Acceptance criteria
+
+**Phase 1 — Concrete values (`Scenario:`)**
+
+- [ ] Each composer row shows an editable value field per `{param : type}` token in the step pattern, pre-filled with the param's `example` value from the library.
+- [ ] The live `.feature` preview substitutes the entered values, producing e.g. `Given I am logged in as "admin@triangle.io"` instead of `Given I am logged in as {username : string}`.
+- [ ] Steps with no parameters render their pattern text as-is (no input fields shown).
+- [ ] Copy .feature and Save .feature export the substituted text.
+- [ ] An empty value field is preserved as an empty string in the output (not the `{...}` token).
+
+**Phase 2 — Variable mode (`Scenario Outline:`)**
+
+- [ ] Each parameter value field has a toggle between "concrete" and "variable" mode.
+- [ ] In variable mode the field shows `<varName>` (editable). The variable name defaults to the param name from the library.
+- [ ] When any step contains at least one `<varName>`, the output switches from `Scenario:` to `Scenario Outline:` and appends an `Examples:` table.
+- [ ] The Examples table header row lists all unique variable names used across all steps.
+- [ ] The Examples table starts with one data row of empty cells for the user to fill in; additional rows can be added.
+- [ ] Multiple steps using the same `<varName>` share a single column in the Examples table.
+- [ ] Switching all parameters back to concrete mode reverts the output to `Scenario:`.
+
+**Phase 3 — Data tables (deferred)**
+
+- [ ] Out of scope until the library schema supports a `hasTable` flag on step definitions.
+
+#### Implementation notes
+
+- The concrete-value substitution logic belongs in `FeatureTextBuilder` (currently only handles keyword assignment). `PatternTokeniser` already splits patterns into static text and `ParamToken` segments — reuse it.
+- Phase 2 requires `FeatureTextBuilder` to detect `<...>` values, collect unique variable names, and emit `Scenario Outline:` + `Examples:` table.
+- Value inputs in the composer row are an extension to `ComposerRow.razor` and the `ComposerItem` record (which needs to carry a `Dictionary<int, string> ParamValues` and `Dictionary<int, bool> IsVariable` alongside the step).
+- `ComposerState` mutation methods (`AddStep`, `RemoveStep`, `MoveStep`, `Clear`) need updating to carry the new fields; `FeatureText` cache invalidation is already handled by `Notify()`.
+
+---
+
 ## Open Questions
 
 | # | Question | Owner | Blocking? |

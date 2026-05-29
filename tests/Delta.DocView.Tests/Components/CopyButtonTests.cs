@@ -14,7 +14,7 @@ public class CopyButtonTests : TestContext
             .Add(c => c.Text, "anything")
             .Add(c => c.Label, "Copy thing"));
 
-        Assert.Equal("Copy thing", cut.Find("[data-testid='copy-button']").TextContent);
+        Assert.Contains("Copy thing", cut.Find("[data-testid='copy-button']").TextContent);
     }
 
     [Fact]

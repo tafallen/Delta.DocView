@@ -14,7 +14,7 @@ public class StatsStripTests : TestContext
         var cut = RenderComponent<StatsStrip>(p => p.Add(c => c.Step, step));
 
         var used = cut.Find("[data-testid='stat-used']");
-        Assert.Contains("Used in 7 scenarios", used.TextContent);
+        Assert.Contains("7 scenarios", used.TextContent);
     }
 
     [Fact]

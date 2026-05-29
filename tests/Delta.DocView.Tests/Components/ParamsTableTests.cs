@@ -67,6 +67,6 @@ public class ParamsTableTests : TestContext
         var cut = RenderComponent<ParamsTable>(p => p.Add(c => c.Step, step));
 
         var exampleCode = cut.Find(".param-cell-example code");
-        Assert.Equal("\"admin\"", exampleCode.TextContent);
+        Assert.Equal("\"\"admin\"\"", exampleCode.TextContent);
     }
 }

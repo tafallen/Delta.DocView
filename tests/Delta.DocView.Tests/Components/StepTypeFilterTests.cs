@@ -66,9 +66,9 @@ public class StepTypeFilterTests
         var cut = ctx.RenderComponent<StepTypeFilter>();
 
         var buttons = cut.FindAll("button.step-type");
-        Assert.Equal("3", buttons[0].QuerySelector(".count")!.TextContent);
-        Assert.Equal("2", buttons[1].QuerySelector(".count")!.TextContent);
-        Assert.Equal("1", buttons[2].QuerySelector(".count")!.TextContent);
+        Assert.Equal("3", buttons[0].QuerySelector(".step-type-count")!.TextContent);
+        Assert.Equal("2", buttons[1].QuerySelector(".step-type-count")!.TextContent);
+        Assert.Equal("1", buttons[2].QuerySelector(".step-type-count")!.TextContent);
     }
 
     [Fact]

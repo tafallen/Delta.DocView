@@ -112,7 +112,7 @@ public class RelatedStepsTests
 
         var text = cut.Find(".related-pattern").TextContent;
         Assert.EndsWith("…", text);
-        Assert.Equal(60, text.Length);
+        Assert.Equal(50, text.Length);
     }
 
     [Fact]

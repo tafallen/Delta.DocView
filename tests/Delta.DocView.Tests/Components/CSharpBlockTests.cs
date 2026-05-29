@@ -13,7 +13,9 @@ public class CSharpBlockTests : TestContext
         var cut = RenderComponent<CSharpBlock>(p => p.Add(c => c.Source, "public void Foo()"));
 
         Assert.Empty(cut.FindAll("[data-testid='cs-source']"));
-        Assert.Contains("▸ Show", cut.Find("[data-testid='cs-toggle']").TextContent);
+        var toggleText = cut.Find("[data-testid='cs-toggle']").TextContent;
+        Assert.Contains("▸", toggleText);
+        Assert.Contains("C# step definition", toggleText);
     }
 
     [Fact]
@@ -26,7 +28,9 @@ public class CSharpBlockTests : TestContext
         cut.Find("[data-testid='cs-toggle']").Click();
 
         Assert.NotEmpty(cut.FindAll("[data-testid='cs-source']"));
-        Assert.Contains("▾ Hide", cut.Find("[data-testid='cs-toggle']").TextContent);
+        var toggleText = cut.Find("[data-testid='cs-toggle']").TextContent;
+        Assert.Contains("▾", toggleText);
+        Assert.Contains("C# step definition", toggleText);
     }
 
     [Fact]
@@ -40,7 +44,9 @@ public class CSharpBlockTests : TestContext
         cut.Find("[data-testid='cs-toggle']").Click();
 
         Assert.Empty(cut.FindAll("[data-testid='cs-source']"));
-        Assert.Contains("▸ Show", cut.Find("[data-testid='cs-toggle']").TextContent);
+        var toggleText = cut.Find("[data-testid='cs-toggle']").TextContent;
+        Assert.Contains("▸", toggleText);
+        Assert.Contains("C# step definition", toggleText);
     }
 
     [Fact]

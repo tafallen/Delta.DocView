@@ -76,7 +76,8 @@ public class StepRowTests
         using var _c = ctx;
         var cut = ctx.RenderComponent<StepRow>(p => p.Add(x => x.Step, MakeStep(tags: new[] { "a", "b", "c" })));
 
-        Assert.Equal("a · b · c", cut.Find(".step-tags").TextContent);
+        var pills = cut.FindAll(".step-tags-row .tag-pill");
+        Assert.Equal(new[] { "a", "b", "c" }, pills.Select(p => p.TextContent).ToArray());
     }
 
     [Fact]
@@ -86,7 +87,8 @@ public class StepRowTests
         using var _c = ctx;
         var cut = ctx.RenderComponent<StepRow>(p => p.Add(x => x.Step, MakeStep(tags: new[] { "a", "b", "c", "d", "e" })));
 
-        Assert.Equal("a · b · c +2", cut.Find(".step-tags").TextContent);
+        var pills = cut.FindAll(".step-tags-row .tag-pill");
+        Assert.Equal(new[] { "a", "b", "c", "+2" }, pills.Select(p => p.TextContent).ToArray());
     }
 
     [Fact]

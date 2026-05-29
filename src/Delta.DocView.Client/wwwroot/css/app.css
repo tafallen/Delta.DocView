@@ -71,9 +71,6 @@
   --text:       #f2f1f2;
   --text-muted: #908f90;
 
-  --accent-500: #f4823f;
-  --accent-100: oklch(0.34 0.06 55);
-
   --chip-given-bg: oklch(0.34 0.06 55);
   --chip-given-fg: oklch(0.86 0.09 60);
   --chip-when-bg:  oklch(0.33 0.06 245);
@@ -91,6 +88,25 @@
   --syntax-string:  #4ade80;   /* lighter green */
   --syntax-comment: #94a3b8;   /* lighter slate — critical: was near-invisible */
   --syntax-number:  #fbbf24;   /* lighter amber */
+}
+
+/* ── Per-accent dark overrides ───────────────────────────────────── */
+[data-dark="true"][data-accent="orange"],
+[data-dark="true"]:not([data-accent]),
+[data-dark="true"][data-accent=""] {
+  --accent-500: #f4823f;
+  --accent-600: oklch(0.58 0.18 48);
+  --accent-100: oklch(0.34 0.06 55);
+}
+[data-dark="true"][data-accent="blue"] {
+  --accent-500: oklch(0.72 0.20 240);
+  --accent-600: oklch(0.62 0.18 240);
+  --accent-100: oklch(0.30 0.08 240);
+}
+[data-dark="true"][data-accent="violet"] {
+  --accent-500: oklch(0.72 0.18 290);
+  --accent-600: oklch(0.62 0.16 290);
+  --accent-100: oklch(0.30 0.07 290);
 }
 
 /* ── Accent variants ──────────────────────────────────────────────── */

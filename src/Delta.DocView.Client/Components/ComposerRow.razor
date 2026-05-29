@@ -10,6 +10,27 @@
           aria-hidden="true">⠿</span>
     <span class="composer-keyword">@Keyword</span>
     <span class="composer-row-pattern">@Item.Step.Pattern</span>
+    @if (Item.ParamValues.Count > 0)
+    {
+        <div class="composer-row-values" data-testid="composer-row-values">
+            @for (var pi = 0; pi < Item.ParamValues.Count; pi++)
+            {
+                var capturedPi = pi;
+                var label = (pi < Item.Step.Params.Count)
+                    ? (Item.Step.Params[pi].Name ?? Item.Step.Params[pi].Type)
+                    : $"param {pi + 1}";
+                <label class="composer-value-label">
+                    <span class="composer-value-name" aria-hidden="true">@label</span>
+                    <input class="composer-value-input"
+                           type="text"
+                           aria-label="@label value"
+                           data-testid="param-value-input"
+                           value="@Item.ParamValues[capturedPi]"
+                           @oninput="e => OnParamValueChanged.InvokeAsync((capturedPi, e.Value?.ToString() ?? string.Empty))" />
+                </label>
+            }
+        </div>
+    }
     <div class="composer-row-actions">
         <button class="composer-row-btn"
                 type="button"
@@ -53,4 +74,5 @@
     [Parameter] public EventCallback OnDragStart { get; set; }
     [Parameter] public EventCallback OnDragEnd { get; set; }
     [Parameter] public EventCallback OnDrop { get; set; }
+    [Parameter] public EventCallback<(int Index, string Value)> OnParamValueChanged { get; set; }
 }

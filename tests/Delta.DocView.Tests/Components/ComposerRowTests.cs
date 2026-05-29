@@ -79,4 +79,64 @@ public class ComposerRowTests : TestContext
 
         Assert.Contains("is-drag", cut.Markup);
     }
+
+    [Fact]
+    public void Renders_Value_Input_Per_Param()
+    {
+        var step = new Step
+        {
+            Id = "s-param", Type = "Given",
+            Pattern = "I am {actor : string}",
+            Domain = "Auth", File = "T.cs", Line = 1,
+            Params = [new StepParam { Name = "actor", Type = "string", Example = "admin" }]
+        };
+        var item = new ComposerItem(Guid.NewGuid(), step, ["admin"]);
+
+        var cut = RenderComponent<ComposerRow>(p => p
+            .Add(c => c.Item, item)
+            .Add(c => c.Keyword, "Given")
+            .Add(c => c.OnRemove, EventCallback.Empty)
+            .Add(c => c.OnNavigate, EventCallback.Empty));
+
+        var inputs = cut.FindAll("[data-testid='param-value-input']");
+        Assert.Single(inputs);
+        Assert.Equal("admin", inputs[0].GetAttribute("value"));
+    }
+
+    [Fact]
+    public void No_Params_Renders_No_Inputs()
+    {
+        var cut = RenderComponent<ComposerRow>(p => p
+            .Add(c => c.Item, MakeItem())
+            .Add(c => c.Keyword, "Given")
+            .Add(c => c.OnRemove, EventCallback.Empty)
+            .Add(c => c.OnNavigate, EventCallback.Empty));
+
+        Assert.Empty(cut.FindAll("[data-testid='param-value-input']"));
+    }
+
+    [Fact]
+    public void Input_Change_Fires_OnParamValueChanged()
+    {
+        var step = new Step
+        {
+            Id = "s-cb", Type = "Given",
+            Pattern = "I am {actor : string}",
+            Domain = "Auth", File = "T.cs", Line = 1,
+            Params = [new StepParam { Name = "actor", Type = "string", Example = "admin" }]
+        };
+        var item = new ComposerItem(Guid.NewGuid(), step, ["admin"]);
+
+        (int idx, string val) captured = (-1, "");
+        var cut = RenderComponent<ComposerRow>(p => p
+            .Add(c => c.Item, item)
+            .Add(c => c.Keyword, "Given")
+            .Add(c => c.OnRemove, EventCallback.Empty)
+            .Add(c => c.OnNavigate, EventCallback.Empty)
+            .Add(c => c.OnParamValueChanged, (v) => captured = v));
+
+        cut.Find("[data-testid='param-value-input']").Input("hello");
+
+        Assert.Equal((0, "hello"), captured);
+    }
 }

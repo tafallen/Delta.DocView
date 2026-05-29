@@ -51,6 +51,7 @@ public sealed class TweaksStore
 
     public async Task InitializeAsync()
     {
+        // Idempotent: repeat calls no-op (App.razor awaits this once at boot).
         if (_initialized) return;
 
         try

@@ -61,16 +61,22 @@ public class LocalStorageFavouritesStoreTests
     }
 
     [Fact]
-    public async Task InitializeAsync_CalledTwice_Throws()
+    public async Task InitializeAsync_CalledTwice_IsNoOp()
     {
         var js = Substitute.For<IJSRuntime>();
         js.InvokeAsync<string>("docview.favourites.read", Arg.Any<object?[]?>())
-            .Returns(ValueTask.FromResult("[]"));
+            .Returns(ValueTask.FromResult("[\"a\",\"b\"]"));
 
         var store = new LocalStorageFavouritesStore(js);
         await store.InitializeAsync();
 
-        await Assert.ThrowsAsync<InvalidOperationException>(() => store.InitializeAsync());
+        // Second call must not throw, must not re-read from JS, and must leave state unchanged.
+        await store.InitializeAsync();
+
+        await js.Received(1).InvokeAsync<string>("docview.favourites.read", Arg.Any<object?[]?>());
+        Assert.True(store.Has("a"));
+        Assert.True(store.Has("b"));
+        Assert.Equal(2, store.Count);
     }
 
     [Fact]

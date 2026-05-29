@@ -24,8 +24,9 @@ namespace Delta.DocView.Client.Services;
 /// <b>Lifecycle contract.</b> <see cref="InitializeAsync"/> MUST complete before any
 /// <see cref="FavouritesStoreBase.Toggle"/> call. App.razor gates MainLayout rendering on
 /// <c>Task.WhenAll(LoadAsync, InitializeAsync)</c>. Refactoring the boot sequence
-/// requires preserving this invariant. A second call to <see cref="InitializeAsync"/>
-/// throws <see cref="InvalidOperationException"/>.
+/// requires preserving this invariant. <see cref="InitializeAsync"/> is idempotent:
+/// a second call no-ops (it does not re-hydrate from JS or raise
+/// <see cref="FavouritesStoreBase.Changed"/>).
 /// </para>
 /// <para>
 /// <b>Persistence contract (mirrored in <c>docview.js</c>).</b>
@@ -54,7 +55,8 @@ public sealed class LocalStorageFavouritesStore : FavouritesStoreBase
 
     public override async Task InitializeAsync()
     {
-        if (_initialized) throw new InvalidOperationException("LocalStorageFavouritesStore.InitializeAsync called more than once.");
+        // Idempotent: repeat calls no-op (App.razor awaits this once at boot).
+        if (_initialized) return;
 
         try
         {

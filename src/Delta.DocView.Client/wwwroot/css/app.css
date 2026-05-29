@@ -1051,3 +1051,34 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   gap: 8px;
   justify-content: flex-end;
 }
+
+/* ── Keyboard shortcuts overlay ───────────────────────────────────── */
+.shortcuts-backdrop {
+  position: fixed; inset: 0; z-index: 100;
+  background: rgba(65, 64, 66, 0.4);
+  display: flex; align-items: center; justify-content: center;
+}
+.shortcuts-dialog {
+  width: min(520px, 92vw); max-height: 80vh; overflow-y: auto;
+  background: var(--bg); color: var(--text);
+  border: 1px solid var(--border); border-radius: .5rem;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+  padding: 1.25rem 1.5rem; font-family: var(--font-sans);
+}
+.shortcuts-title { font-size: 1.05rem; margin: 0 0 1rem; }
+.shortcuts-list { display: flex; flex-direction: column; gap: .5rem; margin: 0; }
+.shortcut-row { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.shortcut-label { font-size: .9rem; }
+.shortcut-keys { display: flex; align-items: center; gap: .35rem; margin: 0; }
+.shortcut-or { font-size: .75rem; opacity: .6; }
+.shortcut-keys kbd {
+  background: var(--bg-panel, rgba(0,0,0,0.05));
+  border: 1px solid var(--border); border-radius: .25rem;
+  padding: .1rem .4rem; font-family: var(--font-mono); font-size: .8rem;
+}
+.shortcuts-close {
+  margin-top: 1.25rem; height: 32px; padding: 0 14px;
+  border: 1px solid var(--border); border-radius: 6px;
+  background: var(--bg-rail); color: var(--text); cursor: pointer; font-size: .85rem;
+}
+.shortcuts-close:hover { background: var(--bg-panel); }

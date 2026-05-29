@@ -1,0 +1,71 @@
+@using Delta.DocView.Client.Services
+@inject ShortcutsState State
+@inject IPlatform Platform
+@inject IJSRuntime JS
+@implements IDisposable
+
+@if (State.IsOpen)
+{
+    <div class="shortcuts-backdrop" data-testid="shortcuts-backdrop" @onclick="State.Close">
+        <div class="shortcuts-dialog" id="@_dialogId" data-testid="shortcuts-dialog"
+             role="dialog" aria-modal="true" aria-label="Keyboard shortcuts"
+             @onclick:stopPropagation="true" @onkeydown="OnKey">
+            <h2 class="shortcuts-title">Keyboard shortcuts</h2>
+            <dl class="shortcuts-list">
+                @foreach (var s in _shortcuts)
+                {
+                    <div class="shortcut-row" data-testid="shortcut-row">
+                        <dt class="shortcut-label">@s.Label</dt>
+                        <dd class="shortcut-keys">
+                            @for (var i = 0; i < s.Keys.Count; i++)
+                            {
+                                @if (i > 0)
+                                {
+                                    <span class="shortcut-or">or</span>
+                                }
+                                <kbd>@s.Keys[i]</kbd>
+                            }
+                        </dd>
+                    </div>
+                }
+            </dl>
+            <button class="shortcuts-close" data-testid="shortcuts-close"
+                    type="button" @onclick="State.Close" aria-label="Close">Close</button>
+        </div>
+    </div>
+}
+
+@code {
+    private IReadOnlyList<Shortcut> _shortcuts = [];
+    private string _dialogId = "";
+    private bool _wasOpen;
+
+    protected override void OnInitialized()
+    {
+        _shortcuts = ShortcutDefinitions.For(Platform);
+        _dialogId = "shortcuts-dialog-" + Guid.NewGuid().ToString("N")[..8];
+        State.Changed += OnChanged;
+    }
+
+    private void OnChanged() => InvokeAsync(StateHasChanged);
+
+    private void OnKey(Microsoft.AspNetCore.Components.Web.KeyboardEventArgs e)
+    {
+        if (e.Key == "Escape") State.Close();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (State.IsOpen && !_wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focusTrap.activate", _dialogId); } catch { }
+        }
+        else if (!State.IsOpen && _wasOpen)
+        {
+            try { await JS.InvokeVoidAsync("docview.focusTrap.deactivate"); } catch { }
+        }
+        _wasOpen = State.IsOpen;
+    }
+
+    public void Dispose() => State.Changed -= OnChanged;
+}

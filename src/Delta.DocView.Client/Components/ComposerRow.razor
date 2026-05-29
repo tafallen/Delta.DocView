@@ -13,6 +13,20 @@
     <div class="composer-row-actions">
         <button class="composer-row-btn"
                 type="button"
+                title="Move step up"
+                aria-label="Move step up"
+                data-testid="move-up"
+                disabled="@(!CanMoveUp)"
+                @onclick="OnMoveUp">▲</button>
+        <button class="composer-row-btn"
+                type="button"
+                title="Move step down"
+                aria-label="Move step down"
+                data-testid="move-down"
+                disabled="@(!CanMoveDown)"
+                @onclick="OnMoveDown">▼</button>
+        <button class="composer-row-btn"
+                type="button"
                 title="Go to step"
                 aria-label="Navigate to step"
                 data-testid="row-navigate"
@@ -32,6 +46,10 @@
     [Parameter] public bool IsDragging { get; set; }
     [Parameter] public EventCallback OnRemove { get; set; }
     [Parameter] public EventCallback OnNavigate { get; set; }
+    [Parameter] public EventCallback OnMoveUp { get; set; }
+    [Parameter] public EventCallback OnMoveDown { get; set; }
+    [Parameter] public bool CanMoveUp { get; set; }
+    [Parameter] public bool CanMoveDown { get; set; }
     [Parameter] public EventCallback OnDragStart { get; set; }
     [Parameter] public EventCallback OnDragEnd { get; set; }
     [Parameter] public EventCallback OnDrop { get; set; }

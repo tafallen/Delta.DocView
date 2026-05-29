@@ -44,9 +44,14 @@
                             var item = Composer.Steps[i];
                             var keyword = FeatureTextBuilder.GetKeyword(i, Composer.Steps);
                             var capturedId = item.Id;
+                            var capturedIndex = i;
                             <ComposerRow Item="@item"
                                          Keyword="@keyword"
                                          IsDragging="@(_draggingId == item.Id)"
+                                         CanMoveUp="@(capturedIndex > 0)"
+                                         CanMoveDown="@(capturedIndex < Composer.Steps.Count - 1)"
+                                         OnMoveUp="@(() => Composer.MoveStep(capturedId, capturedIndex - 1))"
+                                         OnMoveDown="@(() => Composer.MoveStep(capturedId, capturedIndex + 1))"
                                          OnRemove="@(() => Composer.RemoveStep(capturedId))"
                                          OnNavigate="@(() => Selection.Select(item.Step))"
                                          OnDragStart="@(() => _draggingId = capturedId)"

@@ -219,6 +219,63 @@ public class ScenarioComposerTests : TestContext
     }
 
     [Fact]
+    public void MoveDown_Button_Reorders_Step()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        composer.AddStep(MakeStep("C"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        cut.FindAll(".composer-row")[0].QuerySelector("[data-testid='move-down']")!.Click();
+
+        Assert.Equal(
+            new[] { "B", "A", "C" },
+            composer.Steps.Select(s => s.Step.Id).ToArray());
+    }
+
+    [Fact]
+    public void MoveUp_Button_Reorders_Step()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        composer.AddStep(MakeStep("C"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        cut.FindAll(".composer-row")[2].QuerySelector("[data-testid='move-up']")!.Click();
+
+        Assert.Equal(
+            new[] { "A", "C", "B" },
+            composer.Steps.Select(s => s.Step.Id).ToArray());
+    }
+
+    [Fact]
+    public void MoveUp_Disabled_On_First_Row()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        var btn = cut.FindAll(".composer-row")[0].QuerySelector("[data-testid='move-up']")!;
+        Assert.True(btn.HasAttribute("disabled"));
+    }
+
+    [Fact]
+    public void MoveDown_Disabled_On_Last_Row()
+    {
+        var composer = MakeComposer();
+        composer.AddStep(MakeStep("A"));
+        composer.AddStep(MakeStep("B"));
+        var cut = RenderComponent<ScenarioComposer>();
+
+        var rows = cut.FindAll(".composer-row");
+        var btn = rows[rows.Count - 1].QuerySelector("[data-testid='move-down']")!;
+        Assert.True(btn.HasAttribute("disabled"));
+    }
+
+    [Fact]
     public void ScenarioComposer_SaveClick_Invokes_SaveTextFile_With_Filename_And_Content()
     {
         var composer = MakeComposer();

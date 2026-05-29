@@ -187,5 +187,24 @@ window.docview = {
                 this._ref = null;
             }
         }
+    },
+    // Storage key 'docview.tweaks.v1' is the contract with TweaksStore.cs.
+    // Payload: JSON { dark, accent, density, rowEmphasis, source }. Bump key suffix on schema change.
+    tweaks: {
+        read: function () {
+            try { return window.localStorage.getItem('docview.tweaks.v1') || ''; }
+            catch (e) { console.warn('docview.tweaks.read failed', e); return ''; }
+        },
+        write: function (json) {
+            try { window.localStorage.setItem('docview.tweaks.v1', json); }
+            catch (e) { console.warn('docview.tweaks.write failed', e); }
+        },
+        applyRoot: function (dark, accent, density, rowEmphasis) {
+            var r = document.documentElement;
+            r.setAttribute('data-dark', dark ? 'true' : 'false');
+            r.setAttribute('data-accent', accent || 'orange');
+            r.setAttribute('data-density', density || 'comfortable');
+            r.setAttribute('data-row-emphasis', rowEmphasis || 'pattern');
+        }
     }
 };

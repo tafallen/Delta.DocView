@@ -22,5 +22,6 @@ builder.Services.AddScoped<PaletteState>();
 builder.Services.AddScoped<ShortcutsState>();
 builder.Services.AddScoped<ComposerState>();
 builder.Services.AddScoped<IPlatform, PlatformService>();
+builder.Services.AddScoped<TweaksStore>();
 
 await builder.Build().RunAsync();

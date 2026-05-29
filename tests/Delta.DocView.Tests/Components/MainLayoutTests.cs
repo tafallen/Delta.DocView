@@ -34,6 +34,7 @@ public class MainLayoutTests : TestContext
         Services.AddSingleton<PaletteState>();
         Services.AddSingleton<ComposerState>();
         Services.AddSingleton(_ => Substitute.For<IPlatform>());
+        Services.AddSingleton<ShortcutsState>();
         JSInterop.Mode = JSRuntimeMode.Loose;
         JSInterop.SetupVoid("docview.setDark", _ => true);
     }

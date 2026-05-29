@@ -52,6 +52,7 @@ public class AppTests
         ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped<ComposerState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
+        ctx.Services.AddScoped<ShortcutsState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var cut = ctx.RenderComponent<Delta.DocView.Client.App>();
@@ -110,6 +111,7 @@ public class AppTests
         ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped<ComposerState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
+        ctx.Services.AddScoped<ShortcutsState>();
         return ctx;
     }
 

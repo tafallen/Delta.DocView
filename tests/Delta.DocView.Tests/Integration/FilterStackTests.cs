@@ -100,6 +100,7 @@ public class FilterStackTests
         ctx.Services.AddScoped<ComposerState>();
         ctx.Services.AddScoped<PaletteState>();
         ctx.Services.AddScoped(_ => Substitute.For<IPlatform>());
+        ctx.Services.AddScoped<ShortcutsState>();
         ctx.JSInterop.Mode = JSRuntimeMode.Loose;
 
         var state = ctx.Services.GetRequiredService<FilterState>();
@@ -839,6 +840,99 @@ public class FilterStackTests
                 Assert.NotEmpty(results);
                 Assert.Equal("g3", results[0].GetAttribute("data-step-id"));
             },
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Shortcuts_Opens_When_KeyboardHandler_Receives_OpenShortcuts()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var overlay = ctx.RenderComponent<ShortcutsOverlay>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        ctx.RenderComponent<Header>();
+
+        keyboard.Instance.OnKey("open-shortcuts");
+
+        overlay.WaitForAssertion(
+            () => Assert.Single(overlay.FindAll("[data-testid='shortcuts-dialog']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Shortcuts_Opens_When_Header_Button_Clicked()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var overlay = ctx.RenderComponent<ShortcutsOverlay>();
+        ctx.RenderComponent<KeyboardHandler>();
+        var header = ctx.RenderComponent<Header>();
+
+        header.Find("[data-testid='shortcuts-button']").Click();
+
+        overlay.WaitForAssertion(
+            () => Assert.Single(overlay.FindAll("[data-testid='shortcuts-dialog']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Shortcuts_Escape_On_Dialog_Closes()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var overlay = ctx.RenderComponent<ShortcutsOverlay>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        ctx.RenderComponent<Header>();
+
+        keyboard.Instance.OnKey("open-shortcuts");
+
+        overlay.WaitForAssertion(
+            () => Assert.Single(overlay.FindAll("[data-testid='shortcuts-dialog']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        overlay.Find("[data-testid='shortcuts-dialog']")
+               .KeyDown(new KeyboardEventArgs { Key = "Escape" });
+
+        overlay.WaitForAssertion(
+            () => Assert.Empty(overlay.FindAll("[data-testid='shortcuts-dialog']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Shortcuts_Backdrop_Click_Closes()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var overlay = ctx.RenderComponent<ShortcutsOverlay>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        ctx.RenderComponent<Header>();
+
+        keyboard.Instance.OnKey("open-shortcuts");
+
+        overlay.WaitForAssertion(
+            () => Assert.Single(overlay.FindAll("[data-testid='shortcuts-dialog']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+
+        overlay.Find("[data-testid='shortcuts-backdrop']").Click();
+
+        overlay.WaitForAssertion(
+            () => Assert.Empty(overlay.FindAll("[data-testid='shortcuts-dialog']")),
+            timeout: TimeSpan.FromMilliseconds(500));
+    }
+
+    [Fact]
+    public void Shortcuts_Lists_Seven_Shortcuts()
+    {
+        var (ctx, _, _, _) = NewContext();
+        using var _d = ctx;
+        var overlay = ctx.RenderComponent<ShortcutsOverlay>();
+        var keyboard = ctx.RenderComponent<KeyboardHandler>();
+        ctx.RenderComponent<Header>();
+
+        keyboard.Instance.OnKey("open-shortcuts");
+
+        overlay.WaitForAssertion(
+            () => Assert.Equal(7, overlay.FindAll("[data-testid='shortcut-row']").Count),
             timeout: TimeSpan.FromMilliseconds(500));
     }
 }

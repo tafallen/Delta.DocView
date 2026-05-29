@@ -209,7 +209,6 @@ window.docview = {
             try {
                 if (this._mqlListener) return; // idempotent — already watching
                 this._mql = window.matchMedia('(prefers-color-scheme: dark)');
-                var self = this;
                 this._mqlListener = function (e) {
                     dotNetRef.invokeMethodAsync('OnOsColorSchemeChanged', e.matches);
                 };

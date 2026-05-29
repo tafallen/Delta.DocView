@@ -111,6 +111,7 @@ public sealed class TweaksStore : IDisposable
 
     public void SetDark(bool value)
     {
+        if (FollowOs) SetFollowOs(false);   // manual override clears Follow OS
         if (value == Dark) return;
         Dark = value;
         _ = PersistAsync();

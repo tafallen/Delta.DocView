@@ -351,6 +351,19 @@ public class TweaksStoreTests
         Assert.True(store.Dark); // immediately reflects OS preference (true)
     }
 
+    [Fact]
+    public async Task SetDark_WhenFollowOs_ClearsFollowOs()
+    {
+        var js = new RecordingJsRuntime { ReadResponse = "" };
+        var store = new TweaksStore(js);
+        await store.InitializeAsync();
+        store.SetFollowOs(true);
+
+        store.SetDark(false);
+
+        Assert.False(store.FollowOs);
+    }
+
     /// <summary>
     /// Hand-rolled <see cref="IJSRuntime"/> stub: returns a preset string for
     /// <c>docview.tweaks.read</c>, a bool for <c>docview.prefersDark</c>, and records

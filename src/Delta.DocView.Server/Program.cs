@@ -1,3 +1,4 @@
+using Delta.DocView.Server.Auth;
 using Delta.DocView.Server.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +13,8 @@ builder.Services.AddSingleton<IStepLibraryStore>(sp => sp.GetRequiredService<Ste
 // Loader/validator are stateless — register so startup resolves them from DI
 builder.Services.AddSingleton<StepLibraryLoader>();
 builder.Services.AddSingleton<StepLibraryValidator>();
+
+builder.AddDocViewAuth();
 
 var app = builder.Build();
 
@@ -46,6 +49,8 @@ else
 app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 app.MapFallbackToFile("index.html");
 

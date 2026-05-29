@@ -1,8 +1,10 @@
 using Delta.DocView.Server.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Delta.DocView.Server.Controllers;
 
+[AllowAnonymous]
 [ApiController]
 [Route("[controller]")]
 public sealed class HealthController : ControllerBase

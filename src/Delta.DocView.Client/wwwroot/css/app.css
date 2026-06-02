@@ -643,7 +643,7 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   font-family: var(--font-mono);
   font-size: .82rem; line-height: 1.6; margin: .5rem 0 0;
   border: 1px solid var(--border);
-  white-space: pre-wrap; word-break: break-all;
+  white-space: pre-wrap; overflow-wrap: anywhere;
   max-height: none; height: auto;
 }
 .cs-kw      { color: var(--syntax-kw);      font-weight: 600; }

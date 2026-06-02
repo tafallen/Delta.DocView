@@ -116,7 +116,7 @@
         // Append DataTable column header + empty row for table params
         foreach (var p in Step.Params.Where(param => param.HasTable && param.Columns.Count > 0))
         {
-            sb.Append(FeatureTextBuilder.AppendTableRows(p.Columns.Select(c => c.Name), indent: "  "));
+            sb.Append(FeatureTextBuilder.AppendTableRows(p.Columns.Select(c => c.Name)));
         }
         _composed = sb.ToString();
     }

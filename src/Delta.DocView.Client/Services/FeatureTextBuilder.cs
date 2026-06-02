@@ -4,6 +4,9 @@ namespace Delta.DocView.Client.Services;
 
 public static class FeatureTextBuilder
 {
+    /// <summary>Indent prepended to each DataTable row relative to the file root.
+    /// 6 spaces = 4 (step) + 2 (table under step) in a standard SpecFlow .feature.</summary>
+    private const string TableIndent = "      ";
     public static string GetKeyword(int index, IReadOnlyList<ComposerItem> items)
     {
         var type = items[index].Step.Type;
@@ -47,7 +50,7 @@ public static class FeatureTextBuilder
         // Append DataTable column header + empty data row for table-typed params
         foreach (var p in item.Step.Params.Where(param => param.HasTable && param.Columns.Count > 0))
         {
-            sb.Append(AppendTableRows(p.Columns.Select(c => c.Name), indent: "      "));
+            sb.Append(AppendTableRows(p.Columns.Select(c => c.Name)));
         }
 
         return sb.ToString();
@@ -59,12 +62,12 @@ public static class FeatureTextBuilder
     ///   |      |      |
     /// Returns the string with a leading newline so it can be appended directly.
     /// </summary>
-    public static string AppendTableRows(IEnumerable<string> columns, string indent = "      ")
+    public static string AppendTableRows(IEnumerable<string> columns, string indent = TableIndent)
     {
         var cols = columns.ToList();
         if (cols.Count == 0) return "";
         var header = $"\n{indent}| {string.Join(" | ", cols)} |";
-        var emptyRow = $"\n{indent}| {string.Join(" | ", cols.Select(_ => ""))} |";
+        var emptyRow = $"\n{indent}| {string.Join(" | ", cols.Select(_ => "  "))} |";
         return header + emptyRow;
     }
 }

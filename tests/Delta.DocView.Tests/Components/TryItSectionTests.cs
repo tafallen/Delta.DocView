@@ -240,4 +240,55 @@ public class TryItSectionTests : TestContext
 
         Assert.Empty(cut.FindAll("input"));
     }
+
+    // ── Hybrid step: inline token AND DataTable param ────────────────────────
+
+    private static Step MakeHybridStep() => new()
+    {
+        Id = "hybrid1", Type = "Given",
+        Pattern = "I am {actor : string} in the following trades",
+        Domain = "Core", File = "T.cs", Line = 1,
+        Params =
+        [
+            new StepParam { Name = "actor", Type = "string", Example = "admin" },
+            new StepParam
+            {
+                Name = "trades", Type = "table",
+                ColumnsSource = "declared",
+                Columns = [new TableColumn { Name = "Notional", Type = "string" },
+                           new TableColumn { Name = "Currency", Type = "string" }]
+            }
+        ]
+    };
+
+    [Fact]
+    public void Hybrid_Step_With_Table_And_Inline_Param_Shows_DataTable_Note_And_Inputs()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, MakeHybridStep()));
+
+        // DataTable note must be present
+        Assert.NotEmpty(cut.FindAll("[data-testid='try-it-datatable']"));
+
+        // Exactly one input for the inline {actor} token
+        var inputs = cut.FindAll("input");
+        Assert.Single(inputs);
+
+        // No mismatch banner — everything is accounted for
+        Assert.Empty(cut.FindAll("[data-testid='try-it-mismatch']"));
+    }
+
+    [Fact]
+    public void All_Table_Step_No_Mismatch_No_Inputs_Regression()
+    {
+        // Regression guard: the all-table case must still work after the Any() refactor.
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, MakeTableStep()));
+
+        Assert.NotEmpty(cut.FindAll("[data-testid='try-it-datatable']"));
+        Assert.Empty(cut.FindAll("[data-testid='try-it-mismatch']"));
+        Assert.Empty(cut.FindAll("input"));
+    }
 }

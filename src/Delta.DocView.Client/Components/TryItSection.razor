@@ -78,10 +78,18 @@
             .ToList();
         _expectedParamCount = _paramIndices.Count;
         _actualParamCount = Step.Params.Count;
-        // A step is a "table step" when all its params are DataTable params and there are
-        // no inline {token} slots — the mismatch is expected and informative, not an error.
-        _isTableStep = Step.Params.Count > 0 && Step.Params.All(p => p.HasTable) && _paramIndices.Count == 0;
-        _hasMismatch = !_isTableStep && _expectedParamCount != _actualParamCount;
+
+        var anyTableParam = Step.Params.Any(p => p.HasTable);
+        var inlineParamCount = Step.Params.Count(p => !p.HasTable);
+
+        // Show the DataTable note whenever the step has any table param (including hybrid steps
+        // that also have inline {token} params).
+        _isTableStep = anyTableParam;
+
+        // Only flag a mismatch if the inline-token count diverges from non-table param count
+        // (table params have no inline token — that's expected, not a mismatch).
+        _hasMismatch = _paramIndices.Count != inlineParamCount
+                       && !(anyTableParam && inlineParamCount == 0 && _paramIndices.Count == 0);
         _inputs = new string[_paramIndices.Count];
         for (var i = 0; i < _paramIndices.Count; i++)
         {

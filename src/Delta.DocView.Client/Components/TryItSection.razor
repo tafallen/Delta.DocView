@@ -6,7 +6,13 @@
         <span class="detail-section-title">Try it</span>
         <span class="try-it-hint">edit the values to see the resulting Gherkin line</span>
     </div>
-    @if (_hasMismatch)
+    @if (_isTableStep)
+    {
+        <div class="try-it-datatable-note" data-testid="try-it-datatable" role="note">
+            📋 This step accepts a <strong>DataTable</strong>. The step keyword is ready to copy below — add the data table rows directly in your <code>.feature</code> file.
+        </div>
+    }
+    else if (_hasMismatch)
     {
         <div class="try-it-mismatch" data-testid="try-it-mismatch" role="alert">
             ⚠ This step has @_expectedParamCount parameter @(_expectedParamCount == 1 ? "token" : "tokens") in its pattern but @_actualParamCount @(_actualParamCount == 1 ? "param" : "params") defined. The composed line below may be incomplete.
@@ -53,6 +59,7 @@
     private string _composed = "";
     private string _uid = "";
     private bool _hasMismatch;
+    private bool _isTableStep;
     private int _expectedParamCount;
     private int _actualParamCount;
 
@@ -71,7 +78,10 @@
             .ToList();
         _expectedParamCount = _paramIndices.Count;
         _actualParamCount = Step.Params.Count;
-        _hasMismatch = _expectedParamCount != _actualParamCount;
+        // A step is a "table step" when all its params are DataTable params and there are
+        // no inline {token} slots — the mismatch is expected and informative, not an error.
+        _isTableStep = Step.Params.Count > 0 && Step.Params.All(p => p.HasTable) && _paramIndices.Count == 0;
+        _hasMismatch = !_isTableStep && _expectedParamCount != _actualParamCount;
         _inputs = new string[_paramIndices.Count];
         for (var i = 0; i < _paramIndices.Count; i++)
         {

@@ -638,10 +638,13 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
 .cs-toggle-file { font-size: .78rem; color: var(--text-muted); font-family: var(--font-mono); }
 .cs-source {
   background: var(--bg-panel);
-  padding: .75rem; border-radius: .35rem; overflow-x: auto;
+  padding: .75rem; border-radius: .35rem;
+  overflow-x: auto; overflow-y: visible;
   font-family: var(--font-mono);
   font-size: .82rem; line-height: 1.6; margin: .5rem 0 0;
   border: 1px solid var(--border);
+  white-space: pre-wrap; word-break: break-all;
+  max-height: none; height: auto;
 }
 .cs-kw      { color: var(--syntax-kw);      font-weight: 600; }
 .cs-string  { color: var(--syntax-string);             }
@@ -1173,3 +1176,21 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   font-size: .7rem; font-weight: 600; vertical-align: middle;
 }
 .param-table-cols { font-size: .78rem; opacity: .8; font-style: italic; }
+
+/* ── DataTable note in Try It + param columns sub-table ──────── */
+.try-it-datatable-note {
+  padding: .5rem .75rem; margin-bottom: .5rem;
+  background: var(--accent-100); border-radius: .3rem;
+  font-size: .85rem; line-height: 1.5;
+}
+.param-columns-table {
+  width: 100%; border-collapse: collapse; font-size: .8rem;
+}
+.param-columns-table th {
+  text-align: left; padding: .15rem .4rem;
+  font-size: .7rem; font-weight: 600; text-transform: uppercase;
+  letter-spacing: .04em; color: var(--text-muted);
+  border-bottom: 1px solid var(--border);
+}
+.param-columns-table td { padding: .2rem .4rem; }
+.param-columns-table tr + tr td { border-top: 1px solid var(--border-2, var(--border)); }

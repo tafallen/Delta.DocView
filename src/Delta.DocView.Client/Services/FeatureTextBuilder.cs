@@ -43,6 +43,28 @@ public static class FeatureTextBuilder
                 paramIdx++;
             }
         }
+
+        // Append DataTable column header + empty data row for table-typed params
+        foreach (var p in item.Step.Params.Where(param => param.HasTable && param.Columns.Count > 0))
+        {
+            sb.Append(AppendTableRows(p.Columns.Select(c => c.Name), indent: "      "));
+        }
+
         return sb.ToString();
+    }
+
+    /// <summary>
+    /// Builds a Gherkin DataTable block from the given column names:
+    ///   | Col1 | Col2 |
+    ///   |      |      |
+    /// Returns the string with a leading newline so it can be appended directly.
+    /// </summary>
+    public static string AppendTableRows(IEnumerable<string> columns, string indent = "      ")
+    {
+        var cols = columns.ToList();
+        if (cols.Count == 0) return "";
+        var header = $"\n{indent}| {string.Join(" | ", cols)} |";
+        var emptyRow = $"\n{indent}| {string.Join(" | ", cols.Select(_ => ""))} |";
+        return header + emptyRow;
     }
 }

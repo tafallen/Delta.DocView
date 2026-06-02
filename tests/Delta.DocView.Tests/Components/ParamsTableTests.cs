@@ -69,4 +69,71 @@ public class ParamsTableTests : TestContext
         var exampleCode = cut.Find(".param-cell-example code");
         Assert.Equal("\"\"admin\"\"", exampleCode.TextContent);
     }
+
+    // ── DataTable param sub-table ────────────────────────────────────────────
+
+    [Fact]
+    public void DataTable_Param_With_Columns_Renders_Column_Sub_Table()
+    {
+        var step = new Step
+        {
+            Params = new[]
+            {
+                new StepParam
+                {
+                    Name = "trades", Type = "table",
+                    ColumnsSource = "declared",
+                    Columns = [new TableColumn { Name = "Notional", Type = "string" },
+                               new TableColumn { Name = "Currency", Type = "string" }]
+                }
+            }
+        };
+
+        var cut = RenderComponent<ParamsTable>(p => p.Add(c => c.Step, step));
+
+        var subTable = cut.Find("[data-testid='param-table-cols']");
+        Assert.NotNull(subTable);
+        Assert.Contains("Notional", subTable.TextContent);
+        Assert.Contains("Currency", subTable.TextContent);
+    }
+
+    [Fact]
+    public void DataTable_Param_No_Columns_Shows_Badge_Only()
+    {
+        var step = new Step
+        {
+            Params = new[]
+            {
+                new StepParam
+                {
+                    Name = "rows", Type = "table",
+                    ColumnsSource = "declared",
+                    Columns = []
+                }
+            }
+        };
+
+        var cut = RenderComponent<ParamsTable>(p => p.Add(c => c.Step, step));
+
+        Assert.NotEmpty(cut.FindAll(".param-table-badge"));
+        Assert.Empty(cut.FindAll("[data-testid='param-table-cols']"));
+    }
+
+    [Fact]
+    public void Plain_Param_Shows_Example_Not_Sub_Table()
+    {
+        var step = new Step
+        {
+            Params = new[]
+            {
+                new StepParam { Name = "username", Type = "string", Example = "\"alice\"" }
+            }
+        };
+
+        var cut = RenderComponent<ParamsTable>(p => p.Add(c => c.Step, step));
+
+        var exampleCell = cut.Find(".param-cell-example");
+        Assert.Contains("alice", exampleCell.TextContent);
+        Assert.Empty(cut.FindAll("[data-testid='param-table-cols']"));
+    }
 }

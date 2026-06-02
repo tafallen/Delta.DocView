@@ -134,4 +134,67 @@ public class FeatureTextBuilderTests
         var result = FeatureTextBuilder.Build("Test", [item, itemAfter]);
         Assert.Contains("Given from London to ", result);
     }
+
+    // ── AppendTableRows ──────────────────────────────────────────────────────
+
+    [Fact]
+    public void AppendTableRows_ZeroColumns_ReturnsEmpty()
+        => Assert.Equal("", FeatureTextBuilder.AppendTableRows(Array.Empty<string>()));
+
+    [Fact]
+    public void AppendTableRows_SingleColumn_ProducesHeaderAndEmptyRow()
+    {
+        var result = FeatureTextBuilder.AppendTableRows(new[] { "Name" });
+        Assert.Contains("| Name |", result);
+        Assert.Equal(2, result.Split('\n').Length - 1); // leading \n + header + empty row
+    }
+
+    [Fact]
+    public void AppendTableRows_MultipleColumns_AllColumnsInHeader()
+    {
+        var result = FeatureTextBuilder.AppendTableRows(new[] { "Col1", "Col2", "Col3" });
+        Assert.Contains("| Col1 | Col2 | Col3 |", result);
+    }
+
+    [Fact]
+    public void AppendTableRows_EmptyDataRow_HasPaddedCells()
+    {
+        var result = FeatureTextBuilder.AppendTableRows(new[] { "A", "B" });
+        var lines = result.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+        // Second line is the empty data row; each empty cell should have at least one space
+        Assert.Contains("|  ", lines[^1]);
+    }
+
+    [Fact]
+    public void AppendTableRows_CustomIndent_AppliedToAllRows()
+    {
+        var result = FeatureTextBuilder.AppendTableRows(new[] { "X" }, "  ");
+        foreach (var line in result.Split('\n', StringSplitOptions.RemoveEmptyEntries))
+            Assert.StartsWith("  |", line);
+    }
+
+    [Fact]
+    public void Build_StepWithTableParam_IncludesTableBlock()
+    {
+        var step = new Step
+        {
+            Id = "s1", Type = "Given",
+            Pattern = "the following trades exist",
+            Domain = "Core", File = "T.cs", Line = 1,
+            Params =
+            [
+                new StepParam
+                {
+                    Name = "trades", Type = "table",
+                    ColumnsSource = "declared",
+                    Columns = [new TableColumn { Name = "Notional", Type = "string" },
+                               new TableColumn { Name = "Currency", Type = "string" }]
+                }
+            ]
+        };
+        var item = ComposerItem.From(step);
+        var result = FeatureTextBuilder.Build("My Scenario", [item]);
+        Assert.Contains("| Notional | Currency |", result);
+        Assert.Contains("Given the following trades exist", result);
+    }
 }

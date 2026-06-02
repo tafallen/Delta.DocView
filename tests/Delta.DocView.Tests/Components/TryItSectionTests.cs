@@ -189,4 +189,55 @@ public class TryItSectionTests : TestContext
         Assert.Equal("the system is ready", cut.Find("[data-testid='composed-line']").TextContent);
         Assert.NotNull(cut.Find("[data-testid='copy-button']"));
     }
+
+    // ── DataTable step branch ────────────────────────────────────────────────
+
+    private static Step MakeTableStep() => new()
+    {
+        Id = "st1", Type = "Given",
+        Pattern = "the following trades exist",
+        Domain = "Core", File = "T.cs", Line = 1,
+        Params =
+        [
+            new StepParam
+            {
+                Name = "trades", Type = "table",
+                ColumnsSource = "declared",
+                Columns = [new TableColumn { Name = "Notional", Type = "string" },
+                           new TableColumn { Name = "Currency", Type = "string" }]
+            }
+        ]
+    };
+
+    [Fact]
+    public void DataTable_Step_Shows_Datatable_Note_Not_Mismatch_Warning()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, MakeTableStep()));
+
+        Assert.NotEmpty(cut.FindAll("[data-testid='try-it-datatable']"));
+        Assert.Empty(cut.FindAll("[data-testid='try-it-mismatch']"));
+    }
+
+    [Fact]
+    public void DataTable_Step_Composed_Line_Includes_Table_Block()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, MakeTableStep()));
+
+        var composedText = cut.Find("[data-testid='composed-line']").TextContent;
+        Assert.Contains("| Notional | Currency |", composedText);
+    }
+
+    [Fact]
+    public void DataTable_Step_No_Inputs_Rendered()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+
+        var cut = RenderComponent<TryItSection>(p => p.Add(c => c.Step, MakeTableStep()));
+
+        Assert.Empty(cut.FindAll("input"));
+    }
 }

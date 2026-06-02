@@ -1164,3 +1164,12 @@ mark { background: var(--highlight-bg); padding: 0 0.1em; border-radius: 0.15em;
   min-width: 80px; max-width: 180px;
 }
 .composer-value-input:focus { outline: none; border-color: var(--accent-500); box-shadow: 0 0 0 2px var(--accent-100); }
+
+/* ── DataTable param badge ────────────────────────────────────── */
+.param-table-badge {
+  display: inline-block; margin-left: .3rem;
+  padding: .05rem .3rem; border-radius: .2rem;
+  background: var(--accent-100); color: var(--accent-600, #c25924);
+  font-size: .7rem; font-weight: 600; vertical-align: middle;
+}
+.param-table-cols { font-size: .78rem; opacity: .8; font-style: italic; }

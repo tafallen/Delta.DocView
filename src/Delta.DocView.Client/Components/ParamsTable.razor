@@ -13,8 +13,25 @@
                 {
                     <tr>
                         <td class="param-cell-name"><code>@p.Name</code></td>
-                        <td class="param-cell-type"><span class="param-type-chip param-@UiStrings.DisplayParamType(p.Type).ToLowerInvariant()">@UiStrings.DisplayParamType(p.Type)</span></td>
-                        <td class="param-cell-example"><code>"@p.Example"</code></td>
+                        <td class="param-cell-type">
+                            <span class="param-type-chip param-@UiStrings.DisplayParamType(p.Type).ToLowerInvariant()">@UiStrings.DisplayParamType(p.Type)</span>
+                            @if (p.HasTable)
+                            {
+                                <span class="param-table-badge" title="@(p.ColumnsSource is not null ? $"Columns from: {p.ColumnsSource}" : "DataTable")">table</span>
+                            }
+                        </td>
+                        <td class="param-cell-example">
+                            @if (p.HasTable && p.Columns.Count > 0)
+                            {
+                                <span class="param-table-cols" data-testid="param-table-cols">
+                                    @string.Join(", ", p.Columns.Select(c => c.Name))
+                                </span>
+                            }
+                            else
+                            {
+                                <code>"@p.Example"</code>
+                            }
+                        </td>
                     </tr>
                 }
             </tbody>

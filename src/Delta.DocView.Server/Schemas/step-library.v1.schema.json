@@ -55,7 +55,23 @@
             "properties": {
               "name":    { "type": "string", "minLength": 1 },
               "type":    { "type": "string" },
-              "example": { "type": "string" }
+              "example": { "type": "string" },
+              "columnsSource": {
+                "type": "string",
+                "enum": ["declared", "roslyn", "feature", "roslyn+feature", "declared+feature"]
+              },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "type"],
+                  "additionalProperties": false,
+                  "properties": {
+                    "name": { "type": "string", "minLength": 1 },
+                    "type": { "type": "string", "minLength": 1 }
+                  }
+                }
+              }
             }
           }
         },
